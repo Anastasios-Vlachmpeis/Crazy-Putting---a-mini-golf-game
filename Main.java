@@ -5,7 +5,8 @@ public class Main {
         ODE populationGrowth = new ExampleModelPopulation(); //chosen model
 
         int samplesPerSecond = 10;
-        ExamplePopulation.integrate(populationGrowth, 150, 0, 10, samplesPerSecond);
+        double[] y0 = new double[] {150};
+        ExamplePopulation.integrate(populationGrowth, y0, 0, 10, samplesPerSecond);
     }
     
 }
