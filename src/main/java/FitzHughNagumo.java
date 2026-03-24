@@ -24,7 +24,7 @@ public class FitzHughNagumo implements ODE {
     @Override
     public double[] getDerivative(double t, double[] y) {
         if (y == null || y.length < 2) {
-            throw new IllegalArgumentException("FitzHughNagumo expects state y with length larger than 2!");
+            throw new IllegalArgumentException("FitzHughNagumo expects state y with length ≥ 2!");
         }
         double v = y[0];
         double w = y[1];

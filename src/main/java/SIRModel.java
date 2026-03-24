@@ -17,7 +17,7 @@ public class SIRModel implements ODE {
     @Override
     public double[] getDerivative(double t, double[] y) {
         if (y == null || y.length < 3) {
-            throw new IllegalArgumentException("SIRModel expects state y with length larger than 3...");
+            throw new IllegalArgumentException("SIRModel expects state y with length ≥ 3...");
         }
         double s = y[0];
         double i = y[1];
