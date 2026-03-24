@@ -2,6 +2,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -21,15 +22,21 @@ public class GUI extends Application  {
     //parameter panel - changes based on ODE selection
     private VBox paramPanel = new VBox(5);
 
+    //two type of charts 
+    private LineChart<Number, Number> timeSeriesChart; 
+    private LineChart<Number, Number> phaseSpaceChart;
+
     @Override 
     public void start(Stage primaryStage) {
         VBox leftPanel = buildLeftPanel();
+        TabPane tabPane = buildTabPane();
 
-        // Placeholder root layout — you'll expand this later with charts
+        //might change root layout later, when I add charts 
         BorderPane root = new BorderPane();
         root.setLeft(leftPanel);
+        root.setCenter(tabPane);
 
-        // Make the window full-screen on launch
+        //make the window full-screen on launch
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         primaryStage.setX(screenBounds.getMinX());
         primaryStage.setY(screenBounds.getMinY());
@@ -37,10 +44,44 @@ public class GUI extends Application  {
         primaryStage.setHeight(screenBounds.getHeight());
 
         primaryStage.setScene(new Scene(root, 900, 600, Color.AZURE));
-        primaryStage.setTitle("ODE Solver - Team 17");
+        primaryStage.setTitle("Phase 1 - Team 17");
+
         primaryStage.show();
     }
 
+    private TabPane buildTabPane() {
+        //time series chart
+        NumberAxis tsX = new NumberAxis();
+        NumberAxis tsY = new NumberAxis();
+        tsX.setLabel("Time");
+        tsY.setLabel("Value");
+        timeSeriesChart = new LineChart<>(tsX, tsY);
+        timeSeriesChart.setTitle("Time Series");
+        timeSeriesChart.setAnimated(false);
+        timeSeriesChart.setCreateSymbols(false);
+ 
+        //phase space chart
+        NumberAxis psX = new NumberAxis();
+        NumberAxis psY = new NumberAxis();
+        phaseSpaceChart = new LineChart<>(psX, psY);
+        phaseSpaceChart.setTitle("Phase Space");
+        phaseSpaceChart.setAnimated(false);
+        phaseSpaceChart.setCreateSymbols(false);
+
+        //put both charts in different tabs
+        Tab timeSeriesTab = new Tab("Time Series", timeSeriesChart);
+        timeSeriesTab.setClosable(false); //make sure user doesn't accidentally close the tab 
+        Tab phaseSpaceTab = new Tab("Phase Space", phaseSpaceChart);
+        phaseSpaceTab.setClosable(false);
+
+        timeSeriesChart.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        phaseSpaceChart.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+ 
+        TabPane tabPane = new TabPane(timeSeriesTab, phaseSpaceTab);
+        BorderPane.setMargin(tabPane, new Insets(10));
+ 
+        return tabPane;
+    }
 
     private VBox buildLeftPanel() {
         VBox leftPanel = new VBox(10);
@@ -82,15 +123,15 @@ public class GUI extends Application  {
 
         leftPanel.getChildren().addAll(
             systemLabel, odeSelection,
-            new Separator(),
+            //new Separator(),
             solverLabel, solverSelection,
-            new Separator(),
+            //new Separator(),
             simLabel,
             stepLabel, stepSizeField,
             timeLabel, integrationTimeField,
-            new Separator(),
+            //new Separator(),
             paramLabel, paramPanel,
-            new Separator(),
+            //new Separator(),
             runButton
         );
 
@@ -104,10 +145,10 @@ public class GUI extends Application  {
         
             case "Lotka-Volterra" -> {
                 paramPanel.getChildren().addAll(
-                    new Label("x₀ (prey):"),        new TextField("10"),
-                    new Label("y₀ (predator):"),    new TextField("5"),
-                    new Label("α (prey growth):"),  new TextField("1.0"),
-                    new Label("β (predation):"),    new TextField("0.1"),
+                    new Label("x₀ (prey):"), new TextField("10"),
+                    new Label("y₀ (predator):"), new TextField("5"),
+                    new Label("α (prey growth):"), new TextField("1.0"),
+                    new Label("β (predation):"), new TextField("0.1"),
                     new Label("γ (predator loss):"),new TextField("1.5"),
                     new Label("δ (pred. growth):"), new TextField("0.075")
                 );
@@ -115,20 +156,20 @@ public class GUI extends Application  {
             case "SIR" -> {
                 paramPanel.getChildren().addAll(
                     new Label("S₀ (susceptible):"), new TextField("0.99"),
-                    new Label("I₀ (infected):"),    new TextField("0.01"),
-                    new Label("R₀ (recovered):"),   new TextField("0.0"),
+                    new Label("I₀ (infected):"), new TextField("0.01"),
+                    new Label("R₀ (recovered):"), new TextField("0.0"),
                     new Label("k (infection rate):"),new TextField("2.0"),
                     new Label("γ (recovery rate):"), new TextField("1.0"),
-                    new Label("µ (birth/death):"),   new TextField("0.001")
+                    new Label("µ (birth/death):"), new TextField("0.001")
                 );
             }
             case "FitzHugh-Nagumo" -> {
                 paramPanel.getChildren().addAll(
-                    new Label("V₀ (voltage):"),     new TextField("0.0"),
-                    new Label("W₀ (recovery):"),    new TextField("0.0"),
-                    new Label("a:"),                new TextField("0.7"),
-                    new Label("b:"),                new TextField("0.8"),
-                    new Label("ε (time scale):"),   new TextField("0.05"),
+                    new Label("V₀ (voltage):"), new TextField("0.0"),
+                    new Label("W₀ (recovery):"), new TextField("0.0"),
+                    new Label("a:"), new TextField("0.7"),
+                    new Label("b:"), new TextField("0.8"),
+                    new Label("ε (time scale):"), new TextField("0.05"),
                     new Label("I_ext (stimulus):"), new TextField("0.5")
                 );
             }
@@ -148,7 +189,8 @@ public class GUI extends Application  {
             .mapToDouble(n -> Double.parseDouble(((TextField) n).getText()))
             .toArray();
 
-        // TODO: pass params to input module which then passes it to ODE and to solver 
+        // TODO: pass params to input module which then passes it to ODE and to solver
+        // TODO: Based on what input module/solver gives as results build charts from that 
     }
     
     public static void main(String[] args) {
