@@ -1,14 +1,15 @@
 import java.util.Arrays;
 
 public class Solver {
-    public void integrate(ODE equation, double[] y0, double tStart, double tEnd, double numberOfSamples){
-        double stepSize = 1/numberOfSamples; //Convert to Delta t
+    public void integrate(ODE equation, double[] y0, double tStart, double tEnd, double samplesPerSecond){
+        double stepSize = 1/samplesPerSecond; //Convert to Delta t
         double[] y = Arrays.copyOf(y0, y0.length);// Make a copy, don't touch the original array
         //Here we calculate t(n+1) from t(n)
 
         //Print start values
+        System.out.printf("Time: %.2f seconds | ", tStart);
         for (int i = 0; i < y0.length; i++) {
-            System.out.printf("Time: %.2f seconds | Value: %.2f%n", tStart, y0[i]);
+            System.out.printf(" Value: %.2f", y0[i]);
         }
         for (double t = tStart; t < (tEnd-stepSize); t += stepSize) {
             // Call the interface method
@@ -19,8 +20,9 @@ public class Solver {
             }
 
             //Print current values
+            System.out.printf("%nTime: %.2f seconds | ", (t + stepSize));
             for (int i = 0; i < y.length; i++) {
-                System.out.printf("Time: %.2f seconds | Value: %.2f%n", (t + stepSize), y[i]);
+                System.out.printf(" Value: %.2f", y[i]);
             }
         }
     }
