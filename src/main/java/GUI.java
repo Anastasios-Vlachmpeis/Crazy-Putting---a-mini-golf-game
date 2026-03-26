@@ -176,7 +176,7 @@ public class GUI extends Application  {
         }
     }
 
-    private void runSimulation() {
+    /* private void runSimulation() {
         //read parameters, run selected solver, and update charts: 
         double h = Double.parseDouble(stepSizeField.getText());
         double tEnd = Double.parseDouble(integrationTimeField.getText());
@@ -191,10 +191,83 @@ public class GUI extends Application  {
 
         // TODO: pass params to input module which then passes it to ODE and to solver
         // TODO: Based on what input module/solver gives as results build charts from that 
-    }
+    }  */
+
+    private void runSimulation() {
+        String solver = solverSelection.getValue();
+        String system = odeSelection.getValue();
+
+        if (solver.equals("--Select--") || system.equals("--Select--")) {        // Checking if dropdowns are selected
+            displayAlert("Please select a solver and an ODE system.");
+            return;
+        }
+
+        double h;
+        double tEnd;
+        double[] params;
+
+        try {    // Checking the user is inputting valid numbers
+        h = Double.parseDouble(stepSizeField.getText());
+        tEnd = Double.parseDouble(integrationTimeField.getText());
+        params = paramPanel.getChildren().stream()
+            .filter(n -> n instanceof TextField)
+            .mapToDouble(n -> Double.parseDouble(((TextField) n).getText()))
+            .toArray();
+
+        } catch (NumberFormatException e) {
+            displayAlert("Please enter valid numbers.");
+            return;
+        }
+
+        if (h <= 0 || tEnd <= 0) {
+            displayAlert("Step size and integration time must be bigger than 0.");
+            return;
+        }
+
+        //Building ODE Object
+        ODE ode;
+        double[] y0;
+
+        // The initial conditions are set in params[0], params[1]. In case of SIR, there's three initial conditions y0 so we have to deal with it.
+        switch (system) {
+            case "Lotka-Volterra" -> {
+               y0 = new double[]{params[0], params[1]};
+               ode = new LotkaVolterra(params[2], params[3], params[4], params[5]);
+            }
+            case "SIR" -> {
+                y0 = new double[]{params[0], params[1], params[2]};
+                ode = new SIRModel(params[3], params[4], params[5]);
+            }
+            case "FitzHugh-Nagumo" -> {
+                y0 = new double[]{params[0], params[1]};
+                ode = new FitzHughNagumo(params[2], params[3], params[4], params[5]);
+            }
+            default -> {
+                displayAlert("Unknown system.");
+                return;
+            }
+        }
+        
+        Solver solverObj = new Solver();
+        double[][] results = solverObj.integrate(ode, y0, 0.0, tEnd, h);
+        
+        
+        // TODO system specific validation, solver selection (RK4?), Results prepared for plotting 
+        
+}
     
+    private void displayAlert(String message) {        // Alert to be given in case one of the previous conditions are met
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setTitle("Invalid Input");
+    alert.setHeaderText(null);       // This removes the default header
+    alert.setContentText(message);   // Main message shown (changes)
+    alert.showAndWait();             // Displays alert. Pauses execution until user closes it.
+    }
+
     public static void main(String[] args) {
         launch(args);
     }
 
 }
+
+
