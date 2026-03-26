@@ -64,7 +64,7 @@ public class GUI extends Application  {
         timeSeriesChart.setTitle("Time Series");
         timeSeriesChart.setAnimated(false);
         timeSeriesChart.setCreateSymbols(false);
- 
+
         //phase space chart
         NumberAxis psX = new NumberAxis();
         NumberAxis psY = new NumberAxis();
@@ -81,10 +81,10 @@ public class GUI extends Application  {
 
         timeSeriesChart.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         phaseSpaceChart.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
- 
+
         TabPane tabPane = new TabPane(timeSeriesTab, phaseSpaceTab);
         BorderPane.setMargin(tabPane, new Insets(10));
- 
+
         return tabPane;
     }
 

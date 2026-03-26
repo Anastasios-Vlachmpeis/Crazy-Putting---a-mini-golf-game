@@ -18,7 +18,7 @@ public class LotkaVolterra implements ODE {
     @Override
     public double[] getDerivative(double t, double[] y) {
         if (y == null || y.length < 2) {
-            throw new IllegalArgumentException("LotkaVolterra expects state y with length ≥ 2 (prey x, predator y).");
+            throw new IllegalArgumentException("LotkaVolterra expects state y with length >= 2 (prey x, predator y).");
         }
         double prey = y[0];
         double pred = y[1];
