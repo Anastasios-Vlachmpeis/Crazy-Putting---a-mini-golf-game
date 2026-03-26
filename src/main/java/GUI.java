@@ -26,9 +26,14 @@ public class GUI extends Application  {
     private LineChart<Number, Number> timeSeriesChart; 
     private LineChart<Number, Number> phaseSpaceChart;
 
+    private InputModule inputModule;
+
     @Override 
     public void start(Stage primaryStage) {
         VBox leftPanel = buildLeftPanel();
+
+        inputModule = new InputModule(stepSizeField, integrationTimeField, solverSelection, odeSelection, paramPanel);
+
         TabPane tabPane = buildTabPane();
 
         //might change root layout later, when I add charts 
@@ -138,6 +143,7 @@ public class GUI extends Application  {
         return leftPanel;
     }
 
+
     private void updateParameterFields(String system, VBox paramPanel) {
         paramPanel.getChildren().clear();
 
@@ -167,8 +173,8 @@ public class GUI extends Application  {
                 paramPanel.getChildren().addAll(
                     new Label("V₀ (voltage):"), new TextField("0.0"),
                     new Label("W₀ (recovery):"), new TextField("0.0"),
-                    new Label("a:"), new TextField("0.7"),
-                    new Label("b:"), new TextField("0.8"),
+                    new Label("a:"), new TextField("1.0"),                   // Proper
+                    new Label("b:"), new TextField("1.0"),
                     new Label("ε (time scale):"), new TextField("0.05"),
                     new Label("I_ext (stimulus):"), new TextField("0.5")
                 );
@@ -176,83 +182,47 @@ public class GUI extends Application  {
         }
     }
 
-    /* private void runSimulation() {
-        //read parameters, run selected solver, and update charts: 
-        double h = Double.parseDouble(stepSizeField.getText());
-        double tEnd = Double.parseDouble(integrationTimeField.getText());
-        String solver = solverSelection.getValue();
-        String system = odeSelection.getValue();
-
-        //read dynamic parameter fields in order
-        double[] params = paramPanel.getChildren().stream()
-            .filter(n -> n instanceof TextField)
-            .mapToDouble(n -> Double.parseDouble(((TextField) n).getText()))
-            .toArray();
-
-        // TODO: pass params to input module which then passes it to ODE and to solver
-        // TODO: Based on what input module/solver gives as results build charts from that 
-    }  */
-
     private void runSimulation() {
-        String solver = solverSelection.getValue();
-        String system = odeSelection.getValue();
+        InputData input;
 
-        if (solver.equals("--Select--") || system.equals("--Select--")) {        // Checking if dropdowns are selected
-            displayAlert("Please select a solver and an ODE system.");
+        try {
+            input = inputModule.readInput();
+        } catch (IllegalArgumentException e) {
+            displayAlert(e.getMessage());
             return;
         }
 
-        double h;
-        double tEnd;
-        double[] params;
+        String solver = input.solver;
+        String system = input.system;
+        double h = input.h;
+        double tEnd = input.tEnd;
+        double[] params = input.params;
 
-        try {    // Checking the user is inputting valid numbers
-        h = Double.parseDouble(stepSizeField.getText());
-        tEnd = Double.parseDouble(integrationTimeField.getText());
-        params = paramPanel.getChildren().stream()
-            .filter(n -> n instanceof TextField)
-            .mapToDouble(n -> Double.parseDouble(((TextField) n).getText()))
-            .toArray();
-
-        } catch (NumberFormatException e) {
-            displayAlert("Please enter valid numbers.");
-            return;
-        }
-
-        if (h <= 0 || tEnd <= 0) {
-            displayAlert("Step size and integration time must be bigger than 0.");
-            return;
-        }
-
-        //Building ODE Object
         ODE ode;
         double[] y0;
 
-        // The initial conditions are set in params[0], params[1]. In case of SIR, there's three initial conditions y0 so we have to deal with it.
+        try {
+            ode = ODEFactory.createODE(system, params);
+        } catch (IllegalArgumentException e) {
+            displayAlert(e.getMessage());
+            return;
+        }
+        
         switch (system) {
-            case "Lotka-Volterra" -> {
-               y0 = new double[]{params[0], params[1]};
-               ode = new LotkaVolterra(params[2], params[3], params[4], params[5]);
-            }
-            case "SIR" -> {
-                y0 = new double[]{params[0], params[1], params[2]};
-                ode = new SIRModel(params[3], params[4], params[5]);
-            }
-            case "FitzHugh-Nagumo" -> {
-                y0 = new double[]{params[0], params[1]};
-                ode = new FitzHughNagumo(params[2], params[3], params[4], params[5]);
-            }
+            case "Lotka-Volterra" -> y0 = new double[]{params[0], params[1]};
+            case "SIR" -> y0 = new double[]{params[0], params[1], params[2]};
+            case "FitzHugh-Nagumo" -> y0 = new double[]{params[0], params[1]};
             default -> {
                 displayAlert("Unknown system.");
                 return;
-            }
-        }
+    }
+}
         
-        Solver solverObj = new Solver();
+        Solver solverObj = new Solver();                                             
         double[][] results = solverObj.integrate(ode, y0, 0.0, tEnd, h);
         
         
-        // TODO system specific validation, solver selection (RK4?), Results prepared for plotting 
+        // TODO solver selection (RK4?), Results prepared for plotting 
         
 }
     
