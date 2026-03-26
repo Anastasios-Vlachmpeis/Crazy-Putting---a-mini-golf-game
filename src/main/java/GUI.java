@@ -215,16 +215,31 @@ public class GUI extends Application  {
             default -> {
                 displayAlert("Unknown system.");
                 return;
+            }
+        }
+
+        double[][] results;
+
+        switch (solver) {
+            case "Euler" -> {
+                Solver solverObj = new Solver();
+                results = solverObj.integrate(ode, y0, 0.0, tEnd, h);
+            }
+
+            case "Runge-Kutta" -> {
+                RungeKuttaSolver solverObj = new RungeKuttaSolver();
+                results = solverObj.solve(ode, y0, 0.0, tEnd, h);
+            }
+
+            default -> {
+                displayAlert("Unknown solver.");
+                return;
+            }
+        }  
+
+        //TODO: use results for plotting
+           
     }
-}
-        
-        Solver solverObj = new Solver();                                             
-        double[][] results = solverObj.integrate(ode, y0, 0.0, tEnd, h);
-        
-        
-        // TODO solver selection (RK4?), Results prepared for plotting 
-        
-}
     
     private void displayAlert(String message) {        // Alert to be given in case one of the previous conditions are met
     Alert alert = new Alert(Alert.AlertType.ERROR);
