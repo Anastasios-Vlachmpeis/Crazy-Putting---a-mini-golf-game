@@ -35,29 +35,41 @@ public class RungeKuttaSolver {
         int steps = (int) Math.ceil((tEnd - tStart) / h); 
         
 
-        double[][] solution = new double[steps + 1][y0.length]; // [nr of steps + original state][variavle in y0]
+        double[][] solution = new double[steps + 1][y0.length + 1]; // [nr of steps + original state][t, y0, y1, ...]
 
         double t = tStart;
         double[] y = Arrays.copyOf(y0, y0.length);// Make a copy, don't touch the original array
 
-        System.out.printf("%nTime: %.2f seconds | ", t);
-        for (int i = 0; i < y0.length; i++) {// save the first state and print
-            solution[0][i] = y0[i];
-            System.out.printf(" Value: %.2f", solution[0][i]);
-        }
+        //store and print initial state
+        solution[0] = storeRow(t, y);
+        // System.out.printf("%nTime: %.2f seconds | ", t);
+
+        // for (int i = 0; i < y0.length; i++) {
+        //     System.out.printf(" Value: %.2f", y0[i]);
+        // }
 
         for (int step = 1; step < solution.length; step++) { // do the solving
             y = iteration(equation, t, y, h);
             t += h; 
             
-            System.out.printf("%nTime: %.2f seconds | ", t);
-            for (int i = 0; i < y0.length; i++) {
-                solution[step][i] = y[i];
-                System.out.printf(" Value: %.2f ", solution[step][i]);
-            }
+            solution[step] = storeRow(t, y);
+            // System.out.printf("%nTime: %.2f seconds | ", t);
+
+            // for (int i = 0; i < y.length; i++) {
+            //     System.out.printf(" Value: %.2f ", y[i]);
+            // }
         }
 
         return solution;
     }
 
+    //Same helper as in EulerSolver -> row[0] = time & row[1, 2, ..., n] = variables
+    public double[] storeRow(double t, double[] y) {
+        double[] row = new double[y.length + 1];
+        row[0] = t;
+        for (int i = 0; i < y.length; i++) {
+            row[i + 1] = y[i];
+        }
+        return row;
+    }
 }

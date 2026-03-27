@@ -1,10 +1,5 @@
-import javafx.scene.Scene;
-import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
 
 // This class is responsible for reading and validating input from The GUI
 
@@ -28,7 +23,7 @@ public class InputModule {
         String solver = solverSelection.getValue();
         String system = odeSelection.getValue();
 
-        if (solver.equals("--Select--") || system.equals("--Select--")) {                            // Checking if dropdowns are selected
+        if (solver.equals("--Select--") || system.equals("--Select--")) { // Checking if dropdowns are selected
             throw new IllegalArgumentException("Please select a solver and an ODE system.");
         }
 

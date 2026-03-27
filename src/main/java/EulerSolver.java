@@ -1,6 +1,6 @@
 import java.util.Arrays;
 
-public class Solver {
+public class EulerSolver {
     public double[][] integrate(ODE equation, double[] y0, double tStart, double tEnd, double h){   // Now we're storing the values from solver instead of printing them
         double stepSize = h; //Since it's just h in the GUI
         double[] y = Arrays.copyOf(y0, y0.length);// Make a copy, don't touch the original array
@@ -9,10 +9,10 @@ public class Solver {
         java.util.ArrayList<double[]> results = new java.util.ArrayList<>();
 
         //Print start values
-        System.out.printf("Time: %.2f seconds | ", tStart);
-        for (int i = 0; i < y0.length; i++) {
-            System.out.printf(" Value: %.2f", y0[i]);
-        }
+        // System.out.printf("Time: %.2f seconds | ", tStart);
+        // for (int i = 0; i < y0.length; i++) {
+        //     System.out.printf(" Value: %.2f", y0[i]);
+        // }
         results.add(storeRow(tStart, y)); // We store the first point
         for (double t = tStart; t < (tEnd-stepSize); t += stepSize) {
             // Call the interface method
@@ -25,10 +25,10 @@ public class Solver {
             results.add(storeRow(t + stepSize, y)); // Here we store each new point
 
             //Print current values
-            System.out.printf("%nTime: %.2f seconds | ", (t + stepSize));
-            for (int i = 0; i < y.length; i++) {
-                System.out.printf(" Value: %.2f", y[i]);
-            }
+            // System.out.printf("%nTime: %.2f seconds | ", (t + stepSize));
+            // for (int i = 0; i < y.length; i++) {
+            //     System.out.printf(" Value: %.2f", y[i]);
+            // }
         }
         return results.toArray(new double[0][]);
     }
