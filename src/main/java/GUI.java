@@ -28,6 +28,9 @@ public class GUI extends Application  {
 
     private InputModule inputModule;
 
+    //Flag to prevent multiple simultaneous updates when user changes input so that graphs and values get mixed up  
+    private boolean updatingParams = false;
+
     @Override 
     public void start(Stage primaryStage) {
         VBox leftPanel = buildLeftPanel();
@@ -139,7 +142,12 @@ public class GUI extends Application  {
         updateParameterFields(odeSelection.getValue(), paramPanel);
 
         //update paramPanel when ODE selection changes:
-        odeSelection.setOnAction(e -> updateParameterFields(odeSelection.getValue(), paramPanel));
+        odeSelection.setOnAction(e -> {
+            updatingParams = true; //block simulation so that panel can be rebuild
+            updateParameterFields(odeSelection.getValue(), paramPanel);
+            updatingParams = false;
+            tryRunSimulation(); //can run simulation as soon as panel is properly updated
+        });
 
         leftPanel.getChildren().addAll(
             systemLabel, odeSelection,
@@ -200,10 +208,12 @@ public class GUI extends Application  {
     }
 
     private void tryRunSimulation() {
-        // Don't run if user hasn't selected a system or solver yet
-        if (odeSelection.getValue().equals("--Select--") ||
-            solverSelection.getValue().equals("--Select--")) return;
+        if(updatingParams) return; //don't run if the parameter panel is still being rebuild
 
+        //don't run if user hasn't selected a system or solver yet
+        if (odeSelection.getValue().equals("--Select--") ||
+            solverSelection.getValue().equals("--Select--")) 
+            return;
         try {
             runSimulation();
         } catch (NumberFormatException e) {
@@ -282,7 +292,7 @@ public class GUI extends Application  {
         timeSeriesChart.getData().clear();
         phaseSpaceChart.getData().clear();
 
-        //need to set x-axis because of Math.ceil() in borh solvers (or else we have a weird white space at the end of the time series chart)
+        //need to set x-axis because of Math.ceil() in both solvers (or else we have a weird white space at the end of the time series chart)
             // Get actual start and end time from the results
             double tStart = results[0][0];
             double tEnd   = results[results.length - 1][0];
