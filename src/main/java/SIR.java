@@ -2,13 +2,13 @@
  * SIR epidemic model with demographics
  * State: y[0] = S (susceptible), y[1] = I (infected), y[2] = R (recovered)
  */
-public class SIRModel implements ODE {
+public class SIR implements ODE {
 
     private final double k;
     private final double g;
     private final double m;
 
-    public SIRModel(double k, double g, double m) {
+    public SIR(double k, double g, double m) {
         this.k = k;
         this.g = g;
         this.m = m;

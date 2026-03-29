@@ -10,10 +10,13 @@ public class ODEFactory {
                 return new LotkaVolterra(params[2], params[3], params[5], params[4]);   //Switched 4 adn 5 to correct a mistake
 
             case "SIR":
-                return new SIRModel(params[3], params[4], params[5]);
+                return new SIR(params[3], params[4], params[5]);
 
             case "FitzHugh-Nagumo":
                 return new FitzHughNagumo(params[2], params[3], params[4], params[5]);
+
+            /* case "NewSystem":
+                return new NewSystem(params[2]); */
 
             default:
                 throw new IllegalArgumentException("Unknown system.");
