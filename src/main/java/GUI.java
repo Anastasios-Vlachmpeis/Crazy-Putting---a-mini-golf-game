@@ -22,6 +22,10 @@ public class GUI extends Application  {
     //parameter panel - changes based on ODE selection
     private VBox paramPanel = new VBox(5);
 
+    //SIR has more than 2 variables to compare in phase Space 
+    private ComboBox<String> phaseVarSelector = new ComboBox<>();
+    private Label phaseVarLabel = new Label("Phase Space Variables:");
+
     //two type of charts 
     private LineChart<Number, Number> timeSeriesChart; 
     private LineChart<Number, Number> phaseSpaceChart;
@@ -73,6 +77,11 @@ public class GUI extends Application  {
         //for dropdowns —> trigger immediately
         solverSelection.valueProperty().addListener((obs, oldVal, newVal) -> tryRunSimulation());
         odeSelection.valueProperty().addListener((obs, oldVal, newVal) -> tryRunSimulation());
+
+        phaseVarSelector.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) 
+                tryRunSimulation();
+        });
     }
 
     private TabPane buildTabPane() {
@@ -138,7 +147,16 @@ public class GUI extends Application  {
         //parameter panel - will be updated based on ODE selection
         Label paramLabel = new Label("Initial Conditions & Parameters:");
 
-        //for the default ODE:
+        //variable selector for phase space (only for SIR)
+        phaseVarSelector.getItems().addAll("S vs I", "S vs R", "I vs R");
+        phaseVarSelector.setValue("--Select--");
+        phaseVarSelector.setMaxWidth(Double.MAX_VALUE);
+        phaseVarLabel.setVisible(false);
+        phaseVarLabel.setManaged(false); //removes it from layout when hidden, so there is no weird white space
+        phaseVarSelector.setVisible(false);
+        phaseVarSelector.setManaged(false);
+
+        //for default ODE:
         updateParameterFields(odeSelection.getValue(), paramPanel);
 
         //update paramPanel when ODE selection changes:
@@ -153,13 +171,12 @@ public class GUI extends Application  {
             systemLabel, odeSelection,
             new Separator(),
             solverLabel, solverSelection,
+            new Separator(), 
+            phaseVarLabel, phaseVarSelector,
             new Separator(),
-            simLabel,
-            stepLabel, stepSizeField,
-            timeLabel, integrationTimeField,
+            simLabel, stepLabel, stepSizeField, timeLabel, integrationTimeField,
             new Separator(),
-            paramLabel, paramPanel,
-            new Separator()
+            paramLabel, paramPanel
         );
 
         return leftPanel;
@@ -168,6 +185,16 @@ public class GUI extends Application  {
 
     private void updateParameterFields(String system, VBox paramPanel) {
         paramPanel.getChildren().clear();
+
+        //show phase variable selector only for SIR (only one with 3 variables)
+        boolean isSIR = system.equals("SIR");
+        phaseVarLabel.setVisible(isSIR);
+        phaseVarLabel.setManaged(isSIR);
+        phaseVarSelector.setVisible(isSIR);
+        phaseVarSelector.setManaged(isSIR);
+        if (isSIR) {
+            phaseVarSelector.setValue("--Select--"); // default
+        }
 
         switch (system) {
         
@@ -202,7 +229,8 @@ public class GUI extends Application  {
         TextField field = new TextField(defaultValue);
         field.setMaxWidth(Double.MAX_VALUE);
         field.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
-            if (!isNowFocused) tryRunSimulation();
+            if (!isNowFocused) 
+                tryRunSimulation();
         });
         panel.getChildren().addAll(new Label(labelText), field);
     }
@@ -217,7 +245,7 @@ public class GUI extends Application  {
         try {
             runSimulation();
         } catch (NumberFormatException e) {
-            
+            //ignore without doing anythig
         }
     }
 
@@ -332,14 +360,29 @@ public class GUI extends Application  {
             timeSeriesChart.getData().add(series);
         }
 
-        //phase space: var[1] vs var[2] (skip time at index 0)
+        //phase space: compare variables (a bit different for SIR since we have 3 variables)
+        int xVar; 
+        int yVar;
+
+        if(system.equals("SIR") && phaseVarSelector.getValue() != null) { //only for SIR, user can choose which variables to compare in phase space
+            switch (phaseVarSelector.getValue()) {
+                case "S vs I" -> {xVar = 1; yVar = 2;} //numbers to select correct column later
+                case "S vs R" -> {xVar = 1; yVar = 3;}
+                case "I vs R" -> {xVar = 2; yVar = 3;}
+                default -> {xVar = 1; yVar = 2;} //default first 2 variables to S vs I
+            }
+        } else {
+            xVar = 1; //if we don'T have SIR -> always choose variables in 2. and 3. column (1. column is time variable) 
+            yVar = 2; 
+        }
+
         XYChart.Series<Number, Number> phaseSeries = new XYChart.Series<>();
-        phaseSeries.setName(varNames[0] + " vs " + varNames[1]);
-        phaseSpaceChart.getXAxis().setLabel(varNames[0]);
-        phaseSpaceChart.getYAxis().setLabel(varNames[1]);
+        phaseSeries.setName(varNames[xVar - 1] + " vs " + varNames[yVar - 1]);
+        phaseSpaceChart.getXAxis().setLabel(varNames[xVar - 1]);
+        phaseSpaceChart.getYAxis().setLabel(varNames[yVar - 1]);
 
         for (double [] row : results) {
-            phaseSeries.getData().add(new XYChart.Data<>(row[1], row[2]));
+            phaseSeries.getData().add(new XYChart.Data<>(row[xVar], row[yVar]));
         }
         phaseSpaceChart.getData().add(phaseSeries);
 
