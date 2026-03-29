@@ -187,14 +187,18 @@ public class GUI extends Application  {
         paramPanel.getChildren().clear();
 
         //show phase variable selector only for SIR (only one with 3 variables)
-        boolean isSIR = system.equals("SIR");
-        phaseVarLabel.setVisible(isSIR);
-        phaseVarLabel.setManaged(isSIR);
-        phaseVarSelector.setVisible(isSIR);
-        phaseVarSelector.setManaged(isSIR);
-        if (isSIR) {
-            phaseVarSelector.setValue("--Select--"); // default
-        }
+        boolean showSelector = system.equals("SIR" /*|| system.equals("NewSystem")*/); //only if newSystem has several variables to compare in phase space
+        phaseVarLabel.setVisible(showSelector);
+        phaseVarLabel.setManaged(showSelector);
+        phaseVarSelector.setVisible(showSelector);
+        phaseVarSelector.setManaged(showSelector);
+        if (system.equals("SIR")) {
+            phaseVarSelector.getItems().setAll("S vs I", "S vs R", "I vs R");
+            phaseVarSelector.setValue("--Select--");
+        } /*else if (system.equals("NewSystem")) {
+            phaseVarSelector.getItems().setAll("A vs B", "A vs C", "B vs C"); //use correct variable names
+            phaseVarSelector.setValue("--Select--");
+        }*/
 
         switch (system) {
         
@@ -378,7 +382,13 @@ public class GUI extends Application  {
                 case "I vs R" -> {xVar = 2; yVar = 3;}
                 default -> {xVar = 1; yVar = 2;} //default first 2 variables to S vs I
             }
-        } else {
+        } /*else if (system.equals("NewSystem") && phaseVarSelector.getValue() != null) {
+            switch (phaseVarSelector.getValue()) {
+                case "A vs B" -> { xVar = 1; yVar = 2; }
+                case "A vs C" -> { xVar = 1; yVar = 3; }
+                case "B vs C" -> { xVar = 2; yVar = 3; }
+                default       -> { xVar = 1; yVar = 2; }
+            } */ else {
             xVar = 1; //if we don'T have SIR -> always choose variables in 2. and 3. column (1. column is time variable) 
             yVar = 2; 
         }
