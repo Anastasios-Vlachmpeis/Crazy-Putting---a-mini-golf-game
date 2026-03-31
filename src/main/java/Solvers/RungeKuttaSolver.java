@@ -55,15 +55,4 @@ public class RungeKuttaSolver implements Solver {
 
         return solution;
     }
-
-    // Same helper as in EulerSolver -> row[0] = time & row[1, 2, ..., n] =
-    // variables
-    public double[] storeRow(double t, double[] y) {
-        double[] row = new double[y.length + 1];
-        row[0] = t;
-        for (int i = 0; i < y.length; i++) {
-            row[i + 1] = y[i];
-        }
-        return row;
-    }
 }

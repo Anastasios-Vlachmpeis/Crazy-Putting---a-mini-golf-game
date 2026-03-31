@@ -3,14 +3,13 @@ import java.util.Arrays;
 
 import Systems.ODE;
 
-public class EulerSolver implements Solver{
-    
+public class EulerSolver implements Solver {
     @Override
     public double[][] solve(ODE equation, double[] y0, double tStart, double tEnd, double h){   // Now we're storing the values from solver instead of printing them
         double stepSize = h; //Since it's just h in the GUI
         double[] y = Arrays.copyOf(y0, y0.length);// Make a copy, don't touch the original array
         //Here we calculate t(n+1) from t(n)
-
+    
         java.util.ArrayList<double[]> results = new java.util.ArrayList<>();
 
         results.add(storeRow(tStart, y)); // We store the first point
@@ -26,14 +25,5 @@ public class EulerSolver implements Solver{
 
         }
         return results.toArray(new double[0][]);
-    }
-
-    public double[] storeRow(double t, double [] y) { // Helper method that packages time t and current state y (needed for the charts)
-        double[] row = new double[y.length + 1];
-        row[0] = t;
-        for (int i = 0; i < y.length; i++) {
-            row[i + 1] = y[i]; 
-        }
-        return row;
     }
 }
