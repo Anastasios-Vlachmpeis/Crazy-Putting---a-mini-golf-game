@@ -1,6 +1,6 @@
 package Systems;
-// This class is created in order to prevent GUI from constructing the ODE (And therefore meeting the "independent" requirement)
 
+// This class is created in order to prevent GUI from constructing the ODE (And therefore meeting the "independent" requirement)
 public class ODEFactory {
 
     public static ODE createODE(String system, double[] params) {
