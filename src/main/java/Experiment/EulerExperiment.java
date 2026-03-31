@@ -22,7 +22,7 @@ public class EulerExperiment {
             writer.println("h,steps,numerical,exact,error,runtime_ms");
 
             for (double h : stepSizes) {
-                double[][] results = solver.integrate(ode, y0, tStart, tEnd, h);
+                double[][] results = solver.solve(ode, y0, tStart, tEnd, h);
 
                 double numerical = results[results.length - 1][1];
                 double exact = Math.E;
@@ -31,7 +31,7 @@ public class EulerExperiment {
 
                 long start = System.nanoTime();
                 for (int i = 0; i < repeats; i++) {
-                    solver.integrate(ode, y0, tStart, tEnd, h);
+                    solver.solve(ode, y0, tStart, tEnd, h);
                 }
                 long end = System.nanoTime();
 

@@ -1,3 +1,4 @@
+Solvers/Solver.class
 Experiment/ExponentialODE.class
 Experiment/EulerExperiment.class
 Examples/ExampleLotkaVolterra.class

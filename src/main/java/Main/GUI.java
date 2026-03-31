@@ -232,11 +232,11 @@ public class GUI extends Application  {
                 addParamField("ε (time scale):", "0.05", paramPanel);
                 addParamField("I_ext (stimulus):", "0.5", paramPanel);
             }
-            /* case "NewSystem" -> {
+            case "NewSystem" -> {
                 addParamField("y₀:", "0.0", paramPanel);
                 addParamField("y₁:", "0.0", paramPanel);
                 addParamField("a:", "1.0", paramPanel);
-            } */
+            }
         }
     }
 
@@ -294,7 +294,7 @@ public class GUI extends Application  {
             case "Lotka-Volterra" -> y0 = new double[]{params[0], params[1]};
             case "SIR" -> y0 = new double[]{params[0], params[1], params[2]};
             case "FitzHugh-Nagumo" -> y0 = new double[]{params[0], params[1]};
-            /* case "NewSystem" -> y0 = new double[]{params[0], params[1]}; */
+            case "NewSystem" -> y0 = new double[]{params[0], params[1]};
             default -> {
                 displayAlert("Unknown system.");
                 return;
@@ -306,7 +306,7 @@ public class GUI extends Application  {
         switch (solver) {
             case "Euler" -> {
                 EulerSolver solverObj = new EulerSolver();
-                results = solverObj.integrate(ode, y0, 0.0, tEnd, h);
+                results = solverObj.solve(ode, y0, 0.0, tEnd, h);
             }
 
             case "Runge-Kutta" -> {
@@ -321,7 +321,6 @@ public class GUI extends Application  {
         }  
 
         updateCharts(system, results);
-           
     }
     
     private void displayAlert(String message) { // Alert to be given in case one of the previous conditions are met
@@ -353,7 +352,7 @@ public class GUI extends Application  {
             case "Lotka-Volterra" -> new String[]{"Prey (x)", "Predator (y)"};
             case "SIR" -> new String[]{"Susceptible (S)", "Infected (I)", "Recovered (R)"};
             case "FitzHugh-Nagumo" -> new String[]{"Voltage (V)", "Recovery (W)"};
-            /* case "NewSystem" -> new String[]{"Variable 0", "Variable 1"}; */
+            case "NewSystem" -> new String[]{"Variable 0", "Variable 1"};
             default -> new String[]{"y0", "y1", "y2"};
         };
 

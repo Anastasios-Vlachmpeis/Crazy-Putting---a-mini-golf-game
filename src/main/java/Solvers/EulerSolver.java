@@ -3,8 +3,10 @@ import java.util.Arrays;
 
 import Systems.ODE;
 
-public class EulerSolver {
-    public double[][] integrate(ODE equation, double[] y0, double tStart, double tEnd, double h){   // Now we're storing the values from solver instead of printing them
+public class EulerSolver implements Solver{
+    
+    @Override
+    public double[][] solve(ODE equation, double[] y0, double tStart, double tEnd, double h){   // Now we're storing the values from solver instead of printing them
         double stepSize = h; //Since it's just h in the GUI
         double[] y = Arrays.copyOf(y0, y0.length);// Make a copy, don't touch the original array
         //Here we calculate t(n+1) from t(n)
