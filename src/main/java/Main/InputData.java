@@ -1,5 +1,7 @@
 package Main;
+
 // Works as a data container for all the user input
+
 public class InputData {
     public final String solver;
     public final String system;
