@@ -7,9 +7,9 @@ public class NewSystem implements ODE {
 
     @Override
     public double[] getDerivative(double t, double[] y) {
-        double dy0 = /* equation for first variable */;
-        double dy1 = /* equation for second variable */;
-        double dy2 = /* equation for third variable, if needed */;
+        double dy0 = 1/* equation for first variable */;
+        double dy1 = 1/* equation for second variable */;
+        double dy2 = 1/* equation for third variable, if needed */;
         return new double[]{ dy0, dy1, dy2};
     }
 }

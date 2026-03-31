@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 
 public class EulerExperiment {
     public static void main(String[] args) {
-        Solver solver = new Solver();
+        EulerSolver solver = new EulerSolver();
         ODE ode = new ExponentialODE();
 
         double[] y0 = {1.0};
