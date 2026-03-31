@@ -1,4 +1,5 @@
 package Main;
+
 import Solvers.EulerSolver;
 import Solvers.RungeKuttaSolver;
 import Systems.ODE;

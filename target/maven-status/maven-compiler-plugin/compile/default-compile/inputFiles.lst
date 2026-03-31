@@ -1,12 +1,15 @@
-/Users/hlm.schulze/Desktop/Project 1-2/team_17/src/main/java/ODEFactory.java
-/Users/hlm.schulze/Desktop/Project 1-2/team_17/src/main/java/LotkaVolterra.java
-/Users/hlm.schulze/Desktop/Project 1-2/team_17/src/main/java/InputData.java
-/Users/hlm.schulze/Desktop/Project 1-2/team_17/src/main/java/FitzHughNagumo.java
-/Users/hlm.schulze/Desktop/Project 1-2/team_17/src/main/java/GUI.java
-/Users/hlm.schulze/Desktop/Project 1-2/team_17/src/main/java/ExampleModelPopulation.java
-/Users/hlm.schulze/Desktop/Project 1-2/team_17/src/main/java/Main.java
-/Users/hlm.schulze/Desktop/Project 1-2/team_17/src/main/java/InputModule.java
-/Users/hlm.schulze/Desktop/Project 1-2/team_17/src/main/java/ODE.java
-/Users/hlm.schulze/Desktop/Project 1-2/team_17/src/main/java/EulerSolver.java
-/Users/hlm.schulze/Desktop/Project 1-2/team_17/src/main/java/SIRModel.java
-/Users/hlm.schulze/Desktop/Project 1-2/team_17/src/main/java/RungeKuttaSolver.java
+/Users/damian/Documents/Uni/Year 1/Project 1-2/project/team_17/src/main/java/Systems/NewSystem.java
+/Users/damian/Documents/Uni/Year 1/Project 1-2/project/team_17/src/main/java/Systems/FitzHughNagumo.java
+/Users/damian/Documents/Uni/Year 1/Project 1-2/project/team_17/src/main/java/Systems/LotkaVolterra.java
+/Users/damian/Documents/Uni/Year 1/Project 1-2/project/team_17/src/main/java/Systems/ODE.java
+/Users/damian/Documents/Uni/Year 1/Project 1-2/project/team_17/src/main/java/Main/GUI.java
+/Users/damian/Documents/Uni/Year 1/Project 1-2/project/team_17/src/main/java/Experiment/ExponentialODE.java
+/Users/damian/Documents/Uni/Year 1/Project 1-2/project/team_17/src/main/java/Systems/SIR.java
+/Users/damian/Documents/Uni/Year 1/Project 1-2/project/team_17/src/main/java/Examples/ExampleLotkaVolterra.java
+/Users/damian/Documents/Uni/Year 1/Project 1-2/project/team_17/src/main/java/Main/InputModule.java
+/Users/damian/Documents/Uni/Year 1/Project 1-2/project/team_17/src/main/java/Systems/ODEFactory.java
+/Users/damian/Documents/Uni/Year 1/Project 1-2/project/team_17/src/main/java/Main/InputData.java
+/Users/damian/Documents/Uni/Year 1/Project 1-2/project/team_17/src/main/java/Solvers/RungeKuttaSolver.java
+/Users/damian/Documents/Uni/Year 1/Project 1-2/project/team_17/src/main/java/Experiment/EulerExperiment.java
+/Users/damian/Documents/Uni/Year 1/Project 1-2/project/team_17/src/main/java/Solvers/EulerSolver.java
+/Users/damian/Documents/Uni/Year 1/Project 1-2/project/team_17/src/main/java/Examples/ExampleModelPopulation.java
