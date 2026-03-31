@@ -13,7 +13,7 @@ public class EulerSolver implements Solver {
         java.util.ArrayList<double[]> results = new java.util.ArrayList<>();
 
         results.add(storeRow(tStart, y)); // We store the first point
-        for (double t = tStart; t < (tEnd-stepSize); t += stepSize) {
+        for (double t = tStart; t < tEnd; t += stepSize) {
             // Call the interface method
             double[] slope = equation.getDerivative(t, y);
             //Eulers method: new_y = old_y + difference
