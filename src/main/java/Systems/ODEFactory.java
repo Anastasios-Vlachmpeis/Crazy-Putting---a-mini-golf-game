@@ -17,7 +17,7 @@ public class ODEFactory {
                 return new FitzHughNagumo(params[2], params[3], params[4], params[5]);
 
             /* case "NewSystem":
-                return new NewSystem(params[2]); */
+                return new NewSystem(params[2]); */ //only for GUI
 
             default:
                 throw new IllegalArgumentException("Unknown system.");

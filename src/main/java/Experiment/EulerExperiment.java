@@ -1,6 +1,9 @@
+package Experiment;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import Solvers.EulerSolver;
+import Systems.ODE;
 
 // Same structure as RungeKuttaExperiment, but uses the Euler solver and writes to euler_results.csv
 public class EulerExperiment {
@@ -19,7 +22,7 @@ public class EulerExperiment {
             writer.println("h,steps,numerical,exact,error,runtime_ms");
 
             for (double h : stepSizes) {
-                double[][] results = solver.integrate(ode, y0, tStart, tEnd, h);
+                double[][] results = solver.solve(ode, y0, tStart, tEnd, h);
 
                 // Euler stores [time, state] per row, so index [1] is used instead of [0] as in RK4
                 double numerical = results[results.length - 1][1];
@@ -29,7 +32,7 @@ public class EulerExperiment {
 
                 long start = System.nanoTime();
                 for (int i = 0; i < repeats; i++) {
-                    solver.integrate(ode, y0, tStart, tEnd, h);
+                    solver.solve(ode, y0, tStart, tEnd, h);
                 }
                 long end = System.nanoTime();
                 double runtimeMs = (end - start) / 1_000_000.0 / repeats;
