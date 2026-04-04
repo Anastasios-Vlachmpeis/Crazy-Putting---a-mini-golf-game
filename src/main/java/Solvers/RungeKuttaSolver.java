@@ -28,7 +28,7 @@ public class RungeKuttaSolver implements Solver {
         for (int i = 0; i < y.length; i++) {
             nextY[i] = y[i] + (h / 6.0) * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]); // next values of each entry of y
         }
-
+        
         return nextY;
     }
 
