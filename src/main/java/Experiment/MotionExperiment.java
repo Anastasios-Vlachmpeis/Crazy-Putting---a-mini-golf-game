@@ -15,11 +15,11 @@ public class MotionExperiment {
         GolfODE course = new GolfODE(courseSettings);
         RungeKuttaSolver solver = new RungeKuttaSolver();
 
-        double[][] results = solver.solve(course, ball.getState(), 0, 10, 0.5);
+        double[][] results = solver.solveBall(course, ball.getState(), 0.5);
 
-        for (double[] row : results) {
-            System.out.println(Arrays.toString(row));
-        }
+        // for (double[] row : results) {
+        //     System.out.println(Arrays.toString(row));
+        // }
     }
 
 }

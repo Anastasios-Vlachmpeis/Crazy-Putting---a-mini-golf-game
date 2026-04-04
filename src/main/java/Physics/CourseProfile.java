@@ -3,6 +3,7 @@ package Physics;
 public class CourseProfile {
     private final double miuK; // kinetic friction coeficient
     private final double miuS; // static friction coeficient
+    
 
     public CourseProfile(double miuK, double miuS) {
         this.miuK = miuK; 
