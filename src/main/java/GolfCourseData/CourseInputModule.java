@@ -5,7 +5,7 @@ import java.util.*;
 
 public class CourseInputModule {
 
-    // Reads a file and generates the GolfCourse.java source file.     
+    // Reads a file and generates the GeneratedCourseFromFile.java source file.     
     public void generateFromFile(String inputPath) throws Exception {
         Map<String, String> data = new HashMap<>();
         Files.lines(Path.of(inputPath)).forEach(line -> {
@@ -15,10 +15,6 @@ public class CourseInputModule {
         writeJavaFile(data);
     }
 
-    //Allows for manual input (e.g., from a UI or Scanner)    
-    public void generateFromMap(Map<String, String> data) throws Exception {
-        writeJavaFile(data);
-    }
 
     private void writeJavaFile(Map<String, String> data) throws Exception {
         String[] friction = data.get("friction").split(",");
