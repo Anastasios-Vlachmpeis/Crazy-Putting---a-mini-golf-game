@@ -19,6 +19,13 @@ public class CourseRelatedMethods {
         return course.h(x, y) < 0;
     }
 
+    public double[] getFrictions(){
+        double friction1 = course.courseData[0][0];
+        double friction2 = course.courseData[0][1];
+        double friction3 = course.courseData[0][2];
+        return new double[] {friction1, friction2, friction3};
+    }
+
     public double[] getTargetXYR(){
         double x = course.courseData[1][0];
         double y = course.courseData[1][1];
