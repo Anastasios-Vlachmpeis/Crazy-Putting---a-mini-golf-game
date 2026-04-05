@@ -6,3 +6,6 @@ public class TestRunner {
         System.out.println("Test Complete!");
     }
 }
+
+//////////////
+//file is only used to generate the "GeneratedCourseFromFile.java" file

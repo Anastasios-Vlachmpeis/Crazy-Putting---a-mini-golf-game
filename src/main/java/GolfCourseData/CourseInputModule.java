@@ -5,9 +5,7 @@ import java.util.*;
 
 public class CourseInputModule {
 
-    /**
-     * Reads a file and generates the GolfCourse.java source file.
-     */
+    // Reads a file and generates the GolfCourse.java source file.     
     public void generateFromFile(String inputPath) throws Exception {
         Map<String, String> data = new HashMap<>();
         Files.lines(Path.of(inputPath)).forEach(line -> {
@@ -17,31 +15,37 @@ public class CourseInputModule {
         writeJavaFile(data);
     }
 
-    /**
-     * Allows for manual input (e.g., from a UI or Scanner)
-     */
+    //Allows for manual input (e.g., from a UI or Scanner)    
     public void generateFromMap(Map<String, String> data) throws Exception {
         writeJavaFile(data);
     }
 
     private void writeJavaFile(Map<String, String> data) throws Exception {
+        String[] friction = data.get("friction").split(",");
         String[] target = data.get("target").split(",");
         String[] start = data.get("start").split(",");
 
-        String code = "package Systems;\n\n" +
-            "public class GolfCourse {\n" +
-            "    public final double friction = " + data.get("friction") + ";\n" +
-            "    public final double targetX = " + target[0].trim() + ";\n" +
-            "    public final double targetY = " + target[1].trim() + ";\n" +
-            "    public final double targetR = " + target[2].trim() + ";\n" +
-            "    public final double startX = " + start[0].trim() + ";\n" +
-            "    public final double startY = " + start[1].trim() + ";\n\n" +
+        // Create the string for the array contents: {friction, target, start}
+        String arrayContent = String.format("{{%s, %s, %s}, {%s, %s, %s}, {%s, %s, 0.0}}",
+            friction[0].trim(), friction[1].trim(), friction[2].trim(),
+            target[0].trim(), target[1].trim(), target[2].trim(),
+            start[0].trim(), start[1].trim()
+        );
+
+        String code = "package GolfCourseData;\n\n" +
+            "public class GeneratedCourseFromFile {\n" +
+            "    //This file is constantly rebuild -> changes will not save here\n" +
+            "    // first index is the line level of the data starting from line 2\n" +
+            "    //{friction}{target}{start} \n" +
+            "    public final double[][] courseData = " + arrayContent + ";\n\n" +
             "    public double h(double x, double y) {\n" +
-            "        return " + data.get("height") .replaceAll("sin", "Math.sin") + ";\n" +
+            "        return " + data.get("height").replaceAll("sin", "Math.sin") + ";\n" +
+            "    }\n" +
+            "    public double[][] courseData() {\n" +
+            "        return courseData " + ";\n" +
             "    }\n" +
             "}";
 
-        Files.createDirectories(Path.of("src/Systems/"));
-        Files.writeString(Path.of("src/main/java/GolfCourseData/GolfCourseFromFile.java"), code);
+        Files.writeString(Path.of("src/main/java/GolfCourseData/GeneratedCourseFromFile.java"), code);
     }
 }
