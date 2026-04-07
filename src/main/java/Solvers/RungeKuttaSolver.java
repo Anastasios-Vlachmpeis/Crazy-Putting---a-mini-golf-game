@@ -2,6 +2,7 @@ package Solvers;
 
 import java.util.Arrays;
 
+import Systems.GolfODE;
 import Systems.ODE;
 
 public class RungeKuttaSolver implements Solver {
@@ -56,26 +57,50 @@ public class RungeKuttaSolver implements Solver {
         return solution;
     }
 
-    public double[][] solveBall(ODE equation, double[] y0, double h) {
-        double[][] solution = new double[y0.length][y0.length + 1]; // [nr of steps + original state][t, y0, y1, ...]
+    public double[][] solveBall(GolfODE equation, double[] y0, double h) {
+        double[][] solution = new double[y0.length][y0.length + 1];
 
         double t = 0.0;
-        double[] y = Arrays.copyOf(y0, y0.length);// Make a copy, don't touch the original array
-        
-        // store and print initial state
+        double[] y = Arrays.copyOf(y0, y0.length);
+
         solution[0] = storeRow(t, y);
-        System.out.println(Arrays.toString(solution[0]));
+        double miuS = equation.getCourse().getMiuS();
 
         int k = 1;
-        while ((Math.abs(y[0]) > 0.001 || Math.abs(y[1]) > 0.001 ||
-            Math.abs(y[2]) > 0.001 || Math.abs(y[3]) > 0.001)
-            && y[0] >= 0 && y[0] <= 1000
-            && y[1] >= 0 && y[1] <= 1000) {
+        while (-500 <= y[0] && y[0] <= 500 && -500 <= y[1] && y[1] <= 500) { // size of the course, i made it 1000 x
+                                                                             // 1000 for testing
 
+            double speed = Math.sqrt(y[2] * y[2] + y[3] * y[3]);
+
+            double hx = equation.getCourse().dhdx(y[0], y[1]);
+            double hy = equation.getCourse().dhdy(y[0], y[1]);
+
+            double slopeMagnitude = Math.sqrt(hx * hx + hy * hy);
+
+            // stopping point for the ball, if the speed is too small and the static
+            // friction can hold the ball in place
+            if (speed < 0.001 && miuS > slopeMagnitude) { // 0.001 is just a magic numbre here, idk what to put as a
+                                                          // stopping point for speed because it is a double and it will
+                                                          // almost never be 0, so i put a small number here
+
+                // remove the balls velocity if it should stop
+                y[2] = 0.0;
+                y[3] = 0.0;
+
+                if (k >= solution.length) {
+                    solution = doubleArray(solution);
+                }
+
+                solution[k++] = storeRow(t, y);
+                break; // stop the simulation
+            }
+
+            // the ball didnt stop moving, go to next iteration
             y = iteration(equation, t, y, h);
             t += h;
 
-            System.out.println(k + Arrays.toString(y));
+            // double the array size if it doesnt fit. we should really transform this into
+            // an arraylist to avoid this, but idk how to do one for 2d arrays
             if (k >= solution.length) {
                 solution = doubleArray(solution);
             }
@@ -83,7 +108,7 @@ public class RungeKuttaSolver implements Solver {
             solution[k++] = storeRow(t, y);
         }
 
-        return solution;
+        return trimArray(solution, k); // trim the array of the excess rows caused by doubleArray()
     }
 
     public double[][] doubleArray(double[][] arr) {
@@ -96,5 +121,17 @@ public class RungeKuttaSolver implements Solver {
         }
 
         return newArr;
+    }
+
+    public double[][] trimArray(double[][] arr, int usedRows) {
+        double[][] trimmed = new double[usedRows][arr[0].length];
+
+        for (int i = 0; i < usedRows; i++) {
+            for (int j = 0; j < arr[0].length; j++) {
+                trimmed[i][j] = arr[i][j];
+            }
+        }
+
+        return trimmed;
     }
 }
