@@ -2,7 +2,7 @@ package Physics;
 
 public class CourseProfile {
     private final double miuK; // kinetic friction coeficient
-    private final double miuS; // static friction coeficient
+    private final double miuS; // static friction coeficient, theoretically its more like a constant. I just put it here to have both mius in one place
     
 
     public CourseProfile(double miuK, double miuS) {

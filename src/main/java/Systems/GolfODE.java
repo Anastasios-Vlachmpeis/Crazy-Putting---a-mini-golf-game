@@ -34,8 +34,8 @@ public class GolfODE implements ODE {
         double ax; // acceleration in x direction
         double ay; // in y direction
 
-        // first check if the speed is 0 to not devide by 0 in the formula
-        if (speed > 1e-8) {
+        // first check if the speed is 0 to not devide by 0 in the formula, speed is a double, it will almost never be 0, so pick a very small number
+        if (speed > 0.0000001) {
             // ball is moving
             // -G * hx means if ball is going downhill, it accelerates. if uphill, ut
             // decelerates
