@@ -1,6 +1,5 @@
 package Solvers;
 import java.util.Arrays;
-
 import Systems.ODE;
 
 public class EulerSolver implements Solver {
@@ -23,7 +22,15 @@ public class EulerSolver implements Solver {
 
             results.add(storeRow(t + stepSize, y)); // Here we store each new point
 
+            // %.2f rounds the display to 2 decimal places
+            System.out.println(t + " x   " + y[0]);
+            System.out.println(t + "  y  " + y[1]);
+            System.out.println(t + "   z " + y[2]);
+            // System.out.printf("TimeY0: %.2f seconds| Value: %.2f%n", (t + stepSize), y[0]);
+            // System.out.printf("TimeY1: %.2f seconds | Value: %.2f%n", (t + stepSize), y[1]);
+            // System.out.printf("TimeY2: %.2f seconds | Value: %.2f%n", (t + stepSize), y[2]);
         }
         return results.toArray(new double[0][]);
+        
     }
 }

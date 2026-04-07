@@ -55,4 +55,46 @@ public class RungeKuttaSolver implements Solver {
 
         return solution;
     }
+
+    public double[][] solveBall(ODE equation, double[] y0, double h) {
+        double[][] solution = new double[y0.length][y0.length + 1]; // [nr of steps + original state][t, y0, y1, ...]
+
+        double t = 0.0;
+        double[] y = Arrays.copyOf(y0, y0.length);// Make a copy, don't touch the original array
+        
+        // store and print initial state
+        solution[0] = storeRow(t, y);
+        System.out.println(Arrays.toString(solution[0]));
+
+        int k = 1;
+        while ((Math.abs(y[0]) > 0.001 || Math.abs(y[1]) > 0.001 ||
+            Math.abs(y[2]) > 0.001 || Math.abs(y[3]) > 0.001)
+            && y[0] >= 0 && y[0] <= 1000
+            && y[1] >= 0 && y[1] <= 1000) {
+
+            y = iteration(equation, t, y, h);
+            t += h;
+
+            System.out.println(k + Arrays.toString(y));
+            if (k >= solution.length) {
+                solution = doubleArray(solution);
+            }
+
+            solution[k++] = storeRow(t, y);
+        }
+
+        return solution;
+    }
+
+    public double[][] doubleArray(double[][] arr) {
+        double[][] newArr = new double[arr.length * 2][arr[0].length];
+
+        for (int i = 0; i < arr.length; i++) {
+            for (int j = 0; j < arr[0].length; j++) {
+                newArr[i][j] = arr[i][j];
+            }
+        }
+
+        return newArr;
+    }
 }

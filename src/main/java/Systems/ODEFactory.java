@@ -1,6 +1,6 @@
 package Systems;
-// This class is created in order to prevent GUI from constructing the ODE (And therefore meeting the "independent" requirement)
 
+// This class is created in order to prevent GUI from constructing the ODE (And therefore meeting the "independent" requirement)
 public class ODEFactory {
 
     public static ODE createODE(String system, double[] params) {
@@ -17,7 +17,7 @@ public class ODEFactory {
                 return new FitzHughNagumo(params[2], params[3], params[4], params[5]);
 
             /* case "NewSystem":
-                return new NewSystem(params[2]); */
+                return new NewSystem(params[2]); */ //only for GUI
 
             default:
                 throw new IllegalArgumentException("Unknown system.");
