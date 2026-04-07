@@ -57,38 +57,6 @@ public class RungeKuttaSolver implements Solver {
         return solution;
     }
 
-    // public double[][] solveBall(ODE equation, double[] y0, double h) {
-    // double[][] solution = new double[y0.length][y0.length + 1]; // [nr of steps +
-    // original state][t, y0, y1, ...]
-
-    // double t = 0.0;
-    // double[] y = Arrays.copyOf(y0, y0.length);// Make a copy, don't touch the
-    // original array
-
-    // // store and print initial state
-    // solution[0] = storeRow(t, y);
-    // System.out.println(Arrays.toString(solution[0]));
-
-    // int k = 1;
-    // while ((Math.abs(y[2]) > 0.001 || Math.abs(y[3]) > 0.001) && y[0] >= -500 &&
-    // y[0] <= 500 && y[1] >= -500
-    // && y[1] <= 500) {
-
-    // double speed = Math.sqrt(y[2] * y[2] + y[3] * y[3]);
-    // y = iteration(equation, t, y, h);
-    // t += h;
-
-    // System.out.println(k + Arrays.toString(y));
-    // if (k >= solution.length) {
-    // solution = doubleArray(solution);
-    // }
-
-    // solution[k++] = storeRow(t, y);
-    // }
-
-    // return solution;
-    // }
-
     public double[][] solveBall(GolfODE equation, double[] y0, double h) {
         double[][] solution = new double[y0.length][y0.length + 1];
 
