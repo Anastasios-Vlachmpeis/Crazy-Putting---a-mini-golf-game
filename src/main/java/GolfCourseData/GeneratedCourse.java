@@ -1,6 +1,6 @@
 package GolfCourseData;
 
-public class GeneratedCourseFromFile {
+public class GeneratedCourse {
     //This file is constantly rebuild -> changes will not save here
     // first index is the line level of the data starting from line 2
     //{friction}{target}{start} 

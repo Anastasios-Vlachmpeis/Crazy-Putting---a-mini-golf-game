@@ -1,0 +1,19 @@
+<<<<<<< HEAD
+Solvers\RungeKuttaSolver.class
+Systems\LotkaVolterra.class
+Main\GUI.class
+Systems\ODE.class
+Main\InputData.class
+Solvers\Solver.class
+Experiment\EulerExperiment.class
+Main\InputModule.class
+Experiment\ExponentialODE.class
+Examples\ExampleModelPopulation.class
+Systems\FitzHughNagumo.class
+Examples\ExampleLotkaVolterra.class
+Systems\ODEFactory.class
+Solvers\EulerSolver.class
+Systems\SIR.class
+Systems\NewSystem.class
+=======
+>>>>>>> 0241da50ccf35166b74a7ba8e4c3fc7cd19bf386
