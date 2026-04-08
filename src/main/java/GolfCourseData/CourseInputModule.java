@@ -5,7 +5,7 @@ import java.util.*;
 
 public class CourseInputModule {
 
-    // Reads a file and generates the GeneratedCourseFromFile.java source file.     
+    // Reads a file and generates the GeneratedCourse.java source file.     
     public void generateFromFile(String inputPath) throws Exception {
         Map<String, String> data = new HashMap<>();
         Files.lines(Path.of(inputPath)).forEach(line -> {
@@ -13,6 +13,11 @@ public class CourseInputModule {
             if (parts.length == 2) data.put(parts[0].trim(), parts[1].trim());
         });
         writeJavaFile(data);
+    }
+
+    // This method generates the course from the GUI input
+    public void generateFromGUI(String heightFormula, String[][] inputValuesGUI){
+        //Continue adding support for GUI
     }
 
 
@@ -29,7 +34,7 @@ public class CourseInputModule {
         );
 
         String code = "package GolfCourseData;\n\n" +
-            "public class GeneratedCourseFromFile {\n" +
+            "public class GeneratedCourse {\n" +
             "    //This file is constantly rebuild -> changes will not save here\n" +
             "    // first index is the line level of the data starting from line 2\n" +
             "    //{friction}{target}{start} \n" +
@@ -42,6 +47,6 @@ public class CourseInputModule {
             "    }\n" +
             "}";
 
-        Files.writeString(Path.of("src/main/java/GolfCourseData/GeneratedCourseFromFile.java"), code);
+        Files.writeString(Path.of("src/main/java/GolfCourseData/GeneratedCourse.java"), code);
     }
 }
