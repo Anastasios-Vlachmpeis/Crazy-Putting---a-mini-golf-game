@@ -3,7 +3,7 @@ package GolfCourseData;
 public class CourseRelatedMethods {
 //Here we extend the methods for actually using the generated course
     public final double epsilon = 1e-7;
-    GeneratedCourseFromFile course = new GeneratedCourseFromFile();
+    GeneratedCourse course = new GeneratedCourse();
 
     public double height(double x, double y){
         return course.h(x,y);
