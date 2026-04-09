@@ -1,4 +1,4 @@
-package bots;
+package Phase2.src.main.java.Bots;
 
 import GolfCourseData.CourseRelatedMethods;
 import shot_engine.ShotSimulator;
