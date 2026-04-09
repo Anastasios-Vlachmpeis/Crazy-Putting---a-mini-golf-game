@@ -1,4 +1,0 @@
-height = (sin(x-y)/ 7.0) + 0.5
-friction = 0.15, 0.5, 0.0
-target = 10.5, 5.0, 0.2
-start = 0.0, 0.0
