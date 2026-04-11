@@ -1,6 +1,7 @@
 package Systems;
 
-import Phase2.src.main.java.Physics.CourseProfile;
+import Physics.*;
+import Solvers.*;
 
 public class GolfODE implements ODE {
     private final double G = 9.81; // gravitational acceleration

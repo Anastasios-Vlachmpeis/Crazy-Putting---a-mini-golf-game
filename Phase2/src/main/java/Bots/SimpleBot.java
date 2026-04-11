@@ -1,7 +1,7 @@
-package Phase2.src.main.java.Bots;
+package Bots;
 
 import GolfCourseData.CourseRelatedMethods;
-import shot_engine.ShotSimulator;
+import ShotEngine.ShotSimulator;
 
 
 // Minimal rule-based bot that aims from start towards the target with a fixed speed cap

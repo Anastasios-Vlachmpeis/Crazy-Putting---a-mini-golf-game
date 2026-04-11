@@ -16,7 +16,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 
-public class GUI extends Application  {
+public class GUI_phase1 extends Application  {
     //basic settings 
     private TextField stepSizeField = new TextField("0.01");
     private TextField integrationTimeField = new TextField("10");

@@ -1,10 +1,10 @@
-package Phase2.src.main.java.Bots;
+package Bots;
 
 import java.util.Objects;
 import java.util.Optional;
 
 import GolfCourseData.CourseRelatedMethods;
-import ShotEngine.ShotSimulator;
+import ShotEngine.*;
 
 //Shared course access and optional hook for the future ML bot implementation
  
