@@ -1,4 +1,4 @@
-package shot_engine;
+package Phase2.src.main.java.ShotEngine;
 
 // Contract for integrating the ball until rest. Implementation will live with the Phase 2 physics loop.
 @FunctionalInterface
