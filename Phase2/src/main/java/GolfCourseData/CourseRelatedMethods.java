@@ -39,4 +39,16 @@ public class CourseRelatedMethods {
         double height = course.h(x,y);
         return new double[] {x, y, height};
     }
+
+    //we pass different things around in classes so we nee dthe same method twice but slightly different input
+    public double distanceToTarget(double x, double y) {
+        double[] target = getTargetXYR(); // [tx, ty, r]
+        double dx = x - target[0];
+        double dy = y - target[1];
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    public double distanceToTarget(double[] ballState) {
+        return distanceToTarget(ballState[0], ballState[1]);
+    }
 }
