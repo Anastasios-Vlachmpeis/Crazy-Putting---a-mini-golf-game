@@ -1,6 +1,6 @@
 package GolfCourseData;
 
-public class CourseRelatedMethods {
+public class GolfCourse {
 //Here we extend the methods for actually using the generated course
     public final double epsilon = 1e-7;
     GeneratedCourse course = new GeneratedCourse();

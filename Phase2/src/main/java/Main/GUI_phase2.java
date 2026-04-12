@@ -1,4 +1,4 @@
-package Phase2.src.main.java.Main;
+package Main;
 
 import GUI.*;
 import GolfCourseData.*;
@@ -50,9 +50,7 @@ public class GUI_phase2 extends Application{
         BorderPane root = new BorderPane();
         root.setLeft(sidePanel.build());
         root.setCenter(gameCanvas.getView()); //holds both canvases
-        root.setRight(shotPanel.build());
         BorderPane.setMargin(sidePanel.build(), new Insets(10));
-        BorderPane.setMargin(shotPanel.build(), new Insets(10));
 
         //make window fill screen 
         Rectangle2D screen = Screen.getPrimary().getVisualBounds();
@@ -81,7 +79,7 @@ public class GUI_phase2 extends Application{
         //redraw terrain and objects with new course data
         gameCanvas.setCourse(golfCourse, golfODE, ball);
         gameCanvas.drawTerrain();
-        gameCanvas.drawOverlay(ball.getState(), null, 0.0, 0.0);
+        gameCanvas.drawObjects(ball.getState(), null, 0.0, 0.0);
  
         //reset sidePanel values
         sidePanel.resetShotCount();
@@ -101,6 +99,10 @@ public class GUI_phase2 extends Application{
     public Ball getBall() { 
         return ball; 
     }
+
+    public double distanceToTarget(double[] ballState) { //also need it here since in shotPanel we call it from GUI
+        return golfCourse.distanceToTarget(ballState);
+    }   
     
     public static void main(String[] args) {
         launch(args);
