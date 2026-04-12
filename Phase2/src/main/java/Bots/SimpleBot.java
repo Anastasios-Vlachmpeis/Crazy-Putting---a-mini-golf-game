@@ -1,6 +1,6 @@
 package Bots;
 
-import GolfCourseData.CourseRelatedMethods;
+import GolfCourseData.*;
 import ShotEngine.ShotSimulator;
 
 
@@ -13,11 +13,11 @@ public class SimpleBot extends GolfBot {
     // a placeholder until the game exposes a max initial speed
     private static final double PLACEHOLDER_MAX_SPEED = 2.0;
 
-    public SimpleBot(CourseRelatedMethods course) {
+    public SimpleBot(GolfCourse course) {
         super(course);
     }
 
-    public SimpleBot(CourseRelatedMethods course, ShotSimulator shotSimulator) {
+    public SimpleBot(GolfCourse course, ShotSimulator shotSimulator) {
         super(course, shotSimulator);
     }
 

@@ -46,15 +46,28 @@ public class GUI_phase2 extends Application{
         //initial scene -> target and ball at starting position
         gameCanvas.drawObjects(ball.getState(), null, 0.0, 0.0); //ball state, target position, shot power, shot angle
 
-        //scene layout 
         BorderPane root = new BorderPane();
-        root.setLeft(sidePanel.build());
-        root.setCenter(gameCanvas.getView()); //holds both canvases
-        BorderPane.setMargin(sidePanel.build(), new Insets(10));
+
+        //
+        StackPane canvasView = gameCanvas.getView(); //holds both canvases
+        VBox.setVgrow(canvasView, Priority.ALWAYS); //want to have have the size grow
+        HBox.setHgrow(canvasView, Priority.ALWAYS);
+        canvasView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+        VBox courseSection = sidePanel.buildCourseSection();
+        VBox shotSection   = sidePanel.buildShotSection();
+
+        root.setLeft(courseSection);
+        root.setRight(shotSection);
+        root.setCenter(canvasView);
+
+        BorderPane.setMargin(courseSection, new Insets(20));
+        BorderPane.setMargin(shotSection,   new Insets(20));
+        BorderPane.setMargin(canvasView,    new Insets(10));
 
         //make window fill screen 
         Rectangle2D screen = Screen.getPrimary().getVisualBounds();
-        Scene scene = new Scene(root, screen.getWidth(), screen.getHeight(), Color.WHITE);
+        Scene scene = new Scene(root, screen.getWidth(), screen.getHeight(), Color.WHITESMOKE);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Crazy Putting – Phase 2 (team17)");
         primaryStage.setX(screen.getMinX());

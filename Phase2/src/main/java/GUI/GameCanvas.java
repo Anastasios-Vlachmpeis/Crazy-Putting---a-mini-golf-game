@@ -37,7 +37,7 @@ public class GameCanvas {
 
     private static final double SIMULATION_STEP = 0.01; //seconds per simulation step -> step size for RK4 in seconds
 
-    private static final int ANIMATION_FPS = 3; //frames per second for animation
+    private static final int ANIMATION_FPS = 10; //frames per second for animation -> need larger number of animation takes forever
 
     private final Canvas terrain = new Canvas(CANVAS_W, CANVAS_H); //will only be drawn once at the start of the game 
     private final Canvas objects = new Canvas(CANVAS_W, CANVAS_H); //holds ball and target, will be cleared and redrawn every frame
@@ -128,6 +128,25 @@ public class GameCanvas {
         }
  
         drawGrid(gc);
+    }
+
+    private Color computeColorForHeight(double h) {
+        if (h < 0) {
+            double depth = Math.min(Math.abs(h), 1.0);
+            return Color.rgb(
+                (int)(30  + depth * 20),
+                (int)(100 + depth * 50),
+                (int)(180 + depth * 60),
+                1.0
+            );
+        }
+        double t = Math.min(h / 1.5, 1.0);
+        return Color.rgb(
+            (int)(60  + t * 140),
+            (int)(120 + t * 100),
+            (int)(40  + t * 40),
+            1.0
+        );
     }
 
     //Objects layer (ball and target)
@@ -368,6 +387,9 @@ public class GameCanvas {
 
         double ddx = mouseX - bpx;  //from ball toward mouse
         double ddy = bpy - mouseY;  //canvas y is flipped, so flip the sign
+
+        //to debug
+        System.out.println("ddx=" + ddx + " ddy=" + ddy); 
 
         double vx  = ddx * (V_MAX / (CANVAS_W * 0.3)); 
         double vy  = ddy * (V_MAX / (CANVAS_H * 0.3));

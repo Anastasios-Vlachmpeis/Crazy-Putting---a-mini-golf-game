@@ -2,6 +2,7 @@ package GUI;
 
 import GolfCourseData.*;
 import Physics.CourseProfile;
+import Main.*;
 
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -43,28 +44,13 @@ public class SidePanel {
         this.gameCanvas = gameCanvas;
     }
 
-    public VBox build() {
-        VBox root = new VBox(8);
-        root.setPadding(new Insets(12));
-        root.setPrefWidth(230);
-        root.setStyle("-fx-background-color: #1e1e1e;");
- 
-        root.getChildren().addAll(
-            buildCourseSection(),
-            new Separator(),
-            buildShotSection()
-        );
-
-        return root;
-    }
-
     /**
      * Builds top half of the panel:
      *   1. "Load from file" button -> opens FileChooser pointing at .txt files + calls CourseInputModule.generateFromFile(), then GUI_phase2.refreshCourse()
      *   2. Text fields pre-filled from currently loaded course -> user can change individual values without reloading a file
      *   3. "guily" button -> reads fields and calls refreshCourse()
      */
-    private VBox buildCourseSection() {
+    public VBox buildCourseSection() {
         VBox section = new VBox(6);
  
         Label title = sectionLabel("Course Info & Loading");
@@ -139,7 +125,7 @@ public class SidePanel {
             courseStatusLabel.setTextFill(Color.LIGHTGREEN);
  
             //refresh using newly written GeneratedCourse
-            gui.refreshCourse(new CourseRelatedMethods(), 
+            gui.refreshCourse(new GolfCourse(), 
                               new CourseProfile(Double.parseDouble(miuKField.getText().trim()), Double.parseDouble(miuSField.getText().trim())
                             ));
         } 
@@ -161,7 +147,7 @@ public class SidePanel {
                 return;
             }
  
-            gui.refreshCourse(new CourseRelatedMethods(), new CourseProfile(miuK, miuS));
+            gui.refreshCourse(new GolfCourse(), new CourseProfile(miuK, miuS));
  
             courseStatusLabel.setText("guilied.");
             courseStatusLabel.setTextFill(Color.LIGHTGREEN);
@@ -180,7 +166,7 @@ public class SidePanel {
      *   3. Manual velocity input + "Fire" button as an alternative to mouse-drag
      *   4. Bot buttons: "SimpleBot shot" and "MLBot shot" to play against 
      */
-    private VBox buildShotSection() {
+    public VBox buildShotSection() {
         VBox section = new VBox(6);
  
         Label title = sectionLabel("Shot Info & Game State");
@@ -295,7 +281,7 @@ public class SidePanel {
         } 
         else {
             shotResultLabel.setText(String.format("Resting %.2f m from target.", dist));
-            shotResultLabel.setTextFill(Color.WHITE);
+            shotResultLabel.setTextFill(Color.BLACK);
         }
     }
 
@@ -324,8 +310,8 @@ public class SidePanel {
     private Label sectionLabel(String text) {
         Label label = new Label(text);
 
-        label.setFont(Font.font(15));
-        label.setTextFill(Color.WHITESMOKE);
+        label.setFont(Font.font(17));
+        label.setTextFill(Color.BLACK);
 
         return label;
     }
@@ -334,8 +320,8 @@ public class SidePanel {
     private Label smallLabel(String text) {
         Label label = new Label(text);
 
-        label.setFont(Font.font(11));
-        label.setTextFill(Color.LIGHTGRAY);
+        label.setFont(Font.font(13));
+        label.setTextFill(Color.BLACK);
 
         return label;
     }
@@ -343,8 +329,8 @@ public class SidePanel {
     private Label hudLabel(String text) {
         Label label = new Label(text);
 
-        label.setFont(Font.font(12));
-        label.setTextFill(Color.WHITE);
+        label.setFont(Font.font(13));
+        label.setTextFill(Color.BLACK);
 
         return label;
     }
