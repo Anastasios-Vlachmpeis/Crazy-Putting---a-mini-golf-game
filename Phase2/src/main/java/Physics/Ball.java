@@ -1,5 +1,8 @@
 package Physics;
 
+// The golf ball
+// Weight is predetermined
+// State (coordinates and velocity) is adjusted as it moves.
 public class Ball {
     private double weight = 0.0459; // kg
     private double x;
