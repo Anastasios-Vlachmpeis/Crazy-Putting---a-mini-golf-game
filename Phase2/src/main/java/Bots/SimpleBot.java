@@ -10,8 +10,8 @@ import ShotEngine.ShotSimulator;
 
 public class SimpleBot extends GolfBot {
 
-    // a placeholder until the game exposes a max initial speed
-    private static final double PLACEHOLDER_MAX_SPEED = 2.0;
+    // max initial speed based on manual
+    private static final double MAX_SPEED = 5.0;
 
     public SimpleBot(GolfCourse course) {
         super(course);
@@ -61,7 +61,7 @@ public class SimpleBot extends GolfBot {
         // }
 
         //we calculate the speed of the shot
-        double speed = Math.min(PLACEHOLDER_MAX_SPEED, len * 0.2); //cap the speed at predifined max
+        double speed = Math.min(MAX_SPEED, len * 0.2); // ~ cap the speed at 5m/s - use a simple function where speed is less if closer to hole
         //and then the velocity vector
         double vx = ux * speed;
         double vy = uy * speed;
