@@ -19,4 +19,3 @@ public class TestRunner {
 
 //////////////
 //file is only used to generate the "GeneratedCourse.java" file. Later, CourseInputModule needs to be called from the GUI
-////
