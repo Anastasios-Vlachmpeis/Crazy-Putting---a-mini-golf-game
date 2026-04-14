@@ -66,8 +66,8 @@ public class RungeKuttaSolver implements Solver {
         double miuS = equation.getCourse().getMiuS();
 
         int k = 1;
-        while (-500 <= y[0] && y[0] <= 500 && -500 <= y[1] && y[1] <= 500) { // size of the course, i made it 1000 x
-                                                                             // 1000 for testing
+        while (-400 <= y[0] && y[0] <= 400 && -450 <= y[1] && y[1] <= 450) { // size of the course, i made it 800 x
+                                                                             // 900 for testing -> same as in GameCanvas
 
             double speed = Math.sqrt(y[2] * y[2] + y[3] * y[3]);
 

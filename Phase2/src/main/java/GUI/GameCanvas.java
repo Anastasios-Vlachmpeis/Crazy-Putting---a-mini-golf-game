@@ -82,6 +82,7 @@ public class GameCanvas {
         double[] start = golfCourse.getStartPosition(); // [sx, sy, sh]
 
         //find bounding box of course features (start and target)
+        //this ensures we don't draw the whole world but only the part that includes target and ball
         double minX = Math.min(start[0], target[0]) - MARGIN;
         double maxX = Math.max(start[0], target[0]) + MARGIN;
         double minY = Math.min(start[1], target[1]) - MARGIN;
@@ -108,10 +109,10 @@ public class GameCanvas {
         fitToCurrentCourse();
  
         GraphicsContext gc = terrain.getGraphicsContext2D();
-        gc.clearRect(0, 0, CANVAS_W, CANVAS_H);
+        gc.clearRect(0, 0, CANVAS_W, CANVAS_H); //we want to clear teh canvas before wer redraw
  
-        int cellPx = 2;
-        int cols = (int)(CANVAS_W / cellPx);
+        int cellPx = 2; //size of each cell in pixels -> determines resolution of terrain drawing (smaller = more detailed but slower)
+        int cols = (int)(CANVAS_W / cellPx); //
         int rows = (int)(CANVAS_H / cellPx);
  
         for (int row = 0; row < rows; row++) {
@@ -131,22 +132,26 @@ public class GameCanvas {
     }
 
     private Color computeColorForHeight(double h) {
+        ColorForTerrain cT = new ColorForTerrain();
+        
         if (h < 0) {
-            double depth = Math.min(Math.abs(h), 1.0);
-            return Color.rgb(
-                (int)(30  + depth * 20),
-                (int)(100 + depth * 50),
-                (int)(180 + depth * 60),
-                1.0
-            );
+            return cT.isWaterColor(h);
+        } else {
+            return cT.isGrassColor(h, getMaxHeight());
         }
-        double t = Math.min(h / 1.5, 1.0);
-        return Color.rgb(
-            (int)(60  + t * 140),
-            (int)(120 + t * 100),
-            (int)(40  + t * 40),
-            1.0
-        );
+    }
+
+    private double getMaxHeight() {
+        double maxH = 0.0;
+        for (int x = 0; x <= CANVAS_W; x+=5) { //we don't want to check every pixels since this takes a long time so we check every 5 pixels
+            for (int y = 0; y <= CANVAS_H; y+=5) {
+                double[] world = canvasToWorld(x, y);
+                double h = golfCourse.height(world[0], world[1]);
+                if (h > maxH) 
+                    maxH = h;
+            }
+        }
+        return maxH;
     }
 
     //Objects layer (ball and target)
@@ -162,7 +167,7 @@ public class GameCanvas {
         double tpx = worldToCanvasX(target[0]);
         double tpy = worldToCanvasY(target[1]);
         //convert world-unit radius to pixels using current scale
-        double   tradPx = target[2] / metersPerPixel;
+        double tradPx = target[2] / metersPerPixel;
  
         //outer red circle for target
         gc.setStroke(Color.RED);
@@ -295,7 +300,7 @@ public class GameCanvas {
         }
     }
 
-    //helper function to choose "nice" grid spacing (1, 2, 5, 10, 20, etc.) based on the current scale -> keeps it at round values
+    //helper function to choose "nice" grid spacing (1, 2, 5, 10, 20, etc.) based on current scale -> keeps it at round values
     private double niceGridSpacing(double rawSpacing) {
         double[] nice = { 0.5, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 100.0 };
         for (double s : nice) {
@@ -388,9 +393,6 @@ public class GameCanvas {
         double ddx = mouseX - bpx;  //from ball toward mouse
         double ddy = bpy - mouseY;  //canvas y is flipped, so flip the sign
 
-        //to debug
-        System.out.println("ddx=" + ddx + " ddy=" + ddy); 
-
         double vx  = ddx * (V_MAX / (CANVAS_W * 0.3)); 
         double vy  = ddy * (V_MAX / (CANVAS_H * 0.3));
         double spd = Math.sqrt(vx * vx + vy * vy); 
@@ -409,6 +411,7 @@ public class GameCanvas {
     private double worldToCanvasY(double wy) {
         return CANVAS_H - (wy - worldY0) / metersPerPixel;
     }
+    //converts canvas coordinates (pixels) to world coordinates (meters)
     private double[] canvasToWorld(double px, double py) {
         double wx = worldX0 + px  * metersPerPixel;
         double wy = worldY0 + (CANVAS_H - py) * metersPerPixel;

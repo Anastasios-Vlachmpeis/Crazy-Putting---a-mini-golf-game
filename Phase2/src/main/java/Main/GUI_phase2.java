@@ -62,8 +62,8 @@ public class GUI_phase2 extends Application{
         root.setCenter(canvasView);
 
         BorderPane.setMargin(courseSection, new Insets(20));
-        BorderPane.setMargin(shotSection,   new Insets(20));
-        BorderPane.setMargin(canvasView,    new Insets(10));
+        BorderPane.setMargin(shotSection, new Insets(20));
+        BorderPane.setMargin(canvasView, new Insets(10));
 
         //make window fill screen 
         Rectangle2D screen = Screen.getPrimary().getVisualBounds();
@@ -99,7 +99,7 @@ public class GUI_phase2 extends Application{
         sidePanel.update(ball.getState(), 0, golfCourse.distanceToTarget(ball.getState()[0], ball.getState()[1]));
     }
 
-    //some getters for side panel and game canvas to access shared objects
+    //Some getters for side panel and game canvas to access shared objects
     public GolfCourse getCourseRelated() { 
         return golfCourse; 
     }

@@ -15,7 +15,7 @@ import java.io.File;
 
 public class SidePanel {
     //needed to fire refreshCourse (after loading new course) and trigger shots and bot runs from the side panel
-    private final GUI_phase2 gui;
+    private final GUI_phase2 gui; //don't do this ---------------------------
     private final GameCanvas gameCanvas;
 
     //elements about course info and loading
@@ -69,7 +69,7 @@ public class SidePanel {
         double[] target = c.getTargetXYR();
         double[] start = c.getStartPosition();
  
-        heightFormulaField = field("(Math.sin(x - y) / 7.0) + 0.5");
+        heightFormulaField = field("(sin(x - y) / 7.0) + 0.5");
         miuKField = field(String.valueOf(frictions[0]));
         miuSField = field(String.valueOf(frictions[1]));
         targetXField = field(String.valueOf(target[0]));
