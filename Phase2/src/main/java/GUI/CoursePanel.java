@@ -10,6 +10,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
+import java.io.File;
 
 public class CoursePanel {
     private final GUI_phase2 gui;
@@ -36,7 +37,7 @@ public class CoursePanel {
      */
     public VBox buildCourseSection() {
         VBox section = new VBox(6);
-        section.setPrefWidth(new Insets(12));
+        section.setPadding(new Insets(12));
  
         Label title = sectionLabel("Course Info & Loading");
  
@@ -67,14 +68,15 @@ public class CoursePanel {
         buildBtn.setMaxWidth(Double.MAX_VALUE);
         buildBtn.setOnAction(e -> onBuildManual());
 
-        Region spacer = new Region(); //do this so it looks cleaner
-        spacer.setPrefHeight(8);
+        Separator separator = new Separator();
+        separator.setPadding(new Insets(6, 0, 6, 0));
  
+        section.getChildren().clear();
         section.getChildren().addAll(
             title,
             loadFileBtn,
             statusLabel,
-            spacer, new Separator(), spacer,
+            separator,
             smallLabel("Height formula h(x,y):"), heightFormulaField,
             smallLabel("µK (kinetic friction):"), miuKField,
             smallLabel("µS (static friction):"),  miuSField,

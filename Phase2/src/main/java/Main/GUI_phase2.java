@@ -63,6 +63,8 @@ public class GUI_phase2 extends Application{
 
         BorderPane.setMargin(left, new Insets(20));
         BorderPane.setMargin(right, new Insets(20));
+        
+        root.setCenter(canvasView);
         BorderPane.setMargin(canvasView, new Insets(10));
 
         //make window fill screen 

@@ -47,7 +47,7 @@ public class GameCanvas {
     private GolfCourse golfCourse;
     private GolfODE golfODE;
     private Ball ball;
-    private SidePanel sidePanel; //to update after every shot
+    private ShotPanel shotPanel; //to update after every shot
 
     //for aiming arrow 
     private double dragStartX = 0.0;
@@ -68,8 +68,8 @@ public class GameCanvas {
         this.ball = ball;
     }
 
-    public void setShotPanel(SidePanel sidePanel) {
-        this.sidePanel = sidePanel;
+    public void setShotPanel(ShotPanel shotPanel) {
+        this.shotPanel = shotPanel;
     }
 
     public StackPane getView() {
@@ -115,15 +115,30 @@ public class GameCanvas {
         int cols = (int)(CANVAS_W / cellPx); //
         int rows = (int)(CANVAS_H / cellPx);
  
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
+        // for (int row = 0; row < rows; row++) {
+        //     for (int col = 0; col < cols; col++) {
+        //         double px = col * cellPx + cellPx * 0.5;
+        //         double py = row * cellPx + cellPx * 0.5;
+ 
+        //         double[] world = canvasToWorld(px, py);
+        //         double h = golfCourse.height(world[0], world[1]);
+ 
+        //         gc.setFill(computeColorForHeight(h));
+        //         gc.fillRect(col * cellPx, row * cellPx, cellPx, cellPx);
+        //     }
+        // }
+
+        double maxH = getMaxHeight(); 
+
+        for (int col = 0; col < cols; col++) {
+            for (int row = 0; row < rows; row++) {
                 double px = col * cellPx + cellPx * 0.5;
                 double py = row * cellPx + cellPx * 0.5;
  
                 double[] world = canvasToWorld(px, py);
                 double h = golfCourse.height(world[0], world[1]);
  
-                gc.setFill(computeColorForHeight(h));
+                gc.setFill(computeColorForHeight(h, maxH));
                 gc.fillRect(col * cellPx, row * cellPx, cellPx, cellPx);
             }
         }
@@ -131,13 +146,13 @@ public class GameCanvas {
         drawGrid(gc);
     }
 
-    private Color computeColorForHeight(double h) {
+    private Color computeColorForHeight(double h, double maxH) {
         ColorTerrain cT = new ColorTerrain();
         
         if (h < 0) {
             return cT.isWaterColor(h);
         } else {
-            return cT.isGrassColor(h, getMaxHeight());
+            return cT.isGrassColor(h, maxH);
         }
     }
 
@@ -351,8 +366,8 @@ public class GameCanvas {
         boolean inWater = golfCourse.isWater(finalState[0], finalState[1]);
         boolean won = dist <= golfCourse.getTargetXYR()[2]; //check if ball is within target radius -> if yes player wins
  
-        if (sidePanel != null) 
-            sidePanel.onShotLanded(finalState, dist, inWater, won);
+        if (shotPanel != null) 
+            shotPanel.onShotLanded(finalState, dist, inWater, won);
  
         drawObjects(finalState, trajectory, 0.0, 0.0);
     }
@@ -381,7 +396,7 @@ public class GameCanvas {
                 drawObjects(ball.getState(), null, 0.0, 0.0);
                 return;
             }
-            if (sidePanel != null) sidePanel.recordShot();
+            if (shotPanel != null) shotPanel.recordShot();
             fireShot(vel[0], vel[1]);
         });
     }

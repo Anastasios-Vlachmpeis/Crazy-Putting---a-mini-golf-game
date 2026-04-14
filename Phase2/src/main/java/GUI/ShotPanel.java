@@ -1,5 +1,7 @@
 package GUI;
 
+import javafx.scene.control.Separator;
+
 import GolfCourseData.GolfCourse;
 import Main.GUI_phase2;
  
@@ -74,25 +76,42 @@ public class ShotPanel {
 
         Region spacer = new Region(); //do this so it looks cleaner
         spacer.setPrefHeight(8);
+
+        // Separator separator1 = new Separator();
+        // separator1.setPadding(new Insets(6, 0, 6, 0));
+
+        // Separator separator2 = new Separator();
+        // separator2.setPadding(new Insets(6, 0, 6, 0));  
+
+        // Separator separator3 = new Separator();
+        // separator3.setPadding(new Insets(6, 0, 6, 0));
  
+        section.getChildren().clear();
         section.getChildren().addAll(
             title,
             shotCountLabel,
             ballPosLabel,
             distanceLabel,
             shotResultLabel,
-            spacer, new Separator(), spacer,
+            separator(),
             smallLabel("Manual vx (m/s):"), manualVxField,
             smallLabel("Manual vy (m/s):"), manualVyField,
             fireBtn,
-            spacer, new Separator(), spacer,
+            separator(),
             simpleBotBtn,
             mlBotBtn,
-            spacer, new Separator(), spacer,
+            separator(),
             resetBtn
         );
 
         return section;
+    }
+
+    //helper method 
+    private Separator separator() {
+        Separator sep = new Separator();
+        sep.setPadding(new Insets(6, 0, 6, 0));
+        return sep;
     }
 
     //Asks bots for a shot, then triggers it
