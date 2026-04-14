@@ -17,11 +17,13 @@ public class CourseProfile {
 
     // the derivative of height with respect to x (aka slope of x, aka downhill forse in the direction of x)
     public double dhdx(double x, double y) {
+        //return -0.0001; Used this for bugfixing ~Stan
         return Math.cos((x + y) / 7.0) / 7.0;
     }
 
     // same but for y. the formula is the same tho. I added it just to make more sense later
     public double dhdy(double x, double y) {
+        //return -0.0001; Used this for bugfixing ~Stan
         return Math.cos((x + y) / 7.0) / 7.0;
     }
 

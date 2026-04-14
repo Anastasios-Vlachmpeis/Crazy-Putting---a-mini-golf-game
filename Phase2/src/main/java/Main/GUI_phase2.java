@@ -18,7 +18,7 @@ import javafx.geometry.Rectangle2D; //To
 
 public class GUI_phase2 extends Application{
 
-    private GolfCourse golfCourse = new GolfCourse();
+    private GolfCourse golfCourse = new GolfCourse(0.07, 0.15);
     private CourseProfile courseProfile = new CourseProfile(0.07, 0.15);
     private GolfODE golfODE = new GolfODE(courseProfile);
     private Ball ball;

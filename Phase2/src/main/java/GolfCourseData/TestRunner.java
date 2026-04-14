@@ -2,10 +2,12 @@ package GolfCourseData;
 
 public class TestRunner {
     public static void main(String[] args) throws Exception {
-        int method = 1;
+        int method = 0;
+        System.out.println("Working Directory = " + System.getProperty("user.dir"));
+        System.out.println("Method started");
 
-        if(method == 1){
-            new CourseInputModule().generateFromFile("src/main/java/GolfCourseData/Course.txt");
+        if(method == 0){
+            new CourseInputModule().generateFromFile("Phase2/src/main/java/GolfCourseData/Course1.txt");
             System.out.println("Test Complete!");
         }
         if(method == 1){

@@ -3,7 +3,22 @@ package GolfCourseData;
 public class GolfCourse {
 //Here we extend the methods for actually using the generated course
     public final double epsilon = 1e-7;
+    private final double miuK; // kinetic friction coeficient
+    private final double miuS; // static friction coeficient, theoretically its more like a constant. I just put it here to have both mius in one place
     GeneratedCourse course = new GeneratedCourse();
+
+    public GolfCourse(double miuK, double miuS) {
+        this.miuK = miuK; 
+        this.miuS = miuS; 
+    }
+
+    public double getMiuK() {
+        return miuK;
+    }
+
+    public double getMiuS() {
+        return miuS;
+    }
 
     public double height(double x, double y){
         return course.h(x,y);

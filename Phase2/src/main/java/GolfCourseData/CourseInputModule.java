@@ -62,6 +62,6 @@ public class CourseInputModule {
             "    }\n" +
             "}";
 
-        Files.writeString(Path.of("src/main/java/GolfCourseData/GeneratedCourse.java"), code);
+        Files.writeString(Path.of("Phase2/src/main/java/GolfCourseData/GeneratedCourse.java"), code);
     }
 }
