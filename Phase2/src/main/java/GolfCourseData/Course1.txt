@@ -1,8 +1,4 @@
-<<<<<<< HEAD:Phase2/src/main/java/GolfCourseData/Course.txt
-height = (sin(x+y)/ 7.0) + 0.5
-=======
 height = (cos(x-y)/ 7.0) + 0.5
->>>>>>> 952e02469608e3fc977683f94ad3feb762837101:src/main/java/GolfCourseData/Course.txt
 friction = 0.15, 0.5, 0.0
 target = 10.5, 5.0, 0.2
 start = 0.0, 0.0

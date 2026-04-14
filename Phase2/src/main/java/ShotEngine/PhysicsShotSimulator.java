@@ -27,7 +27,7 @@ public class PhysicsShotSimulator implements ShotSimulator {
         double[] frictions = course.getFrictions();     // [muK, muS, ...]
 
         // GolfODE needs a CourseProfile build one that delegates to GolfCourse
-        CourseProfile profile = buildProfile(frictions[0], frictions[1]);
+        CourseProfile profile = new CourseProfile(frictions[0], frictions[1]);
         GolfODE ode = new GolfODE(profile);
 
         // Initial state vector: [x, y, vx, vy]
