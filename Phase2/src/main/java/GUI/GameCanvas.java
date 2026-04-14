@@ -100,7 +100,7 @@ public class GameCanvas {
         //center the view on the middle of the bounding box
         double worldCenterX = (minX + maxX) / 2.0;
         double worldCenterY = (minY + maxY) / 2.0;
-        worldX0 = worldCenterX - (CANVAS_W / 2.0) * metersPerPixel;
+        worldX0 = worldCenterX - (CANVAS_W / 2.0) * metersPerPixel; 
         worldY0 = worldCenterY - (CANVAS_H / 2.0) * metersPerPixel;
     }
 
@@ -109,29 +109,16 @@ public class GameCanvas {
         fitToCurrentCourse();
  
         GraphicsContext gc = terrain.getGraphicsContext2D();
-        gc.clearRect(0, 0, CANVAS_W, CANVAS_H); //we want to clear teh canvas before wer redraw
+        gc.clearRect(0, 0, CANVAS_W, CANVAS_H); //we want to clear the canvas before we redraw
  
         int cellPx = 2; //size of each cell in pixels -> determines resolution of terrain drawing (smaller = more detailed but slower)
         int cols = (int)(CANVAS_W / cellPx); //
         int rows = (int)(CANVAS_H / cellPx);
- 
-        // for (int row = 0; row < rows; row++) {
-        //     for (int col = 0; col < cols; col++) {
-        //         double px = col * cellPx + cellPx * 0.5;
-        //         double py = row * cellPx + cellPx * 0.5;
- 
-        //         double[] world = canvasToWorld(px, py);
-        //         double h = golfCourse.height(world[0], world[1]);
- 
-        //         gc.setFill(computeColorForHeight(h));
-        //         gc.fillRect(col * cellPx, row * cellPx, cellPx, cellPx);
-        //     }
-        // }
 
-        double maxH = getMaxHeight(); 
-
-        for (int col = 0; col < cols; col++) {
-            for (int row = 0; row < rows; row++) {
+        double maxH = getMaxHeight();
+ 
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
                 double px = col * cellPx + cellPx * 0.5;
                 double py = row * cellPx + cellPx * 0.5;
  
@@ -141,7 +128,7 @@ public class GameCanvas {
                 gc.setFill(computeColorForHeight(h, maxH));
                 gc.fillRect(col * cellPx, row * cellPx, cellPx, cellPx);
             }
-        }
+        } 
  
         drawGrid(gc);
     }
@@ -179,7 +166,7 @@ public class GameCanvas {
  
         //target
         double[] target = golfCourse.getTargetXYR();
-        double tpx = worldToCanvasX(target[0]);
+        double tpx = worldToCanvasX(target[0]); 
         double tpy = worldToCanvasY(target[1]);
         //convert world-unit radius to pixels using current scale
         double tradPx = target[2] / metersPerPixel;
