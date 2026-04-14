@@ -24,7 +24,11 @@ public class CourseInputModule {
             start[0].trim(), start[1].trim()
         );
 
-        String formula = data.get("height").replaceAll("sin", "Math.sin");
+
+        String formula = data.get("height")
+            .replaceAll("sin", "Math.sin")
+            .replaceAll("cos", "Math.cos")
+            .replaceAll("tan", "Math.tan");
 
         //Only formula and arrayContent gets used for 
         writeJavaFile(formula, arrayContent);
@@ -48,14 +52,13 @@ public class CourseInputModule {
         String code = "package GolfCourseData;\n\n" +
             "public class GeneratedCourse {\n" +
             "    //This file is constantly rebuild -> changes will not save here\n" +
-            "    // first index is the line level of the data starting from line 2\n" +
             "    //{friction}{target}{start} \n" +
             "    public final double[][] courseData = " + arrayContent + ";\n\n" +
             "    public double h(double x, double y) {\n" +
             "        return " + formula + ";\n" +
             "    }\n" +
             "    public double[][] courseData() {\n" +
-            "        return courseData " + ";\n" +
+            "        return courseData" + ";\n" +
             "    }\n" +
             "}";
 
