@@ -2,10 +2,6 @@ package GolfCourseData;
 
 public class TestRunner {
     public static void main(String[] args) throws Exception {
-<<<<<<< HEAD:Phase2/src/main/java/GolfCourseData/TestRunner.java
-        new CourseInputModule().generateFromFile("GolfCourseData/Course.txt");
-        System.out.println("Test Complete!");
-=======
         int method = 1;
 
         if(method == 1){
@@ -18,8 +14,6 @@ public class TestRunner {
             new CourseInputModule().generateFromGUI("(sin(3*x-y)/ 3.0) + 2.5", inputValuesGUI);
             System.out.println("Test Complete!");
         }
-
->>>>>>> 952e02469608e3fc977683f94ad3feb762837101:src/main/java/GolfCourseData/TestRunner.java
     }
 }
 
