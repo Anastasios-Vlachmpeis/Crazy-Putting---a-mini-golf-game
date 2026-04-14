@@ -25,7 +25,8 @@ public class GUI_phase2 extends Application{
 
     //Build in separate classes 
     private GameCanvas gameCanvas;
-    private SidePanel sidePanel;
+    private CoursePanel coursePanel;
+    private ShotPanel shotPanel;
 
     @Override
     public void start(Stage primaryStage) {
@@ -34,11 +35,12 @@ public class GUI_phase2 extends Application{
         ball = new Ball(new double[]{ startPos[0], startPos[1], 0.0, 0.0 });
 
         //Initialize game canvas and side panel
-        gameCanvas = new GameCanvas(golfCourse, golfODE, ball);
-        sidePanel = new SidePanel(this, gameCanvas);  
-
+        gameCanvas   = new GameCanvas(golfCourse, golfODE, ball);
+        coursePanel  = new CoursePanel(this);
+        shotPanel    = new ShotPanel(this, gameCanvas);
+  
         //wire back so we can update after every shot
-        gameCanvas.setShotPanel(sidePanel);
+        gameCanvas.setShotPanel(shotPanel);
 
         //draw background terrain 
         gameCanvas.drawTerrain();
@@ -54,15 +56,13 @@ public class GUI_phase2 extends Application{
         HBox.setHgrow(canvasView, Priority.ALWAYS);
         canvasView.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-        VBox courseSection = sidePanel.buildCourseSection();
-        VBox shotSection   = sidePanel.buildShotSection();
+        VBox left  = coursePanel.buildCourseSection();
+        root.setLeft(left);
+        VBox right = shotPanel.buildShotSection();
+        root.setRight(right);
 
-        root.setLeft(courseSection);
-        root.setRight(shotSection);
-        root.setCenter(canvasView);
-
-        BorderPane.setMargin(courseSection, new Insets(20));
-        BorderPane.setMargin(shotSection, new Insets(20));
+        BorderPane.setMargin(left, new Insets(20));
+        BorderPane.setMargin(right, new Insets(20));
         BorderPane.setMargin(canvasView, new Insets(10));
 
         //make window fill screen 
@@ -94,12 +94,12 @@ public class GUI_phase2 extends Application{
         gameCanvas.drawTerrain();
         gameCanvas.drawObjects(ball.getState(), null, 0.0, 0.0);
  
-        //reset sidePanel values
-        sidePanel.resetShotCount();
-        sidePanel.update(ball.getState(), 0, golfCourse.distanceToTarget(ball.getState()[0], ball.getState()[1]));
+        //reset shotPanel values
+        shotPanel.resetShotCount();
+        shotPanel.update(ball.getState(), 0, golfCourse.distanceToTarget(ball.getState()[0], ball.getState()[1]));
     }
 
-    //Some getters for side panel and game canvas to access shared objects
+    //Some getters for shot panel and game canvas to access shared objects
     public GolfCourse getCourseRelated() { 
         return golfCourse; 
     }

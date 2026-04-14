@@ -132,7 +132,7 @@ public class GameCanvas {
     }
 
     private Color computeColorForHeight(double h) {
-        ColorForTerrain cT = new ColorForTerrain();
+        ColorTerrain cT = new ColorTerrain();
         
         if (h < 0) {
             return cT.isWaterColor(h);

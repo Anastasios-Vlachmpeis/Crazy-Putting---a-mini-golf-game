@@ -1,0 +1,218 @@
+package GUI;
+
+import GolfCourseData.GolfCourse;
+import Main.GUI_phase2;
+ 
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+
+public class ShotPanel {
+    private final GUI_phase2 gui;
+    private final GameCanvas gameCanvas;
+
+    private Label shotCountLabel;
+    private Label ballPosLabel;
+    private Label distanceLabel;
+    private Label shotResultLabel;
+
+    private TextField manualVxField;
+    private TextField manualVyField;
+
+    private int shotCount = 0;
+
+    public ShotPanel(GUI_phase2 gui, GameCanvas gameCanvas) {
+        this.gui = gui;
+        this.gameCanvas = gameCanvas;
+    }
+
+    /**
+     * Builds top half of the panel:
+     *   1. Labels to show current shot count, ball position, distance to target
+     *   2. Shot result (e.g. "In water!", "On green, 2.3m from target", "In hole!") 
+     *   3. Manual velocity input + "Fire" button as an alternative to mouse-drag
+     *   4. Bot buttons: "SimpleBot shot" and "MLBot shot" to play against 
+     */
+    public VBox buildShotSection() {
+        VBox section = new VBox(6);
+        section.setPadding(new Insets(12));
+ 
+        Label title = sectionLabel("Shot Info & Game State");
+ 
+        // initial values, updated after every shot in onShotLanded() and after reset in onReset()
+        shotCountLabel = hudLabel("Shots: 0");
+        ballPosLabel = hudLabel("Ball: (0.00, 0.00)");
+        distanceLabel = hudLabel("Distance to target: —");
+        shotResultLabel = new Label("");
+        shotResultLabel.setFont(Font.font(13));
+        shotResultLabel.setWrapText(true);
+ 
+        //manual velocity input
+        manualVxField = field("0.0");
+        manualVyField = field("0.0");
+ 
+        Button fireBtn = new Button("Fire");
+        fireBtn.setMaxWidth(Double.MAX_VALUE);
+        fireBtn.setOnAction(e -> onFireManual());
+ 
+        //bot buttons
+        Button simpleBotBtn = new Button("SimpleBot shot");
+        simpleBotBtn.setMaxWidth(Double.MAX_VALUE);
+        //simpleBotBtn.setOnAction(e -> onSimpleBotShot());
+        simpleBotBtn.setOnAction(e -> shotResultLabel.setText("SimpleBot not yet connected."));
+ 
+        Button mlBotBtn = new Button("MLBot shot");
+        mlBotBtn.setMaxWidth(Double.MAX_VALUE);
+        //mlBotBtn.setOnAction(e -> onMLBotShot());
+        mlBotBtn.setOnAction(e -> shotResultLabel.setText("MLBot not yet connected."));
+ 
+        Button resetBtn = new Button("Reset ball");
+        resetBtn.setMaxWidth(Double.MAX_VALUE);
+        resetBtn.setOnAction(e -> onReset());
+
+        Region spacer = new Region(); //do this so it looks cleaner
+        spacer.setPrefHeight(8);
+ 
+        section.getChildren().addAll(
+            title,
+            shotCountLabel,
+            ballPosLabel,
+            distanceLabel,
+            shotResultLabel,
+            spacer, new Separator(), spacer,
+            smallLabel("Manual vx (m/s):"), manualVxField,
+            smallLabel("Manual vy (m/s):"), manualVyField,
+            fireBtn,
+            spacer, new Separator(), spacer,
+            simpleBotBtn,
+            mlBotBtn,
+            spacer, new Separator(), spacer,
+            resetBtn
+        );
+
+        return section;
+    }
+
+    //Asks bots for a shot, then triggers it
+    // private void onSimpleBotShot() {
+    //     bots.SimpleBot bot = new bots.SimpleBot(gui.getCourseRelated());
+    //     double[] vel = bot.chooseNextShot();
+    //     recordShot();
+    //     gameCanvas.fireShot(vel[0], vel[1]);
+    // }
+    // private void onMLBotShot() {
+    //     bots.MLBot bot = new bots.MLBot(gui.getCourseRelated(), gui.getGolfODE());
+    //     double[] vel = bot.chooseNextShot(gui.getBall().getState());
+    //     recordShot();
+    //     gameCanvas.fireShot(vel[0], vel[1]);
+    // }
+
+    //reads manual velocity fields and triggers a shot with those values
+    private void onFireManual() {
+        try {
+            double vx = Double.parseDouble(manualVxField.getText().trim());
+            double vy = Double.parseDouble(manualVyField.getText().trim());
+            recordShot();
+            gameCanvas.fireShot(vx, vy);
+        } 
+        catch (NumberFormatException ex) {
+            shotResultLabel.setText("Enter valid numbers for vx and vy.");
+            shotResultLabel.setTextFill(Color.SALMON);
+        }
+    }
+
+    //resets ball to start position and clears shot count and result label
+    private void onReset() {
+        double[] startPos = gui.getCourseRelated().getStartPosition();
+        double[] resetState = new double[]{ startPos[0], startPos[1], 0.0, 0.0 };
+
+        gui.getBall().setPos(resetState);
+        gameCanvas.drawObjects(resetState, null, 0.0, 0.0);
+
+        shotResultLabel.setText("");
+        
+        update(resetState, shotCount, gui.distanceToTarget(resetState));
+    }
+
+    //called by GameCanvas after every shot completes to update the shot count, ball position, distance to target, and shot result message
+    public void onShotLanded(double[] finalState, double dist, boolean inWater, boolean won) {
+        update(finalState, shotCount, dist);
+ 
+        if (won) {
+            shotResultLabel.setText("Hole in one! (" + shotCount + " shots)");
+            shotResultLabel.setTextFill(Color.LIGHTGREEN);
+        } 
+        else if (inWater) {
+            shotResultLabel.setText("In the water! +1 penalty. Replaying from build.");
+            shotResultLabel.setTextFill(Color.CORNFLOWERBLUE);
+            
+            //penalty: count an extra shot and reset position
+            recordShot(); 
+            onReset();
+        } 
+        else {
+            shotResultLabel.setText(String.format("Resting %.2f m from target.", dist));
+            shotResultLabel.setTextFill(Color.BLACK);
+        }
+    }
+
+    //updates all labels 
+    public void update(double[] ballState, int shots, double dist) {
+        shotCountLabel.setText("Shots: " + shots);
+
+        ballPosLabel.setText(String.format("Ball: (%.2f, %.2f)", ballState[0], ballState[1]));
+
+        distanceLabel.setText(String.format("Distance: %.2f m", dist));
+    }
+
+    //increment shot count and update the label
+    public void recordShot() {
+        shotCount++;
+        shotCountLabel.setText("Shots: " + shotCount);
+    }
+
+    public void resetShotCount() {
+        shotCount = 0;
+        shotCountLabel.setText("Shots: 0");
+        shotResultLabel.setText("");
+    }
+    
+    //create section titles
+    private Label sectionLabel(String text) {
+        Label label = new Label(text);
+
+        label.setFont(Font.font(17));
+        label.setTextFill(Color.BLACK);
+
+        return label;
+    }
+
+    //create small labels for fields
+    private Label smallLabel(String text) {
+        Label label = new Label(text);
+
+        label.setFont(Font.font(13));
+        label.setTextFill(Color.BLACK);
+
+        return label;
+    }
+
+    private Label hudLabel(String text) {
+        Label label = new Label(text);
+
+        label.setFont(Font.font(13));
+        label.setTextFill(Color.BLACK);
+
+        return label;
+    }
+
+    private TextField field(String defaultValue) {
+        TextField tf = new TextField(defaultValue);
+        tf.setMaxWidth(Double.MAX_VALUE);
+
+        return tf;
+    }
+
+}

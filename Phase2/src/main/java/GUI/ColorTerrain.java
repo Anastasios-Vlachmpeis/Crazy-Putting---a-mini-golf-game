@@ -2,9 +2,9 @@ package GUI;
 
 import javafx.scene.paint.Color;
 
-public class ColorForTerrain {
+public class ColorTerrain {
 
-    public ColorForTerrain() {
+    public ColorTerrain() {
     }
 
     public Color isGrassColor(double h, double maxH) {
