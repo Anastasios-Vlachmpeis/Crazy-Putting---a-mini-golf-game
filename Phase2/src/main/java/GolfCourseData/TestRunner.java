@@ -2,7 +2,7 @@ package GolfCourseData;
 
 public class TestRunner {
     public static void main(String[] args) throws Exception {
-        new CourseInputModule().generateFromFile("src/main/java/GolfCourseData/Course.txt");
+        new CourseInputModule().generateFromFile("GolfCourseData/Course.txt");
         System.out.println("Test Complete!");
     }
 }
