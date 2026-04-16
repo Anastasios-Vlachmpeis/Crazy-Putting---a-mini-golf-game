@@ -1,7 +1,7 @@
 package GUI;
 
 import GolfCourseData.*;
-import Physics.CourseProfile;
+//import Physics.CourseProfile;
 import Main.GUI_phase2;
  
 import javafx.geometry.Insets;
@@ -113,11 +113,12 @@ public class CoursePanel {
             new CourseInputModule().generateFromFile(file.getAbsolutePath());
             statusLabel.setText("Loaded: " + file.getName());
             statusLabel.setTextFill(Color.LIGHTGREEN);
- 
+        /* 
             //refresh using newly written GeneratedCourse
             gui.refreshCourse(new GolfCourse(), 
-                              new CourseProfile(Double.parseDouble(miuKField.getText().trim()), Double.parseDouble(miuSField.getText().trim())
-                            ));
+                new GolfCourse(Double.parseDouble(miuKField.getText().trim()), Double.parseDouble(miuSField.getText().trim())
+                ));
+        */
         } 
         catch (Exception ex) {
             statusLabel.setText("Error: " + ex.getMessage());
@@ -137,7 +138,7 @@ public class CoursePanel {
                 return;
             }
  
-            gui.refreshCourse(new GolfCourse(), new CourseProfile(miuK, miuS));
+            gui.refreshCourse(/*new GolfCourse(), */new GolfCourse(miuK, miuS));//"CourseProfile" was the test engine ~Stan
  
             statusLabel.setText("Built manually");
             statusLabel.setTextFill(Color.LIGHTGREEN);

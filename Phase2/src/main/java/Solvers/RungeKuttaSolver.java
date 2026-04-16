@@ -79,8 +79,8 @@ public class RungeKuttaSolver implements Solver {
             // stopping point for the ball, if the speed is too small and the static
             // friction can hold the ball in place
             if (speed < 0.001 && miuS > slopeMagnitude) { // 0.001 is just a magic numbre here, idk what to put as a
-                                                          // stopping point for speed because it is a double and it will
-                                                          // almost never be 0, so i put a small number here
+                // stopping point for speed because it is a double and it will
+                // almost never be 0, so i put a small number here
 
                 // remove the balls velocity if it should stop
                 y[2] = 0.0;

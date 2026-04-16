@@ -1,5 +1,6 @@
 package GUI;
 
+import java.util.Arrays;
 import GolfCourseData.*;
 import Physics.Ball;
 import Solvers.RungeKuttaSolver;
@@ -30,7 +31,7 @@ public class GameCanvas {
     private double worldX0 = 0.0; 
     private double worldY0 = 0.0; 
 
-    private static final double TARGET_RADIUS_PIXELS = 5.0; 
+    //private static final double TARGET_RADIUS_PIXELS = 5.0; Not used ~Stan
     private static final double BALL_RADIUS_PIXELS = 5.0; 
     private static final double V_MAX = 5.0; //max velocity for shot
     private static final double ARROW_SCALE = 40.0; //pixels per meters/second for aiming arrow
@@ -312,8 +313,11 @@ public class GameCanvas {
     }
 
     public void fireShot(double vx, double vy) {
-        double[] startState = new double[]{ball.getState()[0], ball.getState()[1], vx, vy};
-        ball.setPos(startState);
+        double[] startState = {ball.getState()[0], ball.getState()[1], vx, vy};
+        //Weird loop in ball state between this file and Ball.java 
+        //This causes the location of the ball to suddenly reset to default ~Stan
+        //double[] startState = new double[]{ball.getState()[0], ball.getState()[1], vx, vy};
+        //ball.setPos(startState);
  
         double[][] trajectory = new RungeKuttaSolver().solveBall(golfODE, startState, SIMULATION_STEP);
  
@@ -334,6 +338,7 @@ public class GameCanvas {
  
                 double[] finalRow   = trajectory[trajectory.length - 1];
                 double[] finalState = new double[]{finalRow[1], finalRow[2], finalRow[3], finalRow[4]};
+                //System.out.println("Ball State: " + Arrays.toString(finalState)); //~Stan
                 ball.setPos(finalState);
                 onShotComplete(finalState, trajectory);
                 return;

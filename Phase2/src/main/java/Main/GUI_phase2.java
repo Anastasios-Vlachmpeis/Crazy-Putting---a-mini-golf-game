@@ -19,8 +19,8 @@ import javafx.geometry.Rectangle2D; //To
 public class GUI_phase2 extends Application{
 
     private GolfCourse golfCourse = new GolfCourse(0.07, 0.15);
-    private CourseProfile courseProfile = new CourseProfile(0.07, 0.15);
-    private GolfODE golfODE = new GolfODE(courseProfile);
+    //private CourseProfile courseProfile = new CourseProfile(0.07, 0.15); //2x course model?? ~Stan
+    private GolfODE golfODE = new GolfODE(golfCourse); //Used wrong physics model ~Stan
     private Ball ball;
 
     //Build in separate classes 
@@ -82,10 +82,10 @@ public class GUI_phase2 extends Application{
       Used by CoursePanel when the user loads a new course
       Re-wires all shared objects so every panel sees the new course without having to be rebuilt
      */
-    public void refreshCourse (GolfCourse newCourse, CourseProfile newProfile) {
+    public void refreshCourse (GolfCourse newCourse/*, GolfCourse newProfile*/) {//Duplicte Data ~Stan
         golfCourse = newCourse;
-        courseProfile = newProfile;
-        golfODE = new GolfODE(courseProfile);
+        //golfCourse = newProfile;
+        golfODE = new GolfODE(golfCourse);
  
         //reset ball to the new starting position
         double[] startPos = golfCourse.getStartPosition();
@@ -105,8 +105,8 @@ public class GUI_phase2 extends Application{
     public GolfCourse getCourseRelated() { 
         return golfCourse; 
     }
-    public CourseProfile getCourseProfile() { 
-        return courseProfile; 
+    public GolfCourse getCourseProfile() { 
+        return golfCourse; 
     }
     public GolfODE  getGolfODE() {
         return golfODE; 

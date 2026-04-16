@@ -1,18 +1,19 @@
 package Systems;
 
+import GolfCourseData.GolfCourse;
 import Physics.*;
 import Solvers.*;
 
 public class GolfODE implements ODE {
     private final double G = 9.81; // gravitational acceleration
 
-    private CourseProfile course;
+    private GolfCourse course;
 
-    public GolfODE(CourseProfile course) {
+    public GolfODE(GolfCourse course) {
         this.course = course;
     }
 
-    public CourseProfile getCourse() {
+    public GolfCourse getCourse() {
         return course;
     }
 
@@ -29,14 +30,14 @@ public class GolfODE implements ODE {
         double miuK = course.getMiuK(); // get the kinetif friction coeficient
         double miuS = course.getMiuS(); // and also the static one
 
-        double speed = Math.sqrt(vx * vx + vy * vy); // magnitude of the velocity vector (aka speed)
+        double speed = Math.sqrt((vx * vx) + (vy * vy)); // magnitude of the velocity vector (aka speed)
         double slopeMagnitude = Math.sqrt(hx * hx + hy * hy); // ball stays at rest if miuS is bigger than this
 
         double ax; // acceleration in x direction
         double ay; // in y direction
 
         // first check if the speed is 0 to not devide by 0 in the formula, speed is a double, it will almost never be 0, so pick a very small number
-        if (speed > 0.0000001) {
+        if (speed > 0.0001) { 
             // ball is moving
             // -G * hx means if ball is going downhill, it accelerates. if uphill, ut
             // decelerates
