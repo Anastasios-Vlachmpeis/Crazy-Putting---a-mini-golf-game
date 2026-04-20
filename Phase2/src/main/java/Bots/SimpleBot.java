@@ -41,24 +41,23 @@ public class SimpleBot extends GolfBot {
         double ux = dx/len;
         double uy = dy/len;
 
-        // I'm considering introducing a bias using local slope
-        //
-        //Direction of steepest increase of height 
-        // double[] slope = course.getDerivative(sx, sy);
-        // double gx = slope[0];
-        // double gy = slope[1];
-        //
-        // double gLen = Math.hypot(gx, gy); - gradient magnitude
-        // if (gLen > 1e-12) { can only skip if gradient is the 0 vector (perfectly flat terrain)
-        //     gx/= gLen;
-        //     gy/= gLen;
-        //     double blend = 0.15;
-        //     ux = (1.0 - blend) *ux + blend*gx;
-        //     uy = (1.0 - blend)*uy + blend* gy;
-        //     double uLen = Math.hypot(ux,uy);
-        //     ux/= uLen;
-        //     uy/= uLen;
-        // }
+        // I'm introducing a bias using local slope
+        // Direction of steepest increase of height 
+        double[] slope = course.getDerivative(sx, sy);
+        double gx = slope[0];
+        double gy = slope[1];
+        
+        double gLen = Math.hypot(gx, gy); // - gradient magnitude
+        if (gLen > 1e-12) { //can only skip if gradient is the 0 vector (perfectly flat terrain)
+            gx/= gLen;
+            gy/= gLen;
+            double blend = 0.15;
+            ux = (1.0 - blend) *ux + blend*gx;
+            uy = (1.0 - blend)*uy + blend* gy;
+            double uLen = Math.hypot(ux,uy);
+            ux/= uLen;
+            uy/= uLen;
+        }
 
         //we calculate the speed of the shot
         double speed = Math.min(MAX_SPEED, len * 0.2); // ~ cap the speed at 5m/s - use a simple function where speed is less if closer to hole
@@ -66,6 +65,7 @@ public class SimpleBot extends GolfBot {
         double vx = ux * speed;
         double vy = uy * speed;
 
+        // TODO: Connect ShotSimulator
         // As soon as ShotSimulator is connected, we can simulate the shot and return the result
         // shotSimulator().ifPresent(sim -> sim.simulate(vx, vy));
 
