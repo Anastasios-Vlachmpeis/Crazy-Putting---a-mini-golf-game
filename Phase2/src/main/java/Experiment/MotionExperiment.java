@@ -1,11 +1,8 @@
 package Experiment;
 
-import java.util.Arrays;
-
 import Physics.Ball;
 import Physics.CourseProfile;
 import Solvers.RungeKuttaSolver;
-import Systems.GolfODE;
 
 public class MotionExperiment {
 
@@ -13,14 +10,14 @@ public class MotionExperiment {
         double[] y0 = new double[] { 0, 0, 4, -4 };
         Ball ball = new Ball(y0);
         CourseProfile courseSettings = new CourseProfile(0.07, 0.15);
-        GolfODE course = new GolfODE(courseSettings);
+        //GolfODE course = new GolfODE(courseSettings);
         RungeKuttaSolver solver = new RungeKuttaSolver();
 
-        double[][] results = solver.solveBall(course, ball.getState(), 1);
+        //double[][] results = solver.solveBall(course, ball.getState(), 1);
 
-        for (double[] row : results) {
-            System.out.println(Arrays.toString(row));
-        }
+        //for (double[] row : results) {
+        //    System.out.println(Arrays.toString(row));
+        //}
     }
 
 }

@@ -1,7 +1,6 @@
 package ShotEngine;
 
 import GolfCourseData.GolfCourse;
-import Physics.CourseProfile;
 import Solvers.Solver;
 import Systems.GolfODE;
 
@@ -36,7 +35,8 @@ public class PhysicsShotSimulator implements ShotSimulator {
 
         for (int step = 0; step < maxsteps; step++) {
             //This code never runs??? ~Stan
-            System.out.println("Check!");
+            //It does ~ Tasos
+            //System.out.println("Check!");
 
             double x  = state[0];
             double y  = state[1];
