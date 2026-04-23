@@ -67,6 +67,13 @@ public class GolfCourse {
         return new double[] {x, y, height};
     }
 
+    //Set the current ball position for the next stroke
+    // Position needs to be updated before the bot shoots again
+    public void setBallPosition(double x, double y) {
+        course.courseData[2][0] = x;
+        course.courseData[2][1] = y;
+    }
+
     //we pass different things around in classes so we nee dthe same method twice but slightly different input
     public double distanceToTarget(double x, double y) {
         double[] target = getTargetXYR(); // [tx, ty, r]
