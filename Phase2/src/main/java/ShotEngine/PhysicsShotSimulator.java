@@ -81,7 +81,7 @@ public class PhysicsShotSimulator implements ShotSimulator {
 
     // Advances the state by one step using whichever solver was injected
     private double[] stepOnce(GolfODE ode, double[] state, double t) {
-        double[][] solution = solver.solve(ode, state, t, t + stepsize, stepsize);
+        double[][] solution = solver.solveBall(ode, state, stepsize); // changed the solving method to solveBall
 
         // solve() rows are [t, x, y, vx, vy]
         double[] lastRow   = solution[solution.length - 1];
