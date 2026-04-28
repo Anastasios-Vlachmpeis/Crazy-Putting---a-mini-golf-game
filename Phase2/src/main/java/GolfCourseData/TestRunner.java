@@ -16,8 +16,11 @@ public class TestRunner {
             new CourseInputModule().generateFromGUI("(sin(3*x-y)/ 3.0) + 2.5", inputValuesGUI);
             System.out.println("Test Complete!");
         }
+        System.out.println("Check");
     }
 }
 
 //////////////
 //file is only used to generate the "GeneratedCourse.java" file. Later, CourseInputModule needs to be called from the GUI
+//javac -d bin src/main/java/GolfCourseData/*.java
+//java -cp bin GolfCourseData.TestRunner
