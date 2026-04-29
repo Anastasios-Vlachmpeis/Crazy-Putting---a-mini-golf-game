@@ -1,3 +1,4 @@
+/*
 package GolfCourseData;
 
 public class GeneratedCourse {
@@ -12,3 +13,4 @@ public class GeneratedCourse {
         return courseData;
     }
 }
+*/

@@ -1,6 +1,8 @@
 package Solvers;
 
 import java.util.Arrays;
+
+import Systems.GolfODE;
 import Systems.ODE;
 
 public class EulerSolver implements Solver {

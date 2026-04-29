@@ -28,8 +28,10 @@ public class Ball {
 
     public void setPos(double[] nextY) {
         this.x = nextY[0];
+        //System.out.println(this.x);
         this.xVelocity = nextY[2];
         this.y = nextY[1];
+        //System.out.println(this.y);
         this.yVelocity = nextY[3];
     }
 

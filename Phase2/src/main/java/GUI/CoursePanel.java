@@ -109,10 +109,16 @@ public class CoursePanel {
         File file = chooser.showOpenDialog(null);
         if (file == null) return; // user cancelled
  
+        //Added the file functionality ~Stan
         try {
-            new CourseInputModule().generateFromFile(file.getAbsolutePath());
+            GolfCourse loadedCourse = new GolfCourse();
+            loadedCourse.loadFromFile(file.getAbsolutePath());
+
             statusLabel.setText("Loaded: " + file.getName());
             statusLabel.setTextFill(Color.LIGHTGREEN);
+
+            gui.refreshCourse(loadedCourse);
+
         /* 
             //refresh using newly written GeneratedCourse
             gui.refreshCourse(new GolfCourse(), 
@@ -129,8 +135,24 @@ public class CoursePanel {
     //reads manual input fields and calls refreshCourse() with a new CourseProfile built from those values
     private void onBuildManual() {
         try {
+            //We didnt copy the settings to new course ~Stan
+            String[][] inputs = {
+                {miuKField.getText(), miuSField.getText(), "0.0"},
+                {targetXField.getText(), targetYField.getText(), targetRField.getText() },
+                { ballXField.getText(), ballYField.getText(), "0.0" }
+            };
+
+            GolfCourse newCourse = new GolfCourse();
+            newCourse.loadFromGUI(heightFormulaField.getText(), inputs);
+            gui.refreshCourse(newCourse);
+
+            statusLabel.setText("Built manually");
+            statusLabel.setTextFill(Color.LIGHTGREEN);
+
+            /* 
             double miuK = Double.parseDouble(miuKField.getText().trim());
             double miuS = Double.parseDouble(miuSField.getText().trim());
+            
  
             if (miuK <= 0 || miuS <= 0 || miuS <= miuK) {
                 statusLabel.setText("Need µS > µK > 0");
@@ -138,14 +160,12 @@ public class CoursePanel {
                 return;
             }
  
-            gui.refreshCourse(/*new GolfCourse(), */new GolfCourse(miuK, miuS));//"CourseProfile" was the test engine ~Stan
- 
-            statusLabel.setText("Built manually");
-            statusLabel.setTextFill(Color.LIGHTGREEN);
+            gui.refreshCourse(/*new GolfCourse(), new GolfCourse(miuK, miuS));//"CourseProfile" was the test course ~Stan
+            */            
 
         } 
-        catch (NumberFormatException ex) {
-            statusLabel.setText("Invalid number in fields");
+        catch (Exception ex) {
+            statusLabel.setText("Invalid value's in fields");
             statusLabel.setTextFill(Color.SALMON);
         }
     }

@@ -338,7 +338,7 @@ public class GameCanvas {
  
                 double[] finalRow   = trajectory[trajectory.length - 1];
                 double[] finalState = new double[]{finalRow[1], finalRow[2], finalRow[3], finalRow[4]};
-                //System.out.println("Ball State: " + Arrays.toString(finalState)); //~Stan
+                System.out.println("Ball State: " + Arrays.toString(finalState)); //~Stan
                 ball.setPos(finalState);
                 onShotComplete(finalState, trajectory);
                 return;
