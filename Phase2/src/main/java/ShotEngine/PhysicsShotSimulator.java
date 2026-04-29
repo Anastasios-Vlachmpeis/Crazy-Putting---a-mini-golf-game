@@ -65,7 +65,7 @@ public class PhysicsShotSimulator implements ShotSimulator {
             }
 
             // Advance one timestep
-            state = stepOnce(ode, state, t);
+            state = stepOnce(ode, state);
 
             //Debugging ~Stan
             //System.out.println("T: " + t);
