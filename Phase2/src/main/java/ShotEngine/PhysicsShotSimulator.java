@@ -67,7 +67,7 @@ public class PhysicsShotSimulator implements ShotSimulator {
             }
 
             // Advance one timestep
-            state = stepOnce(ode, state, t);
+            state = stepOnce(ode, state);
 
             //Debugging ~Stan
             //System.out.println("T: " + t);
@@ -80,7 +80,7 @@ public class PhysicsShotSimulator implements ShotSimulator {
     }
 
     // Advances the state by one step using whichever solver was injected
-    private double[] stepOnce(GolfODE ode, double[] state, double t) {
+    private double[] stepOnce(GolfODE ode, double[] state) {
         double[][] solution = solver.solveBall(ode, state, stepsize); // changed the solving method to solveBall
 
         // solve() rows are [t, x, y, vx, vy]
