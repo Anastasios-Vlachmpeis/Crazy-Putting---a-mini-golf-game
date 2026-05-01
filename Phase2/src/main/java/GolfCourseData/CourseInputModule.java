@@ -1,10 +1,14 @@
+/*
 package GolfCourseData;
 
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
 import java.nio.file.*;
 import java.util.*;
 
 public class CourseInputModule {
 
+    
     // Reads a file and generates the GeneratedCourse.java source file.     
     public void generateFromFile(String inputPath) throws Exception {
         Map<String, String> data = new HashMap<>();
@@ -24,16 +28,18 @@ public class CourseInputModule {
             start[0].trim(), start[1].trim()
         );
 
-
+        
         String formula = data.get("height")
             .replaceAll("sin", "Math.sin")
             .replaceAll("cos", "Math.cos")
             .replaceAll("tan", "Math.tan");
+        
 
         //Only formula and arrayContent gets used for 
         writeJavaFile(formula, arrayContent);
     }
 
+    
     // This method generates the course from the GUI input
     public void generateFromGUI(String heightFormula, String[][] inputValuesGUI) throws Exception{
 
@@ -48,7 +54,6 @@ public class CourseInputModule {
 
     private void writeJavaFile(String formula, String arrayContent) throws Exception {
         
-
         String code = "package GolfCourseData;\n\n" +
             "public class GeneratedCourse {\n" +
             "    //This file is constantly rebuild -> changes will not save here\n" +
@@ -64,4 +69,6 @@ public class CourseInputModule {
 
         Files.writeString(Path.of("Phase2/src/main/java/GolfCourseData/GeneratedCourse.java"), code);
     }
+    
 }
+*/

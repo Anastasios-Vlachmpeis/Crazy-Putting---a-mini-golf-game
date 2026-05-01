@@ -1,6 +1,7 @@
 package Solvers;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 
 import Systems.*;
 
@@ -57,17 +58,19 @@ public class RungeKuttaSolver implements Solver {
     }
 
     public double[][] solveBall(GolfODE equation, double[] y0, double h) {
+        //ArrayList<double[]> solutionInList = new ArrayList<>(); // I tried something - did not work ~Stan
         double[][] solution = new double[y0.length][y0.length + 1];
 
         double t = 0.0;
         double[] y = Arrays.copyOf(y0, y0.length);
 
+        //solutionInList.add(storeRow(t, y));
         solution[0] = storeRow(t, y);
         double miuS = equation.getCourse().getMiuS();
 
+        int MAX_STEPS = 50_000;
         int k = 1;
-        while (-400 <= y[0] && y[0] <= 400 && -450 <= y[1] && y[1] <= 450) { // size of the course, i made it 800 x
-                                                                             // 900 for testing -> same as in GameCanvas
+        while (k < MAX_STEPS) { //don't make it dependent on size of the course since the size is dynamic 
 
             double speed = Math.sqrt(y[2] * y[2] + y[3] * y[3]);
 
@@ -78,7 +81,7 @@ public class RungeKuttaSolver implements Solver {
 
             // stopping point for the ball, if the speed is too small and the static
             // friction can hold the ball in place
-            if (speed < 0.001 && miuS > slopeMagnitude) { // 0.001 is just a magic numbre here, idk what to put as a
+            if (speed < 0.01 && miuS > slopeMagnitude) { // 0.01 is just a magic numbre here, idk what to put as a
                 // stopping point for speed because it is a double and it will
                 // almost never be 0, so i put a small number here
 
@@ -90,6 +93,8 @@ public class RungeKuttaSolver implements Solver {
                     solution = doubleArray(solution);
                 }
 
+                //solutionInList.add(storeRow(t, y));
+                //solution[0] = storeRow(t, y);
                 solution[k++] = storeRow(t, y);
                 break; // stop the simulation
             }
@@ -103,14 +108,19 @@ public class RungeKuttaSolver implements Solver {
             if (k >= solution.length) {
                 solution = doubleArray(solution);
             }
-
+            
+            //solutionInList.add(storeRow(t, y));
+            //solution[0] = storeRow(t, y);
             solution[k++] = storeRow(t, y);
         }
 
         return trimArray(solution, k); // trim the array of the excess rows caused by doubleArray()
+        //double[][] finalResult = solutionInList.toArray(new double[0][0]);
+        //return (finalResult);
     }
 
     public double[][] doubleArray(double[][] arr) {
+        //System.out.println("Doubling array started");
         double[][] newArr = new double[arr.length * 2][arr[0].length];
 
         for (int i = 0; i < arr.length; i++) {
@@ -118,7 +128,7 @@ public class RungeKuttaSolver implements Solver {
                 newArr[i][j] = arr[i][j];
             }
         }
-
+        //System.out.println("Doubling array finished. Current length: " + newArr.length);
         return newArr;
     }
 

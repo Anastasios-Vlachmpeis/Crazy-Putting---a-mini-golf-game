@@ -146,7 +146,7 @@ public class ShotPanel {
     private void onReset() {
         double[] startPos = gui.getCourseRelated().getStartPosition();
         double[] resetState = new double[]{ startPos[0], startPos[1], 0.0, 0.0 };
-
+        System.out.println("OnReset triggerd");
         gui.getBall().setPos(resetState);
         gameCanvas.drawObjects(resetState, null, 0.0, 0.0);
 

@@ -1,7 +1,7 @@
 package Experiment;
 
 import Bots.SimpleBot;
-import GolfCourseData.GeneratedCourse;
+//import GolfCourseData.GeneratedCourse;
 import GolfCourseData.GolfCourse;
 import ShotEngine.PhysicsShotSimulator;
 import ShotEngine.ShotSimulation;
@@ -14,10 +14,10 @@ public class BotCourseExperiment {
     private static final int MAX_SHOTS = 100;
 
     public static void main(String[] args) {
-        GeneratedCourse gen = new GeneratedCourse();
-        double miuK = gen.courseData[0][0];
-        double miuS = gen.courseData[0][1];
-        GolfCourse course = new GolfCourse(miuK, miuS);
+        //GeneratedCourse gen = new GeneratedCourse();
+        //double miuK = gen.courseData[0][0];
+        //double miuS = gen.courseData[0][1];
+        GolfCourse course = new GolfCourse(0, 0);
 
         RungeKuttaSolver solver = new RungeKuttaSolver();
         PhysicsShotSimulator shotSim = new PhysicsShotSimulator(course, solver);

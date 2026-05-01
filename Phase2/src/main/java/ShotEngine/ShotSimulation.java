@@ -11,6 +11,7 @@ public record ShotSimulation(double finalX, double finalY, boolean inWater, bool
 
     //ball ended normally
     public static ShotSimulation stoppedAt(double x, double y) {
+        //System.out.println("Stopped at: " + x + ", "+ y);
         return new ShotSimulation(x, y, false, false);
     }
 
