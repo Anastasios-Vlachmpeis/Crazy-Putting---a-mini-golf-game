@@ -80,7 +80,7 @@ public class PhysicsShotSimulator implements ShotSimulator {
     // Advances the state by one step using whichever solver was injected
     private double[] stepOnce(GolfODE ode, double[] state, double t) {
         //double[][] solution = solver.solveBall(ode, state, stepsize); // changed the solving method to solveBall
-        double[][] solution = solver.solve(ode, state, 0, 0, stepsize); //Using this one because Euler/RK4 and Verlet wont compile otherwise. Should not change functionality
+        double[][] solution = solver.solve(ode, state, t, t+stepsize, stepsize); //Using this one because Euler/RK4 and Verlet wont compile otherwise. Should not change functionality
 
         // solve() rows are [t, x, y, vx, vy]
         double[] lastRow   = solution[solution.length - 1];

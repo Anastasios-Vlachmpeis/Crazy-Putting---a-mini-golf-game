@@ -133,10 +133,10 @@ public class GolfCourse {
 
     public double[] getTargetXYR() {
 
-        double x = course.courseData[1][0];
-        double y = course.courseData[1][1];
-        double radius = course.courseData[1][2];
-        return new double[] { x, y, radius };
+        // double x = course.courseData[1][0];
+        // double y = course.courseData[1][1];
+        // double radius = course.courseData[1][2];
+        // return new double[] { x, y, radius };
 
         return targetValues;
     }
