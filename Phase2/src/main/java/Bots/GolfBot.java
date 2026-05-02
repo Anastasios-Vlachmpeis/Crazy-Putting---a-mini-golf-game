@@ -7,11 +7,10 @@ import GolfCourseData.*;
 import ShotEngine.*;
 
 //Shared course access and optional hook for the future ML bot implementation
- 
 public abstract class GolfBot {
 
     protected final GolfCourse course;
-    private final ShotSimulator shotSimulator;
+    protected final ShotSimulator shotSimulator;
 
     protected GolfBot(GolfCourse course, ShotSimulator shotSimulator) {
         this.course = Objects.requireNonNull(course, "course"); //We explicitly check that a course is not null
