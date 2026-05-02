@@ -27,7 +27,7 @@ public class PhysicsShotSimulator implements ShotSimulator {
 
         // GolfODE needs a CourseProfile build one that delegates to GolfCourse
         GolfCourse profile = new GolfCourse(frictions[0], frictions[1]);
-        GolfODE ode = new GolfODE(profile);
+        GolfODE ode = new GolfODE(course); // changed this from profile to course bc the mlbot didnt update when the courses changed ~Damian
 
         // Initial state vector: [x, y, vx, vy]
         double[] state = { start[0], start[1], v0x, v0y };

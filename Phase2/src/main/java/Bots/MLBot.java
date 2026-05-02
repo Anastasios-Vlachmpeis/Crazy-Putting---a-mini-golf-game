@@ -23,19 +23,45 @@ public class MLBot extends GolfBot {
         double tRadius = target[2];
         double bestVx = 0;
         double bestVy = 0;
-        double distanceToHole = Double.MAX_VALUE;
+        double distanceToTarget = Double.MAX_VALUE;
         double bestDistance = Double.MAX_VALUE;
-        
+
+        double exploreChance = 0.2; // chance to explore the map randomly to hpefully get a better shot
+
         // usually takes between 1-10k shots to get result but sometimes more than 40k
+        
         int i = 0;
-        while (distanceToHole > tRadius) {
+        while (distanceToTarget > tRadius) {
             System.out.println("shot nr " + (i + 1));
 
-            double angle = random.nextDouble() * 2 * Math.PI;// get direction based on a circle
-            double speed = random.nextDouble() * MAX_SPEED; // get random speed, max <= 5
+            double vx;
+            double vy;
 
-            double vx = speed * Math.cos(angle); 
-            double vy = speed * Math.sin(angle);
+            // chance to explor e the map in a random direction rather than learn from the
+            // best shot si far, in order to maybe find a better path
+            // first shot doesnt have other shots to learn from so its also random
+            if (i == 0 || random.nextDouble() < exploreChance) {
+                double angle = random.nextDouble() * 2 * Math.PI; // get direction randomly based on a unit circle
+                double speed = random.nextDouble() * MAX_SPEED; // get random speed, max <= 5
+
+                vx = speed * Math.cos(angle);
+                vy = speed * Math.sin(angle);
+
+                System.out.println("random exploration shot");
+            } else { // learn from the best shot so far
+                vx = bestVx + (random.nextDouble() * 2 - 1);  // change vx a little bit
+                vy = bestVy + (random.nextDouble() * 2 - 1);// change vy a little but
+
+                double speed = Math.sqrt(vx * vx + vy * vy);
+
+                // if the speed is too big now, reduce it to the maximum allowed, keeping the ratio relatively the same
+                if (speed > MAX_SPEED) {
+                    vx = vx / speed * MAX_SPEED;
+                    vy = vy / speed * MAX_SPEED;
+                }
+
+                System.out.println("learned shot");
+            }
 
             ShotSimulation sim = shotSimulator.simulate(vx, vy); // simulate the shot
 
@@ -43,16 +69,16 @@ public class MLBot extends GolfBot {
             double finalX = sim.finalX();
             double finalY = sim.finalY();
 
-            distanceToHole = course.distanceToTarget(finalX, finalY);
-            System.out.println("distanceToHole = " + distanceToHole);
+            distanceToTarget = course.distanceToTarget(finalX, finalY);
+            System.out.println("distanceToHole = " + distanceToTarget);
 
-            if (distanceToHole < bestDistance) {
-                bestDistance = distanceToHole;
+            if (distanceToTarget < bestDistance) {
+                bestDistance = distanceToTarget;
                 bestVx = vx;
                 bestVy = vy;
             }
 
-            if (distanceToHole <= tRadius) {
+            if (distanceToTarget <= tRadius) {
                 System.out.println("Found shot inside target radius");
                 break;
             }

@@ -15,7 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 public class ShotPanel {
-    private final GUI_phase2 gui;
+    private GUI_phase2 gui;
     private final GameCanvas gameCanvas;
 
     private Label shotCountLabel;
@@ -111,23 +111,7 @@ public class ShotPanel {
         return section;
     }
 
-    private void onMLBotShot() {
-        GolfCourse course = gui.getCourseRelated();
-        RungeKuttaSolver solver = new RungeKuttaSolver();
-        PhysicsShotSimulator simulator = new PhysicsShotSimulator(course, solver);
-        MLBot bot = new MLBot(course, simulator);
-
-        double[] velocity = bot.shoot();
-        double vx = velocity[0];
-        double vy = velocity[1];
-
-        shotResultLabel.setText(String.format("MLBot shot: vx = %.5f, vy = %.5f", vx, vy)); // this doesnt work heeelp :(
-        shotResultLabel.setTextFill(Color.BLACK);
-
-        recordShot();
-        gameCanvas.fireShot(vx, vy);
-
-    }
+    
 
     // helper method
     private Separator separator() {
@@ -143,12 +127,25 @@ public class ShotPanel {
     // recordShot();
     // gameCanvas.fireShot(vel[0], vel[1]);
     // }
-    // private void onMLBotShot() {
-    // bots.MLBot bot = new bots.MLBot(gui.getCourseRelated(), gui.getGolfODE());
-    // double[] vel = bot.chooseNextShot(gui.getBall().getState());
-    // recordShot();
-    // gameCanvas.fireShot(vel[0], vel[1]);
-    // }
+
+    private void onMLBotShot() {
+        GolfCourse course = gui.getCourseRelated();
+        RungeKuttaSolver solver = new RungeKuttaSolver();
+        PhysicsShotSimulator simulator = new PhysicsShotSimulator(course, solver);
+        MLBot bot = new MLBot(course, simulator);
+
+        double[] velocity = bot.shoot();
+        double vx = velocity[0];
+        double vy = velocity[1];
+
+        shotResultLabel.setText(String.format("MLBot shot: vx = %.5f, vy = %.5f", vx, vy)); // this doesnt work heeelp :( ~Damian
+        shotResultLabel.setTextFill(Color.BLACK);
+
+        recordShot();
+        gameCanvas.fireShot(vx, vy);
+
+    }
+   
 
     // reads manual velocity fields and triggers a shot with those values
     private void onFireManual() {
@@ -205,6 +202,18 @@ public class ShotPanel {
 
         distanceLabel.setText(String.format("Distance: %.2f m", dist));
     }
+
+    // updates the course for the mlbot
+    // public void updateMLBotCourse(double[] ballState, int shots, double dist, GUI_phase2 gui) {
+    //     shotCountLabel.setText("Shots: " + shots);
+    //     ballPosLabel.setText(String.format("Ball: (%.2f, %.2f)", ballState[0], ballState[1]));
+    //     distanceLabel.setText(String.format("Distance: %.2f m", dist));
+    //     shotPanelUpdateCourse(gui);
+    // }
+
+    // public void shotPanelUpdateCourse(GUI_phase2 gui) {
+    //     this.gui = gui;
+    // }
 
     // increment shot count and update the label
     public void recordShot() {
