@@ -33,7 +33,7 @@ public class SimpleBot extends GolfBot {
         super(course, shotSimulator);
     }
 
-    public double[] chooseNextShot() {
+    public double[] shoot() {
         //coordinates of the start and target points
         double[] start = course.getStartPosition();
         double[] target = course.getTargetXYR();

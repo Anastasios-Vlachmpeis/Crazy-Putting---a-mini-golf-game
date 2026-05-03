@@ -1,16 +1,18 @@
 package GUI;
 
-import javafx.scene.control.Separator;
-
+import Bots.MLBot;
+import Bots.SimpleBot;
 import GolfCourseData.GolfCourse;
 import Main.GUI_phase2;
-import Bots.MLBot;
 import ShotEngine.PhysicsShotSimulator;
 import Solvers.RungeKuttaSolver;
-
 import javafx.geometry.Insets;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
@@ -66,8 +68,8 @@ public class ShotPanel {
         // bot buttons
         Button simpleBotBtn = new Button("SimpleBot shot");
         simpleBotBtn.setMaxWidth(Double.MAX_VALUE);
-        // simpleBotBtn.setOnAction(e -> onSimpleBotShot());
-        simpleBotBtn.setOnAction(e -> shotResultLabel.setText("SimpleBot not yet connected."));
+        simpleBotBtn.setOnAction(e -> onSimpleBotShot());
+        //simpleBotBtn.setOnAction(e -> shotResultLabel.setText("SimpleBot not yet connected."));
 
         Button mlBotBtn = new Button("MLBot shot");
         mlBotBtn.setMaxWidth(Double.MAX_VALUE);
@@ -121,12 +123,22 @@ public class ShotPanel {
     }
 
     // Asks bots for a shot, then triggers it
-    // private void onSimpleBotShot() {
-    // bots.SimpleBot bot = new bots.SimpleBot(gui.getCourseRelated());
-    // double[] vel = bot.chooseNextShot();
-    // recordShot();
-    // gameCanvas.fireShot(vel[0], vel[1]);
-    // }
+    private void onSimpleBotShot() {
+        GolfCourse course = gui.getCourseRelated();
+        RungeKuttaSolver solver = new RungeKuttaSolver();
+        PhysicsShotSimulator simulator = new PhysicsShotSimulator(course, solver);
+        SimpleBot bot = new SimpleBot(course, simulator);
+
+        double[] velocity = bot.shoot();
+        double vx = velocity[0];
+        double vy = velocity[1];
+
+        shotResultLabel.setText(String.format("SimpleBot shot: vx = %.5f, vy = %.5f", vx, vy));
+        shotResultLabel.setTextFill(Color.BLACK);
+
+        recordShot();
+        gameCanvas.fireShot(vx, vy);
+    }
 
     private void onMLBotShot() {
         GolfCourse course = gui.getCourseRelated();
