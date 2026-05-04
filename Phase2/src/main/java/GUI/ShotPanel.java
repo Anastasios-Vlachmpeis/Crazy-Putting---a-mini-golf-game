@@ -183,6 +183,8 @@ public class ShotPanel {
         gameCanvas.drawObjects(resetState, null, 0.0, 0.0);
 
         shotResultLabel.setText("");
+        
+        shotCount = 0; 
 
         update(resetState, shotCount, gui.distanceToTarget(resetState));
     }
