@@ -105,6 +105,7 @@ public class GUI_phase2 extends Application{
     public GolfCourse getCourseRelated() { 
         return golfCourse; 
     }
+    
     public GolfCourse getCourseProfile() { 
         return golfCourse; 
     }

@@ -4,9 +4,11 @@ import GolfCourseData.GolfCourse;
 import ShotEngine.ShotSimulator;
 
 
-// Minimal rule-based bot that aims from start towards the target with a fixed speed cap
-// Uses {I need to place CourseRelatedMethods here} for geometry and slope hints
-//Will function properly when a ShotSimulator is wired
+// Rule-based bot, with the following rules:
+// 1 ~ If the ball is already inside the scoring radius, we don't need to shoot
+// 2 ~ If we are relatively close to the hole, we decrease our speed
+// 3 ~ If steepnes is meaningful enough, we adjust the speed based on the slope along the putt
+// 4 ~ If velocity magnitude still exceeds v_max, we scale vx vy down to v_max
 
 public class SimpleBot extends GolfBot {
 
@@ -16,6 +18,13 @@ public class SimpleBot extends GolfBot {
     // A skew of the shot direction towards the slope direction
     private static final double SLOPE_AIM_SKEW = 0.15;
 
+    // When the distance-to-hole is under this multiple of target radius, we decrease our speed
+    private static final double NEAR_HOLE_RING_MULTI = 3.0;
+
+    // Skews for speed based on the slope in the direction of the shot
+    private static final double UPHILL_SPEED_SKEW = 1.15;
+    private static final double DOWNHILL_SPEED_SKEW = 0.92;
+
     public SimpleBot(GolfCourse course) {
         super(course);
     }
@@ -24,7 +33,7 @@ public class SimpleBot extends GolfBot {
         super(course, shotSimulator);
     }
 
-    public double[] chooseNextShot() {
+    public double[] shoot() {
         //coordinates of the start and target points
         double[] start = course.getStartPosition();
         double[] target = course.getTargetXYR();
@@ -32,13 +41,21 @@ public class SimpleBot extends GolfBot {
         double sy = start[1];
         double tx = target[0];
         double ty = target[1];
+        double r = target[2];
 
         //we calculate the direction vector from start to target
         double dx = tx - sx;
         double dy = ty - sy;
         double len = Math.hypot(dx, dy);
+
+        // Rule 0 ~ If distance to target is very much zero, we don't need to shoot
         if (len < 1e-12) { //if start and target are the same point
             return new double[] {0.0, 0.0};//we return a 0 vector
+        }
+
+        // Rule 1 ~ If the ball is already inside the scoring radius, we don't need to shoot
+        if (len <= r) {
+            return new double[] {0.0, 0.0};
         }
 
         double ux = dx/len;
@@ -65,13 +82,21 @@ public class SimpleBot extends GolfBot {
         //     uy/= uLen;
         // }
 
+        double nx = 0.0;
+        double ny = 0.0;
+        boolean haveDownhill = false;
+
         double[] dh = course.getDerivative(sx, sy);
         double steepness = Math.hypot(dh[0], dh[1]); // "steepness" of the surface
-        if (steepness > 1e-12) { //same condition as before -> if surface flat, don't change
 
-            double nx = -dh[0] / steepness;
-            double ny = -dh[1] / steepness;
-            double dot = nx * ux + ny * uy; //dot product of normal and unit vectors
+        // "Aim" rule (gets its own category cause it's a touch more complex than the others)
+        // ~ If the green is not flat here, then we skew our aim using downhill direction and lateral break,
+        // otherwise we leave our aim toward hole unchanged
+        if (steepness > 1e-12) { //same condition as before -> if surface flat, don't change
+            haveDownhill = true; //we now know there is a downhill direction
+            nx = -dh[0] / steepness;
+            ny = -dh[1] / steepness;
+            double dot = nx * ux + ny * uy; //dot product of downhill and to-hole
             //build the "sideways breal", in other words the 'component of downhill'
             // that is orthogonal to the 'to-hole' direction 
             double px = nx - dot * ux;
@@ -98,11 +123,40 @@ public class SimpleBot extends GolfBot {
             }
         }
 
+  
         //we calculate the speed of the shot
-        double speed = Math.min(MAX_SPEED, len * 0.2); // ~ cap the speed at 5m/s - use a simple function where speed is less if closer to hole
-        //and then the velocity vector
+        double speed = Math.min(MAX_SPEED, len * 0.2); 
+
+        // Rule 2 ~ If we are relatively close to the hole,
+        // we soften speed so our putt is "gentler"
+        if (r > 1e-12 && len < NEAR_HOLE_RING_MULTI * r) {
+            speed *= len / (NEAR_HOLE_RING_MULTI * r);
+        }
+
+        // Rule 3 ~ If steepnes is meaningful enough,
+        // we adjust the speed based on the slope along the putt      
+        if (haveDownhill) {
+            double along = nx * ux + ny * uy; 
+            if (along < -1e-9) {
+                speed *= UPHILL_SPEED_SKEW;
+            } else if (along > 1e-9) {
+                speed *= DOWNHILL_SPEED_SKEW;
+            }
+        }
+
+        speed = Math.min(MAX_SPEED, speed); //final capping of the speed
+
         double vx = ux * speed;
         double vy = uy * speed;
+
+        // Rule 4 ~ If velocity magnitude still exceeds v_max,
+        // we scale vx vy down to v_max
+        double vMag = Math.hypot(vx, vy);
+        if (vMag > MAX_SPEED && vMag > 1e-12) {
+            double s = MAX_SPEED / vMag;
+            vx *= s;
+            vy *= s;
+        }
 
         //Won't simulate any shots for this bot, (yet)
         //as it's a simple bot that just aims and shoots.
