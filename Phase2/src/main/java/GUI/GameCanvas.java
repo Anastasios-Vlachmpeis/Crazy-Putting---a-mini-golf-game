@@ -25,11 +25,11 @@ public class GameCanvas {
 
     //for scaling:
     //how many real world meters are represented by one pixel on the canvas (default value)
-    private double metersPerPixel = 20.0 / CANVAS_W; //20 meters across the whole canvas
+    private static double metersPerPixel = 20.0 / CANVAS_W; //20 meters across the whole canvas
     //world coordinates at top left corner of canvas (default value)
     //user never touches these -> derived from course
-    private double worldX0 = 0.0; 
-    private double worldY0 = 0.0; 
+    private static double worldX0 = 0.0; 
+    private static double worldY0 = 0.0; 
 
     //private static final double TARGET_RADIUS_PIXELS = 5.0; Not used ~Stan
     private static final double BALL_RADIUS_PIXELS = 5.0; 
@@ -103,6 +103,17 @@ public class GameCanvas {
         double worldCenterY = (minY + maxY) / 2.0;
         worldX0 = worldCenterX - (CANVAS_W / 2.0) * metersPerPixel; 
         worldY0 = worldCenterY - (CANVAS_H / 2.0) * metersPerPixel;
+    }
+
+    //Sends size to GolfCourse.java for gamebounds
+    public static double[] sendCanvasSize() {
+        double minX = worldX0;
+        double minY = worldY0;
+
+        double maxX = worldX0 + (CANVAS_W * metersPerPixel);
+        double maxY = worldY0 + (CANVAS_H * metersPerPixel);
+
+        return new double[]{minX, maxX, minY, maxY};
     }
 
     //Terrain layer 

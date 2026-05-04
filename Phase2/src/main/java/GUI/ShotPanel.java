@@ -1,7 +1,5 @@
 package GUI;
 
-import javafx.scene.control.Separator;
-
 import GolfCourseData.GolfCourse;
 import Main.GUI_phase2;
  
@@ -91,7 +89,7 @@ public class ShotPanel {
             title,
             shotCountLabel,
             ballPosLabel,
-            distanceLabel,
+            //distanceLabel,
             shotResultLabel,
             separator(),
             smallLabel("Manual vx (m/s):"), manualVxField,
@@ -162,14 +160,16 @@ public class ShotPanel {
         if (won) {
             shotResultLabel.setText("Hole in one! (" + shotCount + " shots)");
             shotResultLabel.setTextFill(Color.LIGHTGREEN);
+            System.out.println("game Won");
         } 
         else if (inWater) {
-            shotResultLabel.setText("In the water! +1 penalty. Replaying from build.");
-            shotResultLabel.setTextFill(Color.CORNFLOWERBLUE);
-            
             //penalty: count an extra shot and reset position
             recordShot(); 
             onReset();
+            shotResultLabel.setText("In the water! +1 penalty. \nReplaying from build.");
+            shotResultLabel.setTextFill(Color.CORNFLOWERBLUE);
+            System.out.println("in Water");
+            System.out.println(inWater);
         } 
         else {
             shotResultLabel.setText(String.format("Resting %.2f m from target.", dist));
@@ -183,7 +183,7 @@ public class ShotPanel {
 
         ballPosLabel.setText(String.format("Ball: (%.2f, %.2f)", ballState[0], ballState[1]));
 
-        distanceLabel.setText(String.format("Distance: %.2f m", dist));
+        //distanceLabel.setText(String.format("Distance: %.2f m", dist));
     }
 
     //increment shot count and update the label

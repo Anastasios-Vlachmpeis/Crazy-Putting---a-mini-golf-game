@@ -2,6 +2,8 @@ package GolfCourseData;
 
 import java.nio.file.*;
 import java.util.*;
+
+import GUI.GameCanvas;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
@@ -18,11 +20,15 @@ public class GolfCourse {
     private double[] targetValues = {10.5, 5.0, 0.2};
     private String[] start;
     private double[] startValues = {0.0, 0.0, 0.0};
-    private String terrainFormula = "0.5*sin(x-2y)+2.5";
+    private String terrainFormula = "(sin(x-y)/7)+0.5";
+    //Gameborders
+    private double[] size = {0,0,0,0}; //{minX, maxX, minY, maxY}
+    private double borderSteepness = 2;
 
     //GeneratedCourse course = new GeneratedCourse();
 
-    public GolfCourse(){}
+    public GolfCourse(){
+    }
 
     public void loadFromFile(String filePath)throws Exception{
         Map<String, String> data = new HashMap<>();
@@ -36,6 +42,8 @@ public class GolfCourse {
         start = data.get("start").split(",");
 
         terrainFormula = data.get("height");
+        //fetchSize();
+
         System.out.println("New settings loaded");
         convertToDouble();
     }
@@ -45,6 +53,7 @@ public class GolfCourse {
         target = inputValuesGUI[1];
         start = inputValuesGUI[2];
         terrainFormula = heightFormula;
+        //fetchSize();
 
         convertToDouble();
     }
@@ -62,6 +71,10 @@ public class GolfCourse {
             .mapToDouble(Double::parseDouble)
             .toArray();
     }
+    
+    public void fetchSize(){
+        size = GUI.GameCanvas.sendCanvasSize();
+    }
 
     public double calculateHeight(String formula, double x, double y){
         Expression e = new ExpressionBuilder(formula)
@@ -73,6 +86,8 @@ public class GolfCourse {
 
         return e.evaluate();
     }
+
+    //Code a hole method to let the ball fall in the hole
 
     public GolfCourse(double miuK, double miuS) {
         if (miuK != 0.0 && miuS != 0.0){
@@ -93,20 +108,28 @@ public class GolfCourse {
         return calculateHeight(terrainFormula, x, y);
     }
     
-    
     public double[] getDerivative(double x, double y){
+        /*
         double slopeX = (calculateHeight(terrainFormula,x + epsilon, y) - calculateHeight(terrainFormula,x, y))/epsilon;
         double slopeY = (calculateHeight(terrainFormula,x, y + epsilon) - calculateHeight(terrainFormula,x, y))/epsilon;
         return new double[] {slopeX, slopeY};
+        */
+       return new double[] {dhdx(x,y), dhdy(x, y)};
     }
     
 
     public double dhdx(double x, double y){
+        fetchSize();
+        if(x < size[0]) return -1 * borderSteepness;
+        if(x > size[1]) return borderSteepness;
         double slopeX = (calculateHeight(terrainFormula, x + epsilon, y) - calculateHeight(terrainFormula, x, y))/epsilon;
         return slopeX;
     }
 
     public double dhdy(double x, double y){
+        fetchSize();
+        if(y < size[2]) return -1 * borderSteepness;
+        if(y > size[3]) return borderSteepness;
         double slopeY = (calculateHeight(terrainFormula, x, y + epsilon) - calculateHeight(terrainFormula, x, y))/epsilon;
         return slopeY;
     }
