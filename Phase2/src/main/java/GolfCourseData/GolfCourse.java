@@ -61,7 +61,6 @@ public class GolfCourse {
         startValues = Arrays.stream(start)
             .mapToDouble(Double::parseDouble)
             .toArray();
-
     }
 
     public double calculateHeight(String formula, double x, double y){
