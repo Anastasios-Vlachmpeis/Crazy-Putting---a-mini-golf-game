@@ -47,7 +47,7 @@ public class MLBot extends GolfBot {
                 vx = speed * Math.cos(angle);
                 vy = speed * Math.sin(angle);
 
-                System.out.println("random exploration shot");
+                //System.out.println("random exploration shot");
             } else { // learn from the best shot so far
                 vx = bestVx + (random.nextDouble() * 2 - 1);  // change vx a little bit
                 vy = bestVy + (random.nextDouble() * 2 - 1);// change vy a little but
@@ -60,7 +60,7 @@ public class MLBot extends GolfBot {
                     vy = vy / speed * MAX_SPEED;
                 }
 
-                System.out.println("learned shot");
+                //System.out.println("learned shot");
             }
 
             ShotSimulation sim = shotSimulator.simulate(vx, vy); // simulate the shot
@@ -70,7 +70,7 @@ public class MLBot extends GolfBot {
             double finalY = sim.finalY();
 
             distanceToTarget = course.distanceToTarget(finalX, finalY);
-            System.out.println("distanceToHole = " + distanceToTarget);
+            //System.out.println("distanceToHole = " + distanceToTarget);
 
             if (distanceToTarget < bestDistance) {
                 bestDistance = distanceToTarget;
@@ -79,7 +79,7 @@ public class MLBot extends GolfBot {
             }
 
             if (distanceToTarget <= tRadius) {
-                System.out.println("Found shot inside target radius");
+                //System.out.println("Found shot inside target radius");
                 break;
             }
             i++;

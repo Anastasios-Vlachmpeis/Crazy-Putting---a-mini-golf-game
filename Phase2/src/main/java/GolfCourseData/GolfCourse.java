@@ -8,11 +8,8 @@ import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
 public class GolfCourse {
-//Here we extend the methods for actually using the generated course
     public final double epsilon = 1e-7;
 
-    //private double miuK; // kinetic friction coeficient
-    //private double miuS; // static friction coeficient, theoretically its more like a constant. I just put it here to have both mius in one place
     //these values are just test/default values
     private String[] friction;
     private double[] frictionValues = {0.15, 0.5, 0.0};
@@ -20,7 +17,7 @@ public class GolfCourse {
     private double[] targetValues = {10.5, 5.0, 0.2};
     private String[] start;
     private double[] startValues = {0.0, 0.0, 0.0};
-    private String terrainFormula = "(sin(x-y)/7)+0.5";
+    private String terrainFormula = "(sin(x-y)/7)+0.5"; //Default terrain
     //Gameborders
     private double[] size = {0,0,0,0}; //{minX, maxX, minY, maxY}
     private double borderSteepness = 2;
@@ -77,6 +74,13 @@ public class GolfCourse {
     }
 
     public double calculateHeight(String formula, double x, double y){
+        /*
+        //ball is in target radius
+        if(distanceToTarget(x, y) < targetValues[2]){
+            return -10;
+        }
+        */
+
         Expression e = new ExpressionBuilder(formula)
             .variables("x", "y")
             .build();
@@ -116,12 +120,20 @@ public class GolfCourse {
         */
        return new double[] {dhdx(x,y), dhdy(x, y)};
     }
-    
 
     public double dhdx(double x, double y){
         fetchSize();
         if(x < size[0]) return -1 * borderSteepness;
         if(x > size[1]) return borderSteepness;
+        
+        //ball is in range of target -> hole implementation
+        if(distanceToTarget(x, y) < targetValues[2]){
+            if(x < targetValues[0]){
+                return -1* distanceToTarget(x, y);
+            }
+            else return 1* distanceToTarget(x, y);
+        }
+        
         double slopeX = (calculateHeight(terrainFormula, x + epsilon, y) - calculateHeight(terrainFormula, x, y))/epsilon;
         return slopeX;
     }
@@ -130,6 +142,15 @@ public class GolfCourse {
         fetchSize();
         if(y < size[2]) return -1 * borderSteepness;
         if(y > size[3]) return borderSteepness;
+        
+        //ball is in range of target -> hole implementation
+        if(distanceToTarget(x, y) < targetValues[2]){
+            if(y < targetValues[1]){
+                return -1* distanceToTarget(x, y);
+            }
+            else return 1* distanceToTarget(x, y);
+        }
+        
         double slopeY = (calculateHeight(terrainFormula, x, y + epsilon) - calculateHeight(terrainFormula, x, y))/epsilon;
         return slopeY;
     }

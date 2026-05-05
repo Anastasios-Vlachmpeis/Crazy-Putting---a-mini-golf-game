@@ -47,6 +47,8 @@ public class ShotPanel {
         VBox section = new VBox(6);
         section.setPadding(new Insets(12));
 
+        section.setPrefWidth(300);
+
         Label title = sectionLabel("Shot Info & Game State");
 
         // initial values, updated after every shot in onShotLanded() and after reset in
