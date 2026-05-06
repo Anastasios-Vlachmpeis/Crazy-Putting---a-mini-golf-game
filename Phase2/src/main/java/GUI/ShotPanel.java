@@ -129,6 +129,8 @@ public class ShotPanel {
     // Asks bots for a shot, then triggers it
     private void onSimpleBotShot() {
         GolfCourse course = gui.getCourseRelated();
+        double[] ballState = gui.getBall().getState();
+        course.setBallPosition(ballState[0], ballState[1]);
         RungeKuttaSolver solver = new RungeKuttaSolver();
         PhysicsShotSimulator simulator = new PhysicsShotSimulator(course, solver);
         SimpleBot bot = new SimpleBot(course, simulator);
@@ -178,7 +180,9 @@ public class ShotPanel {
 
     // resets ball to start position and clears shot count and result label
     private void onReset() {
-        double[] startPos = gui.getCourseRelated().getStartPosition();
+        GolfCourse course = gui.getCourseRelated();
+        double[] startPos = course.getOriginalStartPosition();
+        course.setBallPosition(startPos[0], startPos[1]);
         double[] resetState = new double[] { startPos[0], startPos[1], 0.0, 0.0 };
         System.out.println("OnReset triggerd");
         gui.getBall().setPos(resetState);
