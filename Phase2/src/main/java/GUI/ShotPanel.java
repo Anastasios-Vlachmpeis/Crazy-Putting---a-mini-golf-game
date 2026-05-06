@@ -180,7 +180,9 @@ public class ShotPanel {
 
     // resets ball to start position and clears shot count and result label
     private void onReset() {
-        double[] startPos = gui.getCourseRelated().getOriginalStartPosition();
+        GolfCourse course = gui.getCourseRelated();
+        double[] startPos = course.getOriginalStartPosition();
+        course.setBallPosition(startPos[0], startPos[1]);
         double[] resetState = new double[] { startPos[0], startPos[1], 0.0, 0.0 };
         System.out.println("OnReset triggerd");
         gui.getBall().setPos(resetState);
