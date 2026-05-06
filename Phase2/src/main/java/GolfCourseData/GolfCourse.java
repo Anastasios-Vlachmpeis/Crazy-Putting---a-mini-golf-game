@@ -17,6 +17,7 @@ public class GolfCourse {
     private double[] targetValues = {10.5, 5.0, 0.2};
     private String[] start;
     private double[] startValues = {0.0, 0.0, 0.0};
+    private double[] originalStartValues = {0.0, 0.0, 0.0};
     private String terrainFormula = "(sin(x-y)/7)+0.5"; //Default terrain
     //Gameborders
     private double[] size = {0,0,0,0}; //{minX, maxX, minY, maxY}
@@ -67,6 +68,7 @@ public class GolfCourse {
         startValues = Arrays.stream(start)
             .mapToDouble(Double::parseDouble)
             .toArray();
+        originalStartValues = Arrays.copyOf(startValues, startValues.length);
     }
     
     public void fetchSize(){
@@ -182,6 +184,13 @@ public class GolfCourse {
     public double[] getStartPosition(){
         double x = startValues[0];
         double y = startValues[1];
+        double height = calculateHeight(terrainFormula, x,y);
+        return new double[] {x, y, height};
+    }
+
+    public double[] getOriginalStartPosition(){
+        double x = originalStartValues[0];
+        double y = originalStartValues[1];
         double height = calculateHeight(terrainFormula, x,y);
         return new double[] {x, y, height};
     }

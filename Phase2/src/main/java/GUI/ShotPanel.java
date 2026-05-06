@@ -178,7 +178,7 @@ public class ShotPanel {
 
     // resets ball to start position and clears shot count and result label
     private void onReset() {
-        double[] startPos = gui.getCourseRelated().getStartPosition();
+        double[] startPos = gui.getCourseRelated().getOriginalStartPosition();
         double[] resetState = new double[] { startPos[0], startPos[1], 0.0, 0.0 };
         System.out.println("OnReset triggerd");
         gui.getBall().setPos(resetState);
@@ -194,6 +194,7 @@ public class ShotPanel {
     // called by GameCanvas after every shot completes to update the shot count,
     // ball position, distance to target, and shot result message
     public void onShotLanded(double[] finalState, double dist, boolean inWater, boolean won) {
+        gui.getCourseRelated().setBallPosition(finalState[0], finalState[1]);
         update(finalState, shotCount, dist);
 
         if (won) {

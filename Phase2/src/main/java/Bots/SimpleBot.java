@@ -25,6 +25,9 @@ public class SimpleBot extends GolfBot {
     private static final double UPHILL_SPEED_SKEW = 1.15;
     private static final double DOWNHILL_SPEED_SKEW = 0.92;
 
+    // Speed skew
+    private static final double SPEED_OVERSHOOT = 1.3;
+
     public SimpleBot(GolfCourse course) {
         super(course);
     }
@@ -125,7 +128,8 @@ public class SimpleBot extends GolfBot {
 
   
         //we calculate the speed of the shot
-        double speed = Math.min(MAX_SPEED, len * 0.2); 
+        double miuK = course.getMiuK();
+        double speed = Math.min(MAX_SPEED, SPEED_OVERSHOOT * Math.sqrt(2.0 * miuK * 9.81 * len));
 
         // Rule 2 ~ If we are relatively close to the hole,
         // we soften speed so our putt is "gentler"
