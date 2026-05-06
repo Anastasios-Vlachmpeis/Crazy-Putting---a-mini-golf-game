@@ -129,6 +129,8 @@ public class ShotPanel {
     // Asks bots for a shot, then triggers it
     private void onSimpleBotShot() {
         GolfCourse course = gui.getCourseRelated();
+        double[] ballState = gui.getBall().getState();
+        course.setBallPosition(ballState[0], ballState[1]);
         RungeKuttaSolver solver = new RungeKuttaSolver();
         PhysicsShotSimulator simulator = new PhysicsShotSimulator(course, solver);
         SimpleBot bot = new SimpleBot(course, simulator);
@@ -194,7 +196,6 @@ public class ShotPanel {
     // called by GameCanvas after every shot completes to update the shot count,
     // ball position, distance to target, and shot result message
     public void onShotLanded(double[] finalState, double dist, boolean inWater, boolean won) {
-        gui.getCourseRelated().setBallPosition(finalState[0], finalState[1]);
         update(finalState, shotCount, dist);
 
         if (won) {
