@@ -11,9 +11,9 @@ public class ColorTerrain {
         double t = Math.min(h / maxH, 1.0); //we want to be between 0 and 1 for the height (we normalize it) -> thats why we also cap it at 1
 
        return Color.rgb(
-            (int)(60  + t * 20),   
-            (int)(210 - t * 60),
-            (int)(80  + t * 20),   
+            (int)(60  + (1.0 - t) * 20),   
+            (int)(210 - (1.0 - t) * 60),
+            (int)(80  + (1.0 - t) * 20),   
             1.0
         );
     }
