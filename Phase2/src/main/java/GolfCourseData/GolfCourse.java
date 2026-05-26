@@ -79,7 +79,6 @@ public class GolfCourse {
 
         e.setVariable("x", x);
         e.setVariable("y", y);
-
         return e.evaluate();
     }
 
