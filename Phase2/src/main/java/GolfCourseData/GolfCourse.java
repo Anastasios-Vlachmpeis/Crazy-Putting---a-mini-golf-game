@@ -38,7 +38,6 @@ public class GolfCourse {
         start = data.get("start").split(",");
 
         terrainFormula = data.get("height");
-        //fetchSize();
 
         System.out.println("New settings loaded");
         convertToDouble();
@@ -49,7 +48,6 @@ public class GolfCourse {
         target = inputValuesGUI[1];
         start = inputValuesGUI[2];
         terrainFormula = heightFormula;
-        //fetchSize();
 
         convertToDouble();
     }
