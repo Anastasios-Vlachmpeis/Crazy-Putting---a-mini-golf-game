@@ -21,6 +21,14 @@ public class PhysicsShotSimulator implements ShotSimulator {
 
     @Override
     public ShotSimulation simulate(double v0x, double v0y) {
+        GolfODE ode = new GolfODE(course);
+        double[] start     = course.getStartPosition(); // [x0, y0, z0]
+        double[] state = { start[0], start[1], v0x, v0y };
+        double[][] solution = solver.solveBall(ode, state, stepsize);
+        double[] lastRow   = solution[solution.length - 1];
+        return ShotSimulation.stoppedAt(lastRow[0], lastRow[1]);
+        /*
+
         // Read starting position and friction coefficients from the course
         double[] start     = course.getStartPosition(); // [x0, y0, z0]
         //double[] frictions = course.getFrictions();     // [muK, muS, ...]
@@ -75,6 +83,7 @@ public class PhysicsShotSimulator implements ShotSimulator {
 
         // Safety fallback: return wherever the ball is after maxsteps
         return ShotSimulation.stoppedAt(state[0], state[1]);
+         */
     }
 
     // Advances the state by one step using whichever solver was injected

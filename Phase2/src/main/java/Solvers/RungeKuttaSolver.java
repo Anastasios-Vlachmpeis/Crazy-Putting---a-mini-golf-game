@@ -37,6 +37,7 @@ public class RungeKuttaSolver implements Solver {
         return nextY;
     }
 
+    
     @Override
     public double[][] solve(ODE equation, double[] y0, double tStart, double tEnd, double h) {
         // formula for steps. i used ceil here in case tStart = 0, tEnd = 1, h = 0.3,
@@ -60,6 +61,7 @@ public class RungeKuttaSolver implements Solver {
 
         return solution;
     }
+    
 
     public double[][] solveBall(GolfODE equation, double[] y0, double h) {
         //ArrayList<double[]> solutionInList = new ArrayList<>(); // I tried something - did not work ~Stan
