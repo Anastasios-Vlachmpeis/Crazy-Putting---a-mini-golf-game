@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 import Solvers.EulerSolver;
 import Systems.ODE;
 
-// Same structure as RungeKuttaExperiment, but uses the Euler solver and writes to euler_results.csv
+
 public class EulerExperiment {
     public static void main(String[] args) {
 
