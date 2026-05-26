@@ -23,8 +23,6 @@ public class GolfCourse {
     private double[] size = {0,0,0,0}; //{minX, maxX, minY, maxY}
     private double borderSteepness = 2;
 
-    //GeneratedCourse course = new GeneratedCourse();
-
     public GolfCourse(){
     }
 
@@ -76,12 +74,6 @@ public class GolfCourse {
     }
 
     public double calculateHeight(String formula, double x, double y){
-        /*
-        //ball is in target radius
-        if(distanceToTarget(x, y) < targetValues[2]){
-            return -10;
-        }
-        */
 
         Expression e = new ExpressionBuilder(formula)
             .variables("x", "y")
@@ -92,8 +84,6 @@ public class GolfCourse {
 
         return e.evaluate();
     }
-
-    //Code a hole method to let the ball fall in the hole
 
     public GolfCourse(double miuK, double miuS) {
         if (miuK != 0.0 && miuS != 0.0){
@@ -115,11 +105,6 @@ public class GolfCourse {
     }
     
     public double[] getDerivative(double x, double y){
-        /*
-        double slopeX = (calculateHeight(terrainFormula,x + epsilon, y) - calculateHeight(terrainFormula,x, y))/epsilon;
-        double slopeY = (calculateHeight(terrainFormula,x, y + epsilon) - calculateHeight(terrainFormula,x, y))/epsilon;
-        return new double[] {slopeX, slopeY};
-        */
        return new double[] {dhdx(x,y), dhdy(x, y)};
     }
 
@@ -162,22 +147,10 @@ public class GolfCourse {
     }
 
     public double[] getFrictions(){
-        /*
-        double friction1 = course.courseData[0][0];
-        double friction2 = course.courseData[0][1];
-        double friction3 = course.courseData[0][2];
-        return new double[] {friction1, friction2, friction3};
-        */
        return frictionValues;
     }
 
     public double[] getTargetXYR(){
-        /*
-        double x = course.courseData[1][0];
-        double y = course.courseData[1][1];
-        double radius = course.courseData[1][2];
-        return new double[] {x, y, radius};
-        */
        return targetValues;
     }
 
