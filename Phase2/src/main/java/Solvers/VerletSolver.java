@@ -1,6 +1,8 @@
 package Solvers;
 
 import java.util.Arrays;
+
+import Systems.GolfODE;
 import Systems.ODE;
 
 public class VerletSolver implements Solver {
@@ -57,5 +59,10 @@ public class VerletSolver implements Solver {
         }
 
         return results.toArray(new double[0][]);
+    }
+
+    //placeholder to make it compile
+    public double[][] solveBall(GolfODE equation, double[] y0, double h){
+        return new double[][] {{0},{0}}; 
     }
 }

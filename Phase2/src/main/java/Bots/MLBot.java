@@ -40,7 +40,7 @@ public class MLBot extends GolfBot {
             // chance to explor e the map in a random direction rather than learn from the
             // best shot si far, in order to maybe find a better path
             // first shot doesnt have other shots to learn from so its also random
-            if (i == 0 || random.nextDouble() < exploreChance) {
+            if (i < 20 || random.nextDouble() < exploreChance) {
                 double angle = random.nextDouble() * 2 * Math.PI; // get direction randomly based on a unit circle
                 double speed = random.nextDouble() * MAX_SPEED; // get random speed, max <= 5
 

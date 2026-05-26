@@ -1,6 +1,10 @@
 package Solvers;
 
 import java.util.Arrays;
+
+import GolfCourseData.GolfCourse;
+import ShotEngine.ShotSimulation;
+
 import java.util.ArrayList;
 
 import Systems.*;
@@ -61,6 +65,8 @@ public class RungeKuttaSolver implements Solver {
         //ArrayList<double[]> solutionInList = new ArrayList<>(); // I tried something - did not work ~Stan
         double[][] solution = new double[y0.length][y0.length + 1];
 
+        double[] targetValues = ((GolfODE) equation).getCourse().getTargetXYR();
+
         double t = 0.0;
         double[] y = Arrays.copyOf(y0, y0.length);
 
@@ -68,10 +74,11 @@ public class RungeKuttaSolver implements Solver {
         solution[0] = storeRow(t, y);
         double miuS = equation.getCourse().getMiuS();
 
-        int MAX_STEPS = 50_000;
+        int MAX_STEPS = 5_000;
         int k = 1;
         while (k < MAX_STEPS) { //don't make it dependent on size of the course since the size is dynamic 
 
+            System.out.println(k);
             double speed = Math.sqrt(y[2] * y[2] + y[3] * y[3]);
 
             double hx = equation.getCourse().dhdx(y[0], y[1]);
@@ -96,6 +103,13 @@ public class RungeKuttaSolver implements Solver {
                 //solutionInList.add(storeRow(t, y));
                 //solution[0] = storeRow(t, y);
                 solution[k++] = storeRow(t, y);
+                break; // stop the simulation
+            }
+
+            // ball is in the hole
+            double distanceTarget = Math.sqrt((y[0]-targetValues[0])*(y[0]-targetValues[0])+(y[1]-targetValues[1])*(y[1]-targetValues[1]));
+            //System.out.println("Distance to Hole: " + distanceTarget + " vs Required Radius: " + targetValues[2]);
+            if (distanceTarget < 0.75 * targetValues[2]){
                 break; // stop the simulation
             }
 

@@ -36,4 +36,9 @@ public class EulerSolver implements Solver {
         return results.toArray(new double[0][]);
         
     }
+
+    //placeholder to make it compile
+    public double[][] solveBall(GolfODE equation, double[] y0, double h){
+        return new double[][] {{0},{0}}; 
+    }
 }
