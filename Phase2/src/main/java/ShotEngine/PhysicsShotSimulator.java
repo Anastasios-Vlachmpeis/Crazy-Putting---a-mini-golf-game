@@ -1,5 +1,5 @@
 package ShotEngine;
-
+/* 
 import GolfCourseData.GolfCourse;
 import Solvers.Solver;
 import Systems.GolfODE;
@@ -21,15 +21,6 @@ public class PhysicsShotSimulator implements ShotSimulator {
 
     @Override
     public ShotSimulation simulate(double v0x, double v0y) {
-        GolfODE ode = new GolfODE(course);
-        double[] start     = course.getStartPosition(); // [x0, y0, z0]
-        double[] state = { start[0], start[1], v0x, v0y };
-        double[][] solution = solver.solveBall(ode, state, stepsize);
-        double[] lastRow   = solution[solution.length - 1];
-        return ShotSimulation.stoppedAt(lastRow[0], lastRow[1]);
-        /*
-
-        // Read starting position and friction coefficients from the course
         double[] start     = course.getStartPosition(); // [x0, y0, z0]
         //double[] frictions = course.getFrictions();     // [muK, muS, ...]
 
@@ -83,14 +74,13 @@ public class PhysicsShotSimulator implements ShotSimulator {
 
         // Safety fallback: return wherever the ball is after maxsteps
         return ShotSimulation.stoppedAt(state[0], state[1]);
-         */
     }
 
     // Advances the state by one step using whichever solver was injected
     private double[] stepOnce(GolfODE ode, double[] state, double t) {
         double[][] solution = solver.solveBall(ode, state, stepsize); // changed the solving method to solveBall
         //double[][] solution = solver.solve(ode, state, t, t+stepsize, stepsize); //Using this one because Euler/RK4 and Verlet wont compile otherwise. Should not change functionality
-        System.out.println("Check");
+        //System.out.println("Check");
         // solve() rows are [t, x, y, vx, vy]
         double[] lastRow   = solution[solution.length - 1];
         double[] nextState = new double[state.length];
@@ -100,3 +90,4 @@ public class PhysicsShotSimulator implements ShotSimulator {
         return nextState;
     }
 }
+*/

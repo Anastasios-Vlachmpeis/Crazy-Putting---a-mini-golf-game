@@ -1,7 +1,8 @@
 package Bots;
 
 import GolfCourseData.GolfCourse;
-import ShotEngine.ShotSimulator;
+//import ShotEngine.ShotSimulator;
+import Solvers.Solver;
 
 
 // Rule-based bot, with the following rules:
@@ -31,9 +32,13 @@ public class SimpleBot extends GolfBot {
     public SimpleBot(GolfCourse course) {
         super(course);
     }
-
+    /* 
     public SimpleBot(GolfCourse course, ShotSimulator shotSimulator) {
         super(course, shotSimulator);
+    }
+    */
+    public SimpleBot(GolfCourse course, Solver solver) {
+        super(course, solver);
     }
 
     public double[] shoot() {

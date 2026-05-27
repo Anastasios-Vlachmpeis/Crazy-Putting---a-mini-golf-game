@@ -7,9 +7,10 @@ package Experiment;
 import Bots.SimpleBot;
 //import GolfCourseData.GeneratedCourse;
 import GolfCourseData.GolfCourse;
-import ShotEngine.PhysicsShotSimulator;
-import ShotEngine.ShotSimulation;
+//import ShotEngine.PhysicsShotSimulator;
+//import ShotEngine.ShotSimulation;
 import Solvers.RungeKuttaSolver;
+import Systems.GolfODE;
 
 //Experiment to test the rule based bot on the generated course
 public class BotCourseExperiment {
@@ -18,14 +19,12 @@ public class BotCourseExperiment {
     private static final int MAX_SHOTS = 100;
 
     public static void main(String[] args) {
-        //GeneratedCourse gen = new GeneratedCourse();
-        //double miuK = gen.courseData[0][0];
-        //double miuS = gen.courseData[0][1];
         GolfCourse course = new GolfCourse(0, 0);
 
         RungeKuttaSolver solver = new RungeKuttaSolver();
-        PhysicsShotSimulator shotSim = new PhysicsShotSimulator(course, solver);
-        SimpleBot bot = new SimpleBot(course, shotSim);
+        //PhysicsShotSimulator shotSim = new PhysicsShotSimulator(course, solver);
+        //SimpleBot bot = new SimpleBot(course, shotSim);
+        SimpleBot bot = new SimpleBot(course, solver);
 
         double[] target = course.getTargetXYR();
         double holeR = target[2];
@@ -46,19 +45,35 @@ public class BotCourseExperiment {
             }
 
             System.out.printf("Shot %d: vx=%.4f vy=%.4f |v|=%.4f m/s%n", shot, v[0], v[1], speed);
-
+            /* 
             ShotSimulation result = shotSim.simulate(v[0], v[1]);
             double fx = result.finalX();
             double fy = result.finalY();
+            */
+            // Set up the starting state with your velocity inputs (v[0] and v[1])
+            double[] startState = { course.getStartPosition()[0], course.getStartPosition()[1], v[0], v[1] };
+            GolfODE ode = new GolfODE(course);
+
+            // Ask the solver to calculate the entire shot
+            double[][] fullShotTrajectory = solver.solveBall(ode, startState, 0.01);
+
+            // Get the very last row of the array (where the ball stopped)
+            double[] finalState = fullShotTrajectory[fullShotTrajectory.length - 1];
+
+            // Extract the final X and Y coordinates
+            // Note: Index 0 is time (t), Index 1 is X, Index 2 is Y
+            double fx = finalState[1];
+            double fy = finalState[2];
             double dist = course.distanceToTarget(fx, fy);
 
             System.out.printf("Lands at (%.4f, %.4f) dist to hole %.4f m%n", fx, fy, dist);
-
+            /* 
             if (result.outOfBounds()) {
                 System.out.println("Ball is out of bounds");
                 finished = true;
                 break;
             }
+            */
             if (dist <= holeR) {
                 System.out.println("GAME");
                 finished = true;

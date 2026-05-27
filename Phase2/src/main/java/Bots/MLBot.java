@@ -3,23 +3,28 @@ package Bots;
 import java.util.Random;
 
 import GolfCourseData.GolfCourse;
-import ShotEngine.ShotSimulation;
-import ShotEngine.ShotSimulator;
+//import ShotEngine.ShotSimulation;
+//import ShotEngine.ShotSimulator;
+import Systems.GolfODE;
+import Solvers.RungeKuttaSolver;
+import Solvers.Solver;
 
 public class MLBot extends GolfBot {
 
     private static final double MAX_SPEED = 5.0;
     private final Random random = new Random();
-
+    /* 
     public MLBot(GolfCourse course, ShotSimulator shotSimulator) {
         super(course, shotSimulator);
+    }
+    */
+    public MLBot(GolfCourse course, Solver solver) {
+        super(course, solver);
     }
 
     public double[] shoot() {
         System.out.println("start MLBot");
         double[] target = course.getTargetXYR();
-        double tx = target[0];
-        double ty = target[1];
         double tRadius = target[2];
         double bestVx = 0;
         double bestVy = 0;
@@ -62,16 +67,30 @@ public class MLBot extends GolfBot {
 
                 //System.out.println("learned shot");
             }
-
+            /* 
             ShotSimulation sim = shotSimulator.simulate(vx, vy); // simulate the shot
 
             // get results from simulation
             double finalX = sim.finalX();
             double finalY = sim.finalY();
-
+            
             distanceToTarget = course.distanceToTarget(finalX, finalY);
             //System.out.println("distanceToHole = " + distanceToTarget);
+            */
 
+            /////
+            double[] startState = { course.getStartPosition()[0], course.getStartPosition()[1], vx, vy };
+            GolfODE ode = new GolfODE(course);
+            RungeKuttaSolver solver = new RungeKuttaSolver();
+
+            double[][] fullShotTrajectory = solver.solveBall(ode, startState, 0.01);
+            double[] finalState = fullShotTrajectory[fullShotTrajectory.length - 1];
+            double finalX = finalState[1];
+            double finalY = finalState[2];
+
+            distanceToTarget = course.distanceToTarget(finalX, finalY);
+            //////
+            
             if (distanceToTarget < bestDistance) {
                 bestDistance = distanceToTarget;
                 bestVx = vx;

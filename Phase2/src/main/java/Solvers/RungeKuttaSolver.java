@@ -3,7 +3,7 @@ package Solvers;
 import java.util.Arrays;
 
 import GolfCourseData.GolfCourse;
-import ShotEngine.ShotSimulation;
+//import ShotEngine.ShotSimulation;
 
 import java.util.ArrayList;
 
