@@ -7,14 +7,6 @@ import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
 public class TerrainManipulation {
-    //Here we add:
-    //Height function
-    //the Gaussian bell curves
-    //The physical hole
-
-    //returns:
-    //total height 
-
 
     private List<Hill> hills = new ArrayList<>(); //Artificial added Hills/valleys
     //private GolfCourse currentCourse = new GolfCourse(){};
