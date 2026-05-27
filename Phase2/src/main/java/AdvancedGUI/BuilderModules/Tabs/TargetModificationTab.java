@@ -11,11 +11,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
-public class TargetModificationView extends BorderPane {
+public class TargetModificationTab extends BorderPane {
 
     private CoursePreview coursePreview;
 
-    public TargetModificationView(GolfCourse course, double[] preViewSize) {
+    public TargetModificationTab(GolfCourse course, double[] preViewSize) {
         
         // LEFT SIDE: Preview
         //Canvas previewCanvas = new Canvas(400, 400);

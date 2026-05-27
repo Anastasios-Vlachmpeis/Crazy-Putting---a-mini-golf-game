@@ -10,7 +10,7 @@ import javafx.scene.paint.Color;
 public class CoursePreview extends Canvas {
 
     private final GolfCourse course;
-    private int resolutionSize = 3; //#pixels per "color tile"
+    private int resolutionSize = 2; //#pixels per "color tile"
 
     // Constructor defines the size of the preview canvas
     public CoursePreview(GolfCourse course, double width, double height) {
@@ -96,7 +96,7 @@ public class CoursePreview extends Canvas {
         double heightVal = course.height(gameX, gameY);
 
         // Simple procedural shading: higher ground is lighter green
-        double greenIntensity = 0.4 + (heightVal * 0.1);
+        double greenIntensity = 0.4 + (heightVal * 0.05);
     
         // Clamp the value strictly between 0.1 and 0.9 to prevent out-of-bounds color ranges
         greenIntensity = Math.max(0.1, Math.min(0.9, greenIntensity));

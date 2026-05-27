@@ -1,9 +1,10 @@
 package AdvancedGUI;
 
 import GolfCourseData.GolfCourse;
-import AdvancedGUI.BuilderModules.Tabs.BaseModificationView;
-import AdvancedGUI.BuilderModules.Tabs.HillModificationView;
-import AdvancedGUI.BuilderModules.Tabs.TargetModificationView;
+import AdvancedGUI.BuilderModules.Tabs.BaseModificationTab;
+import AdvancedGUI.BuilderModules.Tabs.HillModificationTab;
+import AdvancedGUI.BuilderModules.Tabs.SaveLoadPresetsTab;
+import AdvancedGUI.BuilderModules.Tabs.TargetModificationTab;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -34,31 +35,36 @@ public class GUI_courseBuilder {
         TabPane tabPane = new TabPane();
 
         // Create tab content views
-        BaseModificationView baseView = new BaseModificationView(course, preViewSize);
-        HillModificationView hillView = new HillModificationView(course, preViewSize);
-        TargetModificationView targetView = new TargetModificationView(course, preViewSize);
+        SaveLoadPresetsTab saveLoadView = new SaveLoadPresetsTab(course, preViewSize);
+        BaseModificationTab baseView = new BaseModificationTab(course, preViewSize);
+        HillModificationTab hillView = new HillModificationTab(course, preViewSize);
+        TargetModificationTab targetView = new TargetModificationTab(course, preViewSize);
 
         //Set up the Tabs
+        Tab saveLoadTab = new Tab("Save / Load", saveLoadView);
         Tab baseTab = new Tab("Dimensions", baseView);
         Tab hillTab = new Tab("Hills & Slopes", hillView);
         Tab targetTab = new Tab("Target / Hole", targetView);
 
+        saveLoadTab.setClosable(false); 
         baseTab.setClosable(false);        
         hillTab.setClosable(false);        
         targetTab.setClosable(false);
 
-        tabPane.getTabs().addAll(baseTab, hillTab, targetTab);
+        tabPane.getTabs().addAll(saveLoadTab, baseTab, hillTab, targetTab);
 
         //Listening for preview updates for all tabs
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if (newTab != null) {
                 // Check which tab content was opened, cast it, and call its refresh method
-                if (newTab.getContent() instanceof BaseModificationView) {
-                    ((BaseModificationView) newTab.getContent()).refreshView();
-                } else if (newTab.getContent() instanceof HillModificationView) {
-                    ((HillModificationView) newTab.getContent()).refreshView();
-                } else if (newTab.getContent() instanceof TargetModificationView) {
-                    ((TargetModificationView) newTab.getContent()).refreshView();
+                if (newTab.getContent() instanceof SaveLoadPresetsTab) {
+                    ((SaveLoadPresetsTab) newTab.getContent()).refreshView();
+                } else if (newTab.getContent() instanceof BaseModificationTab) {
+                    ((BaseModificationTab) newTab.getContent()).refreshView();
+                } else if (newTab.getContent() instanceof HillModificationTab) {
+                    ((HillModificationTab) newTab.getContent()).refreshView();
+                } else if (newTab.getContent() instanceof TargetModificationTab) {
+                    ((TargetModificationTab) newTab.getContent()).refreshView();
                 }
             }
         });
