@@ -1,4 +1,4 @@
-package GUI;
+package SimpleGUI;
 
 import javafx.scene.paint.Color;
 

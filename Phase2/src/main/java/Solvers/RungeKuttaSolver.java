@@ -80,7 +80,7 @@ public class RungeKuttaSolver implements Solver {
         int k = 1;
         while (k < MAX_STEPS) { //don't make it dependent on size of the course since the size is dynamic 
 
-            System.out.println(k);
+            //System.out.println(k);
             double speed = Math.sqrt(y[2] * y[2] + y[3] * y[3]);
 
             double hx = equation.getCourse().dhdx(y[0], y[1]);

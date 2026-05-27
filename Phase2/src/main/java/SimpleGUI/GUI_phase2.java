@@ -1,6 +1,5 @@
-package Main;
+package SimpleGUI;
 
-import GUI.*;
 import GolfCourseData.*;
 import Physics.*;
 import Systems.GolfODE;
