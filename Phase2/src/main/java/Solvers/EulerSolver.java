@@ -6,6 +6,7 @@ import Systems.GolfODE;
 import Systems.ODE;
 
 public class EulerSolver implements Solver {
+    
     @Override
     public double[][] solve(ODE equation, double[] y0, double tStart, double tEnd, double h){   // Now we're storing the values from solver instead of printing them
         double stepSize = h; //Since it's just h in the GUI
@@ -35,5 +36,11 @@ public class EulerSolver implements Solver {
         }
         return results.toArray(new double[0][]);
         
+    }
+    
+
+    //placeholder to make it compile
+    public double[][] solveBall(GolfODE equation, double[] y0, double h){
+        return new double[][] {{0},{0}}; 
     }
 }

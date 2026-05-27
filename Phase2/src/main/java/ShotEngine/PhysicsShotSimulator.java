@@ -1,5 +1,5 @@
 package ShotEngine;
-
+/* 
 import GolfCourseData.GolfCourse;
 import Solvers.Solver;
 import Systems.GolfODE;
@@ -21,12 +21,11 @@ public class PhysicsShotSimulator implements ShotSimulator {
 
     @Override
     public ShotSimulation simulate(double v0x, double v0y) {
-        // Read starting position and friction coefficients from the course
         double[] start     = course.getStartPosition(); // [x0, y0, z0]
-        double[] frictions = course.getFrictions();     // [muK, muS, ...]
+        //double[] frictions = course.getFrictions();     // [muK, muS, ...]
 
         // GolfODE needs a CourseProfile build one that delegates to GolfCourse
-        GolfCourse profile = new GolfCourse(frictions[0], frictions[1]);
+        //GolfCourse profile = new GolfCourse(frictions[0], frictions[1]);
         GolfODE ode = new GolfODE(course); // changed this from profile to course bc the mlbot didnt update when the courses changed ~Damian
 
         // Initial state vector: [x, y, vx, vy]
@@ -67,7 +66,7 @@ public class PhysicsShotSimulator implements ShotSimulator {
             // Advance one timestep
             state = stepOnce(ode, state, t);
 
-            //Debugging ~Stan
+            //Debugging
             //System.out.println("T: " + t);
 
             t += stepsize;
@@ -79,9 +78,9 @@ public class PhysicsShotSimulator implements ShotSimulator {
 
     // Advances the state by one step using whichever solver was injected
     private double[] stepOnce(GolfODE ode, double[] state, double t) {
-        //double[][] solution = solver.solveBall(ode, state, stepsize); // changed the solving method to solveBall
-        double[][] solution = solver.solve(ode, state, t, t+stepsize, stepsize); //Using this one because Euler/RK4 and Verlet wont compile otherwise. Should not change functionality
-
+        double[][] solution = solver.solveBall(ode, state, stepsize); // changed the solving method to solveBall
+        //double[][] solution = solver.solve(ode, state, t, t+stepsize, stepsize); //Using this one because Euler/RK4 and Verlet wont compile otherwise. Should not change functionality
+        //System.out.println("Check");
         // solve() rows are [t, x, y, vx, vy]
         double[] lastRow   = solution[solution.length - 1];
         double[] nextState = new double[state.length];
@@ -91,3 +90,4 @@ public class PhysicsShotSimulator implements ShotSimulator {
         return nextState;
     }
 }
+*/

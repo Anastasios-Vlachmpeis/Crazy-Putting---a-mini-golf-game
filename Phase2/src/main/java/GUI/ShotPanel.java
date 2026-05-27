@@ -5,7 +5,7 @@ import Bots.SimpleBot;
 
 import GolfCourseData.GolfCourse;
 import Main.GUI_phase2;
-import ShotEngine.PhysicsShotSimulator;
+//import ShotEngine.PhysicsShotSimulator;
 import Solvers.RungeKuttaSolver;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -132,8 +132,9 @@ public class ShotPanel {
         double[] ballState = gui.getBall().getState();
         course.setBallPosition(ballState[0], ballState[1]);
         RungeKuttaSolver solver = new RungeKuttaSolver();
-        PhysicsShotSimulator simulator = new PhysicsShotSimulator(course, solver);
-        SimpleBot bot = new SimpleBot(course, simulator);
+        //PhysicsShotSimulator simulator = new PhysicsShotSimulator(course, solver);
+        SimpleBot bot = new SimpleBot(course, solver);
+        //SimpleBot bot = new SimpleBot(course, simulator);
 
         double[] velocity = bot.shoot();
         double vx = velocity[0];
@@ -149,8 +150,9 @@ public class ShotPanel {
     private void onMLBotShot() {
         GolfCourse course = gui.getCourseRelated();
         RungeKuttaSolver solver = new RungeKuttaSolver();
-        PhysicsShotSimulator simulator = new PhysicsShotSimulator(course, solver);
-        MLBot bot = new MLBot(course, simulator);
+        //PhysicsShotSimulator simulator = new PhysicsShotSimulator(course, solver);
+        MLBot bot = new MLBot(course, solver);
+        //MLBot bot = new MLBot(course, simulator);
 
         double[] velocity = bot.shoot();
         double vx = velocity[0];

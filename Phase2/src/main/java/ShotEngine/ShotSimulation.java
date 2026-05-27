@@ -7,6 +7,7 @@ Immutable result of a single shot simulation.
 @param inWater     true if ball ended in water
 @param outOfBounds true if ball ended out of bounds
  */
+/*
 public record ShotSimulation(double finalX, double finalY, boolean inWater, boolean outOfBounds) {
 
     //ball ended normally
@@ -25,3 +26,4 @@ public record ShotSimulation(double finalX, double finalY, boolean inWater, bool
         return new ShotSimulation(x, y, false, true);
     }
 }
+*/

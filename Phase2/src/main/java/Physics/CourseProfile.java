@@ -1,5 +1,5 @@
 package Physics;
-
+/* 
 public class CourseProfile {
     private final double miuK; // kinetic friction coeficient
     private final double miuS; // static friction coeficient, theoretically its more like a constant. I just put it here to have both mius in one place
@@ -42,4 +42,4 @@ public class CourseProfile {
 
     // later we can add getters for the tartet also
 }
-
+*/

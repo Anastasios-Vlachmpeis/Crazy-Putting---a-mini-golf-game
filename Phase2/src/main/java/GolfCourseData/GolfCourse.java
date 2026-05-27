@@ -3,10 +3,6 @@ package GolfCourseData;
 import java.nio.file.*;
 import java.util.*;
 
-import GUI.GameCanvas;
-import net.objecthunter.exp4j.Expression;
-import net.objecthunter.exp4j.ExpressionBuilder;
-
 public class GolfCourse {
     public final double epsilon = 1e-7;
 
@@ -25,6 +21,8 @@ public class GolfCourse {
 
     public GolfCourse(){
     }
+
+    private TerrainManipulation TerrainManipulator = new TerrainManipulation();
 
     public void loadFromFile(String filePath)throws Exception{
         Map<String, String> data = new HashMap<>();
@@ -71,17 +69,18 @@ public class GolfCourse {
         size = GUI.GameCanvas.sendCanvasSize();
     }
 
+    /*
     public double calculateHeight(String formula, double x, double y){
-
+        //Made a new class for the height to add more functionality
         Expression e = new ExpressionBuilder(formula)
             .variables("x", "y")
             .build();
 
         e.setVariable("x", x);
         e.setVariable("y", y);
-
         return e.evaluate();
     }
+    */
 
     public GolfCourse(double miuK, double miuS) {
         if (miuK != 0.0 && miuS != 0.0){
@@ -99,7 +98,8 @@ public class GolfCourse {
     }
 
     public double height(double x, double y){
-        return calculateHeight(terrainFormula, x, y);
+        //return calculateHeight(terrainFormula, x, y);
+        return TerrainManipulator.calculateHeight(terrainFormula, x, y, targetValues);
     }
     
     public double[] getDerivative(double x, double y){
@@ -111,6 +111,7 @@ public class GolfCourse {
         if(x < size[0]) return -1 * borderSteepness;
         if(x > size[1]) return borderSteepness;
         
+        /*
         //ball is in range of target -> hole implementation
         if(distanceToTarget(x, y) < targetValues[2]){
             if(x < targetValues[0]){
@@ -118,8 +119,9 @@ public class GolfCourse {
             }
             else return 1* distanceToTarget(x, y);
         }
+        */
         
-        double slopeX = (calculateHeight(terrainFormula, x + epsilon, y) - calculateHeight(terrainFormula, x, y))/epsilon;
+        double slopeX = (TerrainManipulator.calculateHeight(terrainFormula, x + epsilon, y, targetValues) - TerrainManipulator.calculateHeight(terrainFormula, x, y, targetValues))/epsilon;
         return slopeX;
     }
 
@@ -128,6 +130,7 @@ public class GolfCourse {
         if(y < size[2]) return -1 * borderSteepness;
         if(y > size[3]) return borderSteepness;
         
+        /*
         //ball is in range of target -> hole implementation
         if(distanceToTarget(x, y) < targetValues[2]){
             if(y < targetValues[1]){
@@ -135,13 +138,14 @@ public class GolfCourse {
             }
             else return 1* distanceToTarget(x, y);
         }
+        */
         
-        double slopeY = (calculateHeight(terrainFormula, x, y + epsilon) - calculateHeight(terrainFormula, x, y))/epsilon;
+        double slopeY = (TerrainManipulator.calculateHeight(terrainFormula, x, y + epsilon, targetValues) - TerrainManipulator.calculateHeight(terrainFormula, x, y, targetValues))/epsilon;
         return slopeY;
     }
 
     public boolean isWater(double x, double y) {
-        return calculateHeight(terrainFormula, x, y) < 0;
+        return TerrainManipulator.calculateHeight(terrainFormula, x, y, targetValues) < 0;
     }
 
     public double[] getFrictions(){
@@ -155,14 +159,14 @@ public class GolfCourse {
     public double[] getStartPosition(){
         double x = startValues[0];
         double y = startValues[1];
-        double height = calculateHeight(terrainFormula, x,y);
+        double height = TerrainManipulator.calculateHeight(terrainFormula, x,y, targetValues);
         return new double[] {x, y, height};
     }
 
     public double[] getOriginalStartPosition(){
         double x = originalStartValues[0];
         double y = originalStartValues[1];
-        double height = calculateHeight(terrainFormula, x,y);
+        double height = TerrainManipulator.calculateHeight(terrainFormula, x,y, targetValues);
         return new double[] {x, y, height};
     }
 
