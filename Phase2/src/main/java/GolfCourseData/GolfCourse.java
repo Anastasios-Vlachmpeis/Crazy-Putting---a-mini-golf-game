@@ -111,16 +111,6 @@ public class GolfCourse {
         if(x < size[0]) return -1 * borderSteepness;
         if(x > size[1]) return borderSteepness;
         
-        /*
-        //ball is in range of target -> hole implementation
-        if(distanceToTarget(x, y) < targetValues[2]){
-            if(x < targetValues[0]){
-                return -1* distanceToTarget(x, y);
-            }
-            else return 1* distanceToTarget(x, y);
-        }
-        */
-        
         double slopeX = (TerrainManipulator.calculateHeight(terrainFormula, x + epsilon, y, targetValues) - TerrainManipulator.calculateHeight(terrainFormula, x, y, targetValues))/epsilon;
         return slopeX;
     }
