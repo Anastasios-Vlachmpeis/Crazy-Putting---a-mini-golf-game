@@ -1,10 +1,9 @@
-package GUI;
+package SimpleGUI;
 
 import Bots.MLBot;
 import Bots.SimpleBot;
 
 import GolfCourseData.GolfCourse;
-import Main.GUI_phase2;
 //import ShotEngine.PhysicsShotSimulator;
 import Solvers.RungeKuttaSolver;
 import javafx.geometry.Insets;

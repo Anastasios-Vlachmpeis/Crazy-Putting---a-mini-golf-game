@@ -37,7 +37,7 @@ public class MLBot extends GolfBot {
         
         int i = 0;
         while (distanceToTarget > tRadius) {
-            System.out.println("shot nr " + (i + 1));
+            //System.out.println("shot nr " + (i + 1));
 
             double vx;
             double vy;
@@ -78,7 +78,7 @@ public class MLBot extends GolfBot {
             //System.out.println("distanceToHole = " + distanceToTarget);
             */
 
-            /////
+            ///// Added this block to bypass the shotSimulator package
             double[] startState = { course.getStartPosition()[0], course.getStartPosition()[1], vx, vy };
             GolfODE ode = new GolfODE(course);
             RungeKuttaSolver solver = new RungeKuttaSolver();
@@ -103,7 +103,7 @@ public class MLBot extends GolfBot {
             }
             i++;
         }
-
+        System.out.println("shot nr " + (i + 1));
         System.out.println(" bestVx = " + bestVx + " bestVy = " + bestVy + " bestDistance = " + bestDistance);
 
         return new double[] { bestVx, bestVy };

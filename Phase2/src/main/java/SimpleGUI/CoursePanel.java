@@ -1,9 +1,6 @@
-package GUI;
+package SimpleGUI;
 
 import GolfCourseData.*;
-//import Physics.CourseProfile;
-import Main.GUI_phase2;
- 
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;

@@ -10,13 +10,13 @@ public class GolfCourse {
     private String[] friction;
     private double[] frictionValues = {0.15, 0.5, 0.0};
     private String[] target;
-    private double[] targetValues = {10.5, 5.0, 0.2};
+    private double[] targetValues = {0, 0, 0.2};
     private String[] start;
     private double[] startValues = {0.0, 0.0, 0.0};
     private double[] originalStartValues = {0.0, 0.0, 0.0};
     private String terrainFormula = "(sin(x-y)/7)+0.5"; //Default terrain
     //Gameborders
-    private double[] size = {0,0,0,0}; //{minX, maxX, minY, maxY}
+    private double[] size = {-5,5,-5,5}; //{minX, maxX, minY, maxY}
     private double borderSteepness = 2;
 
     public GolfCourse(){
@@ -65,22 +65,21 @@ public class GolfCourse {
         originalStartValues = Arrays.copyOf(startValues, startValues.length);
     }
     
-    public void fetchSize(){
-        size = GUI.GameCanvas.sendCanvasSize();
+    public void fetchSize(){//For phase 2 GUI
+        size = SimpleGUI.GameCanvas.sendCanvasSize();
     }
 
-    /*
-    public double calculateHeight(String formula, double x, double y){
-        //Made a new class for the height to add more functionality
-        Expression e = new ExpressionBuilder(formula)
-            .variables("x", "y")
-            .build();
-
-        e.setVariable("x", x);
-        e.setVariable("y", y);
-        return e.evaluate();
+    public void setSize(double minX, double maxX, double minY, double maxY){////For phase 3 GUI
+        size = new double[]{minX, maxX, minY, maxY};
     }
-    */
+
+    public double[] getSize() {
+        return this.size;
+    }
+
+    public void setTerrainFormula(String formula){
+        terrainFormula = formula;
+    }
 
     public GolfCourse(double miuK, double miuS) {
         if (miuK != 0.0 && miuS != 0.0){
@@ -111,16 +110,6 @@ public class GolfCourse {
         if(x < size[0]) return -1 * borderSteepness;
         if(x > size[1]) return borderSteepness;
         
-        /*
-        //ball is in range of target -> hole implementation
-        if(distanceToTarget(x, y) < targetValues[2]){
-            if(x < targetValues[0]){
-                return -1* distanceToTarget(x, y);
-            }
-            else return 1* distanceToTarget(x, y);
-        }
-        */
-        
         double slopeX = (TerrainManipulator.calculateHeight(terrainFormula, x + epsilon, y, targetValues) - TerrainManipulator.calculateHeight(terrainFormula, x, y, targetValues))/epsilon;
         return slopeX;
     }
@@ -129,17 +118,7 @@ public class GolfCourse {
         fetchSize();
         if(y < size[2]) return -1 * borderSteepness;
         if(y > size[3]) return borderSteepness;
-        
-        /*
-        //ball is in range of target -> hole implementation
-        if(distanceToTarget(x, y) < targetValues[2]){
-            if(y < targetValues[1]){
-                return -1* distanceToTarget(x, y);
-            }
-            else return 1* distanceToTarget(x, y);
-        }
-        */
-        
+
         double slopeY = (TerrainManipulator.calculateHeight(terrainFormula, x, y + epsilon, targetValues) - TerrainManipulator.calculateHeight(terrainFormula, x, y, targetValues))/epsilon;
         return slopeY;
     }

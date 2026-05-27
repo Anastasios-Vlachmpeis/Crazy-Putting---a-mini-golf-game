@@ -1,4 +1,4 @@
-package GUI;
+package SimpleGUI;
 
 import java.util.Arrays;
 import GolfCourseData.*;
