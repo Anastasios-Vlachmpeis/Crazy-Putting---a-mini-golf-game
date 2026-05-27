@@ -7,14 +7,6 @@ import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
 public class TerrainManipulation {
-    //Here we add:
-    //Height function
-    //the Gaussian bell curves
-    //The physical hole
-
-    //returns:
-    //total height 
-
 
     private List<Hill> hills = new ArrayList<>(); //Artificial added Hills/valleys
     //private GolfCourse currentCourse = new GolfCourse(){};
@@ -83,10 +75,21 @@ public class TerrainManipulation {
             double divisor = 2.0 * (hill.width * hill.width);
             totalHillHeight += hill.peakHeight * Math.exp(-distanceSquared / divisor);
         }
+        //cap the Height
+        if(totalHillHeight < -5){totalHillHeight = -5;};
+        if(totalHillHeight > 5){totalHillHeight = 5;};
         return totalHillHeight;
     }
 
     public void addHill(double centerX, double centerY, double peakHeight, double width){
         hills.add(new Hill(centerX, centerY, peakHeight, width));
+    }
+
+    public java.util.List<Hill> getHills() {
+        return this.hills;
+    }
+
+    public void clearHills() {
+        this.hills.clear();
     }
 }

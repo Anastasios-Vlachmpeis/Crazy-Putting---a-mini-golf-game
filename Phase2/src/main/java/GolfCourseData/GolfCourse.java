@@ -2,6 +2,11 @@ package GolfCourseData;
 
 import java.nio.file.*;
 import java.util.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import java.io.Reader;
+import java.io.Writer;
+
 
 public class GolfCourse {
     public final double epsilon = 1e-7;
@@ -23,7 +28,7 @@ public class GolfCourse {
     }
 
     private TerrainManipulation TerrainManipulator = new TerrainManipulation();
-
+    //Used only in phase 2 in the old GUI
     public void loadFromFile(String filePath)throws Exception{
         Map<String, String> data = new HashMap<>();
         Files.lines(Path.of(filePath)).forEach(line -> {
@@ -40,7 +45,7 @@ public class GolfCourse {
         System.out.println("New settings loaded");
         convertToDouble();
     }
-
+    //Used only in phase 2 in the old GUI
     public void loadFromGUI(String heightFormula, String[][] inputValuesGUI)throws Exception{
         friction = inputValuesGUI[0];
         target = inputValuesGUI[1];
@@ -48,6 +53,49 @@ public class GolfCourse {
         terrainFormula = heightFormula;
 
         convertToDouble();
+    }
+    //Better way to save data used in phase 3
+    public void saveToJson(String filePath) throws Exception {
+        // Create a Gson instance configured to auto-indent your output files beautifully
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    
+        // Open a system stream writer and serialize this entire class layout configuration at once
+        try (Writer writer = Files.newBufferedWriter(Path.of(filePath))) {
+            gson.toJson(this, writer);
+        }
+        System.out.println("Course properties successfully serialized to JSON.");
+    }
+    
+
+    //Better way to save data used in phase 3
+    public void loadFromJson(String filePath) throws Exception {
+        Gson gson = new Gson();
+    
+        try (Reader reader = Files.newBufferedReader(Path.of(filePath))) {
+            // Parse raw JSON text directly back into a temporary data object map
+            GolfCourse loadedData = gson.fromJson(reader, GolfCourse.class);
+        
+            // Safely extract properties back into this active, running UI memory instance
+            this.terrainFormula = loadedData.terrainFormula; 
+            this.size = loadedData.size;                     
+            this.targetValues = loadedData.targetValues;     
+            this.frictionValues = loadedData.frictionValues; 
+            this.startValues = loadedData.startValues;       
+        
+            // Wipe and rebuild the active hill list seamlessly
+            this.clearAllHills(); 
+            if (loadedData.TerrainManipulator != null && loadedData.TerrainManipulator.getHills() != null) { 
+                for (Hill h : loadedData.TerrainManipulator.getHills()) { 
+                    this.addHill(h.centerX, h.centerY, h.peakHeight, h.width); 
+                }
+            }
+        }
+        System.out.println("Course properties successfully deserialized from JSON.");
+    }
+
+    public void clearAllHills() {
+        // This delegates the clearing to your TerrainManipulator object
+        this.TerrainManipulator.clearHills(); 
     }
 
     public void convertToDouble(){
@@ -79,6 +127,16 @@ public class GolfCourse {
 
     public void setTerrainFormula(String formula){
         terrainFormula = formula;
+    }
+    /* 
+    public String getTerrainFormula() {
+        return this.terrainFormula;
+    }
+    */
+
+    public void addHill(double centerX, double centerY, double peakHeight, double width) {
+        // Forward the parameters straight down to your existing terrain manager
+        this.TerrainManipulator.addHill(centerX, centerY, peakHeight, width);
     }
 
     public GolfCourse(double miuK, double miuS) {
