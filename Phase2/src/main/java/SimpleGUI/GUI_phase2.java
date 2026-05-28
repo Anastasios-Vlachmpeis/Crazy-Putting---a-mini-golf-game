@@ -1,7 +1,6 @@
 package SimpleGUI;
 
 import GolfCourseData.*;
-import Physics.*;
 import Systems.GolfODE;
 
 import javafx.application.Application;

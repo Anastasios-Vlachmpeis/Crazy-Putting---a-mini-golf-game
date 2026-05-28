@@ -1,4 +1,4 @@
-package Physics;
+package GolfCourseData;
 
 // The golf ball
 // Weight is predetermined
@@ -9,7 +9,6 @@ public class Ball {
     private double y;
     private double xVelocity;
     private double yVelocity;
-
 
     public Ball(double[] y0) {
         this.x = y0[0];
@@ -34,5 +33,4 @@ public class Ball {
         //System.out.println(this.y);
         this.yVelocity = nextY[3];
     }
-
 }

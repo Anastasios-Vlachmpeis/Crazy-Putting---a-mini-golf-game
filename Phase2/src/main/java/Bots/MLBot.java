@@ -3,6 +3,7 @@ package Bots;
 import java.util.Random;
 
 import GolfCourseData.GolfCourse;
+import ShotEngine.ShotSimulatorV2;
 //import ShotEngine.ShotSimulation;
 //import ShotEngine.ShotSimulator;
 import Systems.GolfODE;
@@ -30,6 +31,9 @@ public class MLBot extends GolfBot {
         double bestVy = 0;
         double distanceToTarget = Double.MAX_VALUE;
         double bestDistance = Double.MAX_VALUE;
+
+        GolfODE golfODE = new GolfODE(course);
+        ShotSimulatorV2 simulator = new ShotSimulatorV2();
 
         double exploreChance = 0.2; // chance to explore the map randomly to hpefully get a better shot
 
@@ -78,18 +82,15 @@ public class MLBot extends GolfBot {
             //System.out.println("distanceToHole = " + distanceToTarget);
             */
 
-            ///// Added this block to bypass the shotSimulator package
             double[] startState = { course.getStartPosition()[0], course.getStartPosition()[1], vx, vy };
-            GolfODE ode = new GolfODE(course);
-            RungeKuttaSolver solver = new RungeKuttaSolver();
-
-            double[][] fullShotTrajectory = solver.solveBall(ode, startState, 0.01);
+            //Using newer and better optimized shotengine
+            //double[][] fullShotTrajectory = solver.solveBall(ode, startState, 0.01);
+            double[][] fullShotTrajectory = simulator.schoot(golfODE, new RungeKuttaSolver(), startState, 0.01);
             double[] finalState = fullShotTrajectory[fullShotTrajectory.length - 1];
             double finalX = finalState[1];
             double finalY = finalState[2];
 
             distanceToTarget = course.distanceToTarget(finalX, finalY);
-            //////
             
             if (distanceToTarget < bestDistance) {
                 bestDistance = distanceToTarget;

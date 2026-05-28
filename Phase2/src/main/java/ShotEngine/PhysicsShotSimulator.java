@@ -1,9 +1,9 @@
 package ShotEngine;
-/* 
+
 import GolfCourseData.GolfCourse;
 import Solvers.Solver;
 import Systems.GolfODE;
-
+/* 
 public class PhysicsShotSimulator implements ShotSimulator {
 
     private static final double stepsize       = 0.01;      // integration step size in seconds
@@ -79,7 +79,8 @@ public class PhysicsShotSimulator implements ShotSimulator {
     // Advances the state by one step using whichever solver was injected
     private double[] stepOnce(GolfODE ode, double[] state, double t) {
         double[][] solution = solver.solveBall(ode, state, stepsize); // changed the solving method to solveBall
-        //double[][] solution = solver.solve(ode, state, t, t+stepsize, stepsize); //Using this one because Euler/RK4 and Verlet wont compile otherwise. Should not change functionality
+        //double[][] solution = solver.solve(ode, state, t, t+stepsize, stepsize);
+        
         //System.out.println("Check");
         // solve() rows are [t, x, y, vx, vy]
         double[] lastRow   = solution[solution.length - 1];

@@ -4,9 +4,15 @@ import Systems.GolfODE;
 import Systems.ODE;
 
 public interface Solver {
+    /* 
     public double[][] solve(ODE equation, double[] y0, double tStart, double tEnd, double h);
 
     public double[][] solveBall(GolfODE equation, double[] y0, double h);
+    */
+
+    public double[] iteration(Systems.ODE equation, double t, double[] y, double h);
+
+    public double[][] solve(ODE equation, double[] y0, double tStart, double tEnd, double h);
 
     public default double[] storeRow(double t, double[] y) { 
         double[] row = new double[y.length + 1];
