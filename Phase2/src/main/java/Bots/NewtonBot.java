@@ -3,7 +3,6 @@ package Bots;
 import Bots.helpers.BotTrialResult;
 import Bots.helpers.VelocitySearchWindow;
 import GolfCourseData.GolfCourse;
-import ShotEngine.ShotSimulator;
 import Solvers.Solver;
 
 /**
@@ -25,8 +24,8 @@ public class NewtonBot extends SearchBot {
     private int updateCount;
     private int searchDepth;
 
-    public NewtonBot(GolfCourse course, ShotSimulator shotSimulator, Solver solver) {
-        super(course, shotSimulator, solver);
+    public NewtonBot(GolfCourse course, Solver solver) {
+        super(course, solver);
     }
 
     public double[] shoot() {
