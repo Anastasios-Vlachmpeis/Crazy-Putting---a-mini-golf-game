@@ -87,12 +87,13 @@ public class BallTargetTab extends BorderPane {
                 
                 if (e.getButton() == MouseButton.PRIMARY) {
                     // LEFT CLICK: Relocate the ball launch start position
-                    course.setBallPosition(clickGameX, clickGameY); //
+                    course.setBallPosition(clickGameX, clickGameY);
+                    course.setOriginalStartPosition(clickGameX, clickGameY);
                     System.out.printf("Ball relocated to: (%.2f, %.2f)%n", clickGameX, clickGameY);
                 } 
                 else if (e.getButton() == MouseButton.SECONDARY) {
                     // RIGHT CLICK: Relocate target array indices directly
-                    double[] targets = course.getTargetXYR(); //
+                    double[] targets = course.getTargetXYR(); 
                     targets[0] = clickGameX;
                     targets[1] = clickGameY;
                     
@@ -103,8 +104,6 @@ public class BallTargetTab extends BorderPane {
                 coursePreview.updatePreview(); 
             }
         });
-
-
 
         //ASSEMBLE
         this.setCenter(coursePreview);

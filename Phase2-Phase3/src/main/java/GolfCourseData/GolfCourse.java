@@ -21,7 +21,7 @@ public class GolfCourse {
     private double[] originalStartValues = {0.0, 0.0, 0.0};
     private String terrainFormula = "(sin(x-y)/7)+0.5"; //Default terrain
     //Gameborders
-    private double[] size = {-10,10,-10,10}; //{minX, maxX, minY, maxY}
+    private double[] size = {-20,20,-20,20}; //{minX, maxX, minY, maxY}
     private double borderSteepness = 2;
 
     public GolfCourse(){
@@ -94,7 +94,6 @@ public class GolfCourse {
     }
 
     public void clearAllHills() {
-        // This delegates the clearing to your TerrainManipulator object
         this.TerrainManipulator.clearHills(); 
     }
 
@@ -205,6 +204,10 @@ public class GolfCourse {
         double y = originalStartValues[1];
         double height = TerrainManipulator.calculateHeight(terrainFormula, x,y, targetValues);
         return new double[] {x, y, height};
+    }
+
+    public void setOriginalStartPosition(double x, double y){
+        originalStartValues = new double[]{x, y, 0.0};
     }
 
     //Set the current ball position for the next stroke
