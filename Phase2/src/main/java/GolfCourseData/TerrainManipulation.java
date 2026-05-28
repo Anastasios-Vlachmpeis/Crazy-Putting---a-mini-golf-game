@@ -11,50 +11,28 @@ public class TerrainManipulation {
     private List<Hill> hills = new ArrayList<>(); //Artificial added Hills/valleys
     //private GolfCourse currentCourse = new GolfCourse(){};
 
+    //Improbe perfomance
+    private String lastFormula = "";
+    private Expression compiledExpression;
+
     public double calculateHeight(String formula, double x, double y, double[] target){
         return functionHeight(formula, x, y, target) + artificialHillsHeight(x, y);
     }
 
     //height based on the formula
     private double functionHeight(String formula, double x, double y, double[] target){
-        Expression e = new ExpressionBuilder(formula)
-            .variables("x", "y")
-            .build();
-        e.setVariable("x", x);
-        e.setVariable("y", y);     
-        double baseFormulaHeight = e.evaluate();
-
-        /*
-        //Add target hole
-        double dx = x - target[0];
-        double dy = y - target[1];
-        double distanceSquared = (dx * dx) + (dy * dy);
-        double holeRadius = target[2];
-        double depth = -0.5;
-        // Gaussian bell curve formula: height = A * exp(-d^2 / (2 * sigma^2))
-        // Using 'holeRadius' directly as a divisor for simplicity
-        double divisor = 2.0 * (holeRadius * holeRadius);
-        double holeManipulation = depth * Math.exp(-distanceSquared / divisor);
-
-        return baseFormulaHeight + holeManipulation;
-
-        ////
-        double funnelWidth = holeRadius * 2.5; // Smooth apron around the hole
-        double divisor = 2.0 * (funnelWidth * funnelWidth);
-        double cupDepth = -2.0; 
-
-        double funnelDrop = cupDepth * Math.exp(-distanceSquared / divisor);
-        double finalHeight = baseFormulaHeight + funnelDrop;
-
-        // THE FIX: Flatten the bottom of the cup
-        // If the math pushes the ball deeper than the physical cup floor, flatten it!
-        double actualHoleRadiusSq = holeRadius * holeRadius;
-        if (distanceSquared < actualHoleRadiusSq) {
-            return baseFormulaHeight + cupDepth; // Perfect flat floor inside the cylinder
+        // OPTIMIZATION: Only parse the string into a mathematical tree if the formula text actually changed
+        if (!formula.equals(lastFormula) || compiledExpression == null) {
+            lastFormula = formula;
+            compiledExpression = new ExpressionBuilder(formula) 
+                .variables("x", "y") 
+                .build(); 
         }
-        return finalHeight;
-        */
-        return baseFormulaHeight;
+        
+        // Re-use the existing compiled function instantly by just swapping the coordinates
+        compiledExpression.setVariable("x", x); 
+        compiledExpression.setVariable("y", y);      
+        return compiledExpression.evaluate(); 
     }
 
     //Calculate hill/valley height on given coordinate
@@ -66,7 +44,7 @@ public class TerrainManipulation {
             double dy = y - hill.centerY;
             double distanceSquared = (dx * dx) + (dy * dy);
             
-            // Optimization: If the ball is too far from the hill, skip the expensive Math.exp()
+            // Optimization: If the ball is too far from the hill, then skip
             // A Gaussian hill effectively hits 0 height at roughly 3 * width
             double cutOffDistance = hill.width * 3.0;
             if (distanceSquared > (cutOffDistance * cutOffDistance)) {

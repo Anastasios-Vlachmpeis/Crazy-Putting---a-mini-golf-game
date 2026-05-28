@@ -10,7 +10,7 @@ import javafx.scene.paint.Color;
 public class CoursePreview extends Canvas {
 
     private final GolfCourse course;
-    private int resolutionSize = 2; //#pixels per "color tile"
+    private int resolutionSize = 2; //number of pixels per "color tile"
 
     // Constructor defines the size of the preview canvas
     public CoursePreview(GolfCourse course, double width, double height) {
@@ -63,9 +63,20 @@ public class CoursePreview extends Canvas {
 
                 // Only colotr the canvas if in bounds
                 if (gameX >= minX && gameX <= maxX && gameY >= minY && gameY <= maxY) {
-                    Color terrainColor = getColorForPosition(gameX, gameY);
+                    double heightVal = course.height(gameX, gameY);
+                    Color terrainColor;
+                    
+                    if (heightVal < 0) {
+                        terrainColor = Color.web("#3498db"); //for water
+                    } else {
+                        // shading
+                        double greenIntensity = 0.4 + (heightVal * 0.05); 
+                        greenIntensity = Math.max(0.1, Math.min(0.9, greenIntensity)); 
+                        terrainColor = Color.color(0.2, greenIntensity, 0.2); 
+                    }
+                    
                     gc.setFill(terrainColor);
-                    gc.fillRect(screenX, screenY, resolutionSize, resolutionSize);
+                    gc.fillRect(screenX, screenY, resolutionSize, resolutionSize); 
                 }
             }
         }
@@ -84,8 +95,19 @@ public class CoursePreview extends Canvas {
         // Draw the center flag cup
         gc.setFill(Color.BLACK);
         gc.fillOval(targetScreenX - 3, targetScreenY - 3, 6, 6);
+
+        // DRAW THE BALL
+        double[] ballPos = course.getStartPosition(); // index 0 = x, index 1 = y
+        double ballScreenX = canvasCenterX + (ballPos[0] - gameCenterX) * scale;
+        double ballScreenY = canvasCenterY - (ballPos[1] - gameCenterY) * scale;
+        double ballRadius = 5.0; // Fixed pixel size so it remains clear on all map sizes
+
+        // Draw the primary white golf ball body
+        gc.setFill(Color.WHITE);
+        gc.fillOval(ballScreenX - ballRadius, ballScreenY - ballRadius, ballRadius * 2, ballRadius * 2);
     }
 
+    /* 
     private Color getColorForPosition(double gameX, double gameY) {
         // Check for water
         if (course.isWater(gameX, gameY)) {
@@ -103,4 +125,5 @@ public class CoursePreview extends Canvas {
 
         return Color.color(0.2, greenIntensity, 0.2);
     }
+    */
 }

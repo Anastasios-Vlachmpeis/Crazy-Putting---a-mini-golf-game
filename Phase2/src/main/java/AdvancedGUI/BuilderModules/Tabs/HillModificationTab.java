@@ -35,6 +35,8 @@ public class HillModificationTab extends BorderPane{
 
         Label title = new Label("Add Gaussian Hills");
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+
+        Label instructions = new Label("Left click to elevate the course\nRight click to lower the course");
         /* 
         TextField heightField = new TextField();
         heightField.setPromptText("Hill Height (e.g., 2.5)");
@@ -65,6 +67,7 @@ public class HillModificationTab extends BorderPane{
     
         rightMenu.getChildren().addAll(
             title, 
+            instructions,
             strengthLabel, strengthSlider, 
             widthLabel, widthSlider
         );

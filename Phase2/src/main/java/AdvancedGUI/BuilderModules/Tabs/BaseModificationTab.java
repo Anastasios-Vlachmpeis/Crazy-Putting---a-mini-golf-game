@@ -33,14 +33,14 @@ public class BaseModificationTab extends BorderPane{
         Label title = new Label("Course Dimensions");
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
-        TextField widthXString = new TextField();
-        widthXString.setPromptText("Course width X direction");
+        TextField widthXString = new TextField("20");
+        //widthXString.setPromptText("Course width X direction");
 
-        TextField widthYString = new TextField();
-        widthYString.setPromptText("Course width Y direction");
+        TextField widthYString = new TextField("20");
+        //widthYString.setPromptText("Course width Y direction");
 
-        TextField terrainFormula = new TextField();
-        terrainFormula.setPromptText("Height Formula");
+        TextField terrainFormula = new TextField("(sin(x-y)/7)+0.5");
+        //terrainFormula.setPromptText("Height Function");
 
         rightMenu.getChildren().addAll(
             title, 
