@@ -4,7 +4,7 @@ import GolfCourseData.GolfCourse;
 import AdvancedGUI.BuilderModules.Tabs.BaseModificationTab;
 import AdvancedGUI.BuilderModules.Tabs.HillModificationTab;
 import AdvancedGUI.BuilderModules.Tabs.SaveLoadPresetsTab;
-import AdvancedGUI.BuilderModules.Tabs.TargetModificationTab;
+import AdvancedGUI.BuilderModules.Tabs.BallTargetTab;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -38,13 +38,13 @@ public class GUI_courseBuilder {
         SaveLoadPresetsTab saveLoadView = new SaveLoadPresetsTab(course, preViewSize);
         BaseModificationTab baseView = new BaseModificationTab(course, preViewSize);
         HillModificationTab hillView = new HillModificationTab(course, preViewSize);
-        TargetModificationTab targetView = new TargetModificationTab(course, preViewSize);
+        BallTargetTab targetView = new BallTargetTab(course, preViewSize);
 
         //Set up the Tabs
-        Tab saveLoadTab = new Tab("Save / Load", saveLoadView);
-        Tab baseTab = new Tab("Dimensions", baseView);
-        Tab hillTab = new Tab("Hills & Slopes", hillView);
-        Tab targetTab = new Tab("Target / Hole", targetView);
+        Tab saveLoadTab = new Tab("Save & Load", saveLoadView);
+        Tab baseTab = new Tab("Dimensions & Height Function", baseView);
+        Tab hillTab = new Tab("Hills & Valleys", hillView);
+        Tab targetTab = new Tab("Target & Hole", targetView);
 
         saveLoadTab.setClosable(false); 
         baseTab.setClosable(false);        
@@ -63,8 +63,8 @@ public class GUI_courseBuilder {
                     ((BaseModificationTab) newTab.getContent()).refreshView();
                 } else if (newTab.getContent() instanceof HillModificationTab) {
                     ((HillModificationTab) newTab.getContent()).refreshView();
-                } else if (newTab.getContent() instanceof TargetModificationTab) {
-                    ((TargetModificationTab) newTab.getContent()).refreshView();
+                } else if (newTab.getContent() instanceof BallTargetTab) {
+                    ((BallTargetTab) newTab.getContent()).refreshView();
                 }
             }
         });

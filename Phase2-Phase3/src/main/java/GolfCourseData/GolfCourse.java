@@ -15,13 +15,13 @@ public class GolfCourse {
     private String[] friction;
     private double[] frictionValues = {0.15, 0.5, 0.0};
     private String[] target;
-    private double[] targetValues = {0, 0, 0.2};
+    private double[] targetValues = {3, 0, 0.2};
     private String[] start;
-    private double[] startValues = {0.0, 0.0, 0.0};
+    private double[] startValues = {-3, 0, 0};
     private double[] originalStartValues = {0.0, 0.0, 0.0};
     private String terrainFormula = "(sin(x-y)/7)+0.5"; //Default terrain
     //Gameborders
-    private double[] size = {-5,5,-5,5}; //{minX, maxX, minY, maxY}
+    private double[] size = {-10,10,-10,10}; //{minX, maxX, minY, maxY}
     private double borderSteepness = 2;
 
     public GolfCourse(){
