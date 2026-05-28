@@ -3,7 +3,6 @@ package Bots;
 import Bots.helpers.BotShotTrial;
 import Bots.helpers.BotTrialResult;
 import GolfCourseData.GolfCourse;
-import ShotEngine.ShotSimulator;
 import Solvers.Solver;
 
 /**
@@ -16,19 +15,19 @@ public abstract class SearchBot extends GolfBot {
     // Tracks the best resting position found during the current search.
     // Initialised to MAX_VALUE so any real candidate immediately becomes the best.
     protected double bestRestDistance = Double.MAX_VALUE;
-    protected double bestRestVx       = 0.0;
-    protected double bestRestVy       = 0.0;
+    protected double bestRestVx = 0.0;
+    protected double bestRestVy = 0.0;
 
-    protected SearchBot(GolfCourse course, ShotSimulator shotSimulator, Solver solver) {
-        super(course, shotSimulator);
+    protected SearchBot(GolfCourse course, Solver solver) {
+        super(course, solver);
         this.solver = solver;
     }
 
     /** Call at the start of every shoot() to clear state from the previous shot. */
     protected void resetBestRest() {
         bestRestDistance = Double.MAX_VALUE;
-        bestRestVx       = 0.0;
-        bestRestVy       = 0.0;
+        bestRestVx = 0.0;
+        bestRestVy = 0.0;
     }
 
     /** Runs a full physics trial from the current ball position. */
@@ -44,13 +43,13 @@ public abstract class SearchBot extends GolfBot {
         if (shot.inWater || shot.outOfBounds) return;
         if (course.isWater(shot.finalX, shot.finalY)) return;
 
-        double[] target       = course.getTargetXYR();
-        double   stopDistance = shot.stopDistance(target[0], target[1]);
+        double[] target = course.getTargetXYR();
+        double stopDistance = shot.stopDistance(target[0], target[1]);
 
         if (stopDistance < bestRestDistance) {
             bestRestDistance = stopDistance;
-            bestRestVx       = vx;
-            bestRestVy       = vy;
+            bestRestVx = vx;
+            bestRestVy = vy;
         }
     }
 

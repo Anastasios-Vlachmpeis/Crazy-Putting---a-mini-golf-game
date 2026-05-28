@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import Bots.helpers.BotTrialResult;
 import Bots.helpers.VelocitySearchWindow;
 import GolfCourseData.GolfCourse;
-import ShotEngine.ShotSimulator;
 import Solvers.Solver;
 
 /**
@@ -22,8 +21,8 @@ public class ManhattanBot extends SearchBot {
     private int searchDepth;
     private int simulationCount;
 
-    public ManhattanBot(GolfCourse course, ShotSimulator shotSimulator, Solver solver) {
-        super(course, shotSimulator, solver);
+    public ManhattanBot(GolfCourse course, Solver solver) {
+        super(course, solver);
     }
 
     public double[] shoot() {
