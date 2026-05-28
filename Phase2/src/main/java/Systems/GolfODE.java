@@ -1,7 +1,7 @@
 package Systems;
 
 import GolfCourseData.GolfCourse;
-import Physics.*;
+//import Physics.*;
 import Solvers.*;
 
 public class GolfODE implements ODE {

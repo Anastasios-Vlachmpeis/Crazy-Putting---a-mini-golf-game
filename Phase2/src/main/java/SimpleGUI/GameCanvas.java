@@ -2,7 +2,7 @@ package SimpleGUI;
 
 import java.util.Arrays;
 import GolfCourseData.*;
-import Physics.Ball;
+import ShotEngine.ShotSimulatorV2;
 import Solvers.RungeKuttaSolver;
 import Systems.GolfODE;
 
@@ -15,6 +15,8 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 
 public class GameCanvas {
+
+    ShotSimulatorV2 simulator = new ShotSimulatorV2();
 
     // fixed canvas pixel size
     private static final double CANVAS_W = 800.0;
@@ -346,7 +348,8 @@ public class GameCanvas {
         // vx, vy};
         // ball.setPos(startState);
 
-        double[][] trajectory = new RungeKuttaSolver().solveBall(golfODE, startState, SIMULATION_STEP);
+        //double[][] trajectory = new RungeKuttaSolver().solveBall(golfODE, startState, SIMULATION_STEP);
+        double[][] trajectory = simulator.schoot(golfODE, new RungeKuttaSolver(), startState, SIMULATION_STEP);
 
         animateBall(trajectory);
     }

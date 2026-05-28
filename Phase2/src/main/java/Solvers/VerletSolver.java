@@ -6,7 +6,7 @@ import Systems.GolfODE;
 import Systems.ODE;
 
 public class VerletSolver implements Solver {
-    
+    /* 
     @Override
     public double[][] solve(ODE equation, double[] y0, double tStart, double tEnd, double h) {
         double stepSize = h;
@@ -66,5 +66,73 @@ public class VerletSolver implements Solver {
     //placeholder to make it compile
     public double[][] solveBall(GolfODE equation, double[] y0, double h){
         return new double[][] {{0},{0}}; 
+    }
+    */
+
+    @Override
+    public double[] iteration(Systems.ODE equation, double t, double[] y, double h) {
+        int n = y.length / 2; //
+        double[] slope = equation.getDerivative(t, y); //
+    
+        // Half-step velocity
+        double[] vHalf = new double[n];
+        for (int i = 0; i < n; i++) {
+            vHalf[i] = y[n + i] + 0.5 * h * slope[n + i]; //
+        }
+
+        // Full position update
+        double[] nextY = new double[y.length];
+        for (int i = 0; i < n; i++) {
+            nextY[i] = y[i] + h * vHalf[i]; //
+            nextY[n + i] = vHalf[i]; //
+        }
+
+        // Correct velocity using acceleration at the new position
+        double[] slopeNext = equation.getDerivative(t + h, nextY); //
+        for (int i = 0; i < n; i++) {
+            nextY[n + i] = vHalf[i] + 0.5 * h * slopeNext[n + i]; //
+        }
+
+        return nextY;
+    }
+
+    @Override
+    public double[][] solve(ODE equation, double[] y0, double tStart, double tEnd, double h) { //
+        double stepSize = h;
+        double[] y = Arrays.copyOf(y0, y0.length); 
+
+        java.util.ArrayList<double[]> results = new java.util.ArrayList<>();
+        results.add(storeRow(tStart, y)); //
+
+        double[] slope = equation.getDerivative(tStart, y); //
+
+        for (double t = tStart; t < tEnd; t += stepSize) {
+            double step = Math.min(stepSize, tEnd - t); 
+            int n = y.length / 2;
+
+            double[] vHalf = new double[n];
+            for (int i = 0; i < n; i++) {
+                vHalf[i] = y[n + i] + 0.5 * step * slope[n + i];
+            }
+
+            double[] yNext = new double[y.length];
+            for (int i = 0; i < n; i++) {
+                yNext[i]     = y[i] + step * vHalf[i];
+                yNext[n + i] = vHalf[i];
+            }
+
+            double[] slopeNext = equation.getDerivative(t + step, yNext); //
+
+            for (int i = 0; i < n; i++) {
+                yNext[n + i] = vHalf[i] + 0.5 * step * slopeNext[n + i];
+            }
+
+            y = yNext;
+            slope = slopeNext; 
+
+            results.add(storeRow(t + step, y)); //
+        }
+
+        return results.toArray(new double[0][]);
     }
 }

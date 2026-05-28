@@ -1,14 +1,9 @@
 // FUNCTIONALITY TEST for THE SIMPLEBOT
-
-
-
 package Experiment;
 
 import Bots.SimpleBot;
-//import GolfCourseData.GeneratedCourse;
 import GolfCourseData.GolfCourse;
-//import ShotEngine.PhysicsShotSimulator;
-//import ShotEngine.ShotSimulation;
+import ShotEngine.ShotSimulatorV2;
 import Solvers.RungeKuttaSolver;
 import Systems.GolfODE;
 
@@ -20,6 +15,8 @@ public class BotCourseExperiment {
 
     public static void main(String[] args) {
         GolfCourse course = new GolfCourse(0, 0);
+        GolfODE golfODE = new GolfODE(course);
+        ShotSimulatorV2 simulator = new ShotSimulatorV2();
 
         RungeKuttaSolver solver = new RungeKuttaSolver();
         //PhysicsShotSimulator shotSim = new PhysicsShotSimulator(course, solver);
@@ -52,10 +49,10 @@ public class BotCourseExperiment {
             */
             // Set up the starting state with your velocity inputs (v[0] and v[1])
             double[] startState = { course.getStartPosition()[0], course.getStartPosition()[1], v[0], v[1] };
-            GolfODE ode = new GolfODE(course);
 
             // Ask the solver to calculate the entire shot
-            double[][] fullShotTrajectory = solver.solveBall(ode, startState, 0.01);
+            //double[][] fullShotTrajectory = solver.solveBall(ode, startState, 0.01);
+            double[][] fullShotTrajectory = simulator.schoot(golfODE, new RungeKuttaSolver(), startState, 0.01);
 
             // Get the very last row of the array (where the ball stopped)
             double[] finalState = fullShotTrajectory[fullShotTrajectory.length - 1];

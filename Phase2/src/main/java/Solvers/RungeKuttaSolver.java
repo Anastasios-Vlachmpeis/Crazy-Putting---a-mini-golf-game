@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import Systems.*;
 
 public class RungeKuttaSolver implements Solver {
-
+    @Override
     public double[] iteration(ODE equation, double t, double[] y, double h) {
 
         double[] k1 = equation.getDerivative(t, y); // first derivative
@@ -36,8 +36,8 @@ public class RungeKuttaSolver implements Solver {
 
         return nextY;
     }
-
-    
+     
+    //Used for experiments etc
     @Override
     public double[][] solve(ODE equation, double[] y0, double tStart, double tEnd, double h) {
         // formula for steps. i used ceil here in case tStart = 0, tEnd = 1, h = 0.3,
@@ -61,8 +61,8 @@ public class RungeKuttaSolver implements Solver {
 
         return solution;
     }
-    
-
+    /*
+    //Striclty for the ball trajectory
     public double[][] solveBall(GolfODE equation, double[] y0, double h) {
         //ArrayList<double[]> solutionInList = new ArrayList<>(); // I tried something - did not work ~Stan
         double[][] solution = new double[y0.length][y0.length + 1];
@@ -159,4 +159,5 @@ public class RungeKuttaSolver implements Solver {
 
         return trimmed;
     }
+    */
 }

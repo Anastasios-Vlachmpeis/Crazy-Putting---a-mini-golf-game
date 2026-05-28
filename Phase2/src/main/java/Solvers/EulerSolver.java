@@ -39,8 +39,19 @@ public class EulerSolver implements Solver {
     }
     
 
+    @Override
+    public double[] iteration(Systems.ODE equation, double t, double[] y, double h) {
+        double[] slope = equation.getDerivative(t, y); 
+        double[] nextY = new double[y.length];
+        for (int i = 0; i < y.length; i++) {
+            nextY[i] = y[i] + (h * slope[i]); 
+        }
+        return nextY;
+    }
+    /* 
     //placeholder to make it compile
     public double[][] solveBall(GolfODE equation, double[] y0, double h){
         return new double[][] {{0},{0}}; 
     }
+    */
 }
