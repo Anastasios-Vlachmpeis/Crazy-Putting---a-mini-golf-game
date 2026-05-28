@@ -2,7 +2,6 @@ package Bots;
 
 import java.util.ArrayList;
 import java.util.Random;
-import Bots.Neigbor;
 import GolfCourseData.GolfCourse;
 import ShotEngine.ShotSimulatorV2;
 import Systems.GolfODE;
@@ -18,11 +17,11 @@ public class HillBot extends GolfBot {
         super(course, solver);
     }
 
-    // n is nr of neighbours
-    private ArrayList<Neighbor> getNeighbors(int n) {
-        Arraylist<Neighbor> neighbors = new ArrayList<Neighbor>();
+    // n is total nr of neighbours
+    private ArrayList<Neighbor> getNeighbors(double vx, double vy, int n) {
+        ArrayList<> neighbors = new ArrayList<Neighbor>();
         for (int i = 0; i < n; i++) {
-            
+            neighbors.add(new Neighbor(vx, vy, i, n));
         }
     }
 
@@ -40,11 +39,20 @@ public class HillBot extends GolfBot {
 
         int i = 0;
         while (distanceToTarget > tRadius) {
-            double vx;
-            double vy;
+            double vx = 0;
+            double vy = 0;
+            Arraylist<> neighbors = getNeighbors(vx, vy, 16);
 
-            vx = bestVx + (random.nextDouble() * 2 - 1); // change vx a little bit
-            vy = bestVy + (random.nextDouble() * 2 - 1);// change vy a little but
+            for (Neighbor neigbor : neighbors) {
+                vx = neigbor.getVelocity[0];
+                vy = neigbor.getVelocity[1];
+                double[] startState = { course.getStartPosition()[0], course.getStartPosition()[1], vx, vy };
+                double[][] fullShotTrajectory = simulator.schoot(golfODE, new RungeKuttaSolver(), startState, 0.01);
+                double[] finalState = fullShotTrajectory[fullShotTrajectory.length - 1];
+                double finalX = finalState[1];
+                double finalY = finalState[2];
+                distanceToTarget = course.distanceToTarget(finalX, finalY);
+            }
 
             double speed = Math.sqrt(vx * vx + vy * vy);
 
@@ -52,14 +60,6 @@ public class HillBot extends GolfBot {
                 vx = vx / speed * MAX_SPEED;
                 vy = vy / speed * MAX_SPEED;
             }
-
-            double[] startState = { course.getStartPosition()[0], course.getStartPosition()[1], vx, vy };
-            double[][] fullShotTrajectory = simulator.schoot(golfODE, new RungeKuttaSolver(), startState, 0.01);
-            double[] finalState = fullShotTrajectory[fullShotTrajectory.length - 1];
-            double finalX = finalState[1];
-            double finalY = finalState[2];
-
-            distanceToTarget = course.distanceToTarget(finalX, finalY);
 
             if (distanceToTarget < bestDistance) {
                 bestDistance = distanceToTarget;
