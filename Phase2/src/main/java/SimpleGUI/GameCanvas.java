@@ -2,7 +2,6 @@ package SimpleGUI;
 
 import java.util.Arrays;
 import GolfCourseData.*;
-import Physics.Ball;
 import Solvers.RungeKuttaSolver;
 import Systems.GolfODE;
 
@@ -56,8 +55,6 @@ public class GameCanvas {
     private ShotPanel shotPanel; // to update after every shot
 
     // for aiming arrow
-    private double dragStartX = 0.0;
-    private double dragStartY = 0.0;
     private boolean dragging = false;
 
     public GameCanvas(GolfCourse golfCourse, GolfODE golfODE, Ball ball) {
