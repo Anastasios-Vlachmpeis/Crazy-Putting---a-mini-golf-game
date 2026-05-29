@@ -72,7 +72,7 @@ public class Game3DScene extends SubScene {
         
         if (maxDim <= 0) { maxDim = 40.0; minX = -20; maxX = 20; minY = -20; maxY = 20; gameWidth = 40; gameHeight = 40; }
 
-        double step = Math.max(0.5, maxDim / 80.0); // Slightly higher resolution for smooth slopes
+        double step = Math.max(0.5, maxDim / 200.0); // Increase 200 for higher 3D resolution
         int cols = (int) (gameWidth / step) + 1;
         int rows = (int) (gameHeight / step) + 1;
 

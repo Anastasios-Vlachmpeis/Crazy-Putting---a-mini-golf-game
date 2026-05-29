@@ -3,6 +3,7 @@ package AdvancedGUI;
 import GolfCourseData.GolfCourse;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import AdvancedGUI.BuilderModules.GUI_courseBuilder;
 import AdvancedGUI.MainGUIModules.MainGameContainer;
 import GameEngine.GameState;
 import javafx.scene.Scene;

@@ -18,6 +18,7 @@ import javafx.beans.value.ChangeListener;
 public class BaseModificationTab extends BorderPane{
 
     private CoursePreview coursePreview;
+    private TextField terrainFormula;
 
     public BaseModificationTab(GolfCourse course, double[] preViewSize) {
 
@@ -33,14 +34,11 @@ public class BaseModificationTab extends BorderPane{
         Label title = new Label("Course Dimensions");
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
-        TextField widthXString = new TextField("20");
-        //widthXString.setPromptText("Course width X direction");
+        TextField widthXString = new TextField("100");
+        TextField widthYString = new TextField("100");
 
-        TextField widthYString = new TextField("20");
-        //widthYString.setPromptText("Course width Y direction");
-
-        TextField terrainFormula = new TextField("(sin(x-y)/7)+0.5");
-        //terrainFormula.setPromptText("Height Function");
+        //TextField terrainFormula = new TextField("(sin(x-y)/7)+0.5");
+        terrainFormula = new TextField("(sin(x-y)/7)+0.5");
 
         rightMenu.getChildren().addAll(
             title, 
@@ -121,5 +119,9 @@ public class BaseModificationTab extends BorderPane{
         } catch (NumberFormatException ex) {
             // Fail silently while typing to prevent error floods during backspaces
         }
+    }
+
+    public void bindFormulaLock(javafx.beans.property.BooleanProperty perlinEnabled) {
+        terrainFormula.disableProperty().bind(perlinEnabled);
     }
 }
