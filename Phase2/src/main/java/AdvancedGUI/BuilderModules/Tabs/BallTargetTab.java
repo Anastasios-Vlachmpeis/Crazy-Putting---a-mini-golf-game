@@ -46,21 +46,41 @@ public class BallTargetTab extends BorderPane {
         Button moveBtn = new Button("Update Location");
         moveBtn.setMaxWidth(Double.MAX_VALUE);
         */
+
+        //TextField rTarget = new TextField();
+        //rTarget.setPromptText("Set target radius");
+
+        Slider rTarget = new Slider(0.1, 0.5, 0.2);
+        rTarget.setShowTickLabels(true);
+        rTarget.setShowTickMarks(true);
+        rTarget.setMajorTickUnit(0.1);
+
+        rTarget.valueProperty().addListener((obs, oldVal, newVal) -> {
+            // Get the current target location so we don't accidentally move it
+            double[] currentTarget = course.getTargetXYR(); 
+            
+            // Update the course with the same X and Y, but the new Radius
+            course.setTargetXYR(currentTarget[0], currentTarget[1], newVal.doubleValue());
+            
+            // Instantly redraw the canvas!
+            coursePreview.updatePreview();
+        });
         
         rightMenu.getChildren().addAll(
             title, 
-            instructionLabel
+            instructionLabel,
+            rTarget
         );
 
         this.coursePreview.setOnMouseClicked(e -> {
             double canvasW = coursePreview.getWidth();
             double canvasH = coursePreview.getHeight();
             
-            double[] size = course.getSize(); //
-            double minX = size[0]; //
-            double maxX = size[1]; //
-            double minY = size[2]; //
-            double maxY = size[3]; //
+            double[] size = course.getSize(); 
+            double minX = size[0]; 
+            double maxX = size[1]; 
+            double minY = size[2]; 
+            double maxY = size[3]; 
 
             double gameWidth = maxX - minX;
             double gameHeight = maxY - minY;
@@ -93,9 +113,10 @@ public class BallTargetTab extends BorderPane {
                 } 
                 else if (e.getButton() == MouseButton.SECONDARY) {
                     // RIGHT CLICK: Relocate target array indices directly
-                    double[] targets = course.getTargetXYR(); 
-                    targets[0] = clickGameX;
-                    targets[1] = clickGameY;
+                    //double[] targets = course.getTargetXYR(); 
+                    //targets[0] = clickGameX;
+                    //targets[1] = clickGameY;
+                    course.setTargetXYR(clickGameX, clickGameY, rTarget.getValue());
                     
                     System.out.printf("Target relocated to: (%.2f, %.2f)%n", clickGameX, clickGameY);
                 }

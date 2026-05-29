@@ -4,6 +4,9 @@ import java.nio.file.*;
 import java.util.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import GolfCourseData.RandomTerrainGeneration.PerlinNoise;
+
 import java.io.Reader;
 import java.io.Writer;
 
@@ -21,8 +24,14 @@ public class GolfCourse {
     private double[] originalStartValues = {0.0, 0.0, 0.0};
     private String terrainFormula = "(sin(x-y)/7)+0.5"; //Default terrain
     //Gameborders
-    private double[] size = {-20,20,-20,20}; //{minX, maxX, minY, maxY}
+    private double[] size = {-50,50,-50,50}; //{minX, maxX, minY, maxY}
     private double borderSteepness = 2;
+
+    //PerlinNoise terrain generation
+    public boolean usePerlinNoise = false;
+    double widthScale = 0.08; // Adjust the scale to make hills/ valleys wider
+    double heightScale = 1.0; //Adjust height stretching
+    public double noiseOffset = 0.0; // Changes the map layout completely
 
     public GolfCourse(){
     }
@@ -154,8 +163,19 @@ public class GolfCourse {
     }
 
     public double height(double x, double y){
+        /* 
         //return calculateHeight(terrainFormula, x, y);
         return TerrainManipulator.calculateHeight(terrainFormula, x, y, targetValues);
+        */
+        double calculatedHeight;
+        if (usePerlinNoise) {
+            // The noise function returns a value between -1 and 1. We multiply by 3 to make hills taller.
+            calculatedHeight = PerlinNoise.noise((x + noiseOffset) * widthScale, (y + noiseOffset) * widthScale) * heightScale + globalElevation + 0.25; 
+        } else {
+            // Keep your standard Exp4j formula parser here for the builder!
+            calculatedHeight = TerrainManipulator.calculateHeight(terrainFormula, x, y, targetValues);
+        }
+        return calculatedHeight;
     }
     
     public double[] getDerivative(double x, double y){
@@ -190,6 +210,12 @@ public class GolfCourse {
 
     public double[] getTargetXYR(){
        return targetValues;
+    }
+
+    public void setTargetXYR(double x, double y, double r){
+        targetValues[0] = x;
+        targetValues[1] = y;
+        targetValues[2] = r;
     }
 
     public double[] getStartPosition(){
@@ -227,5 +253,16 @@ public class GolfCourse {
 
     public double distanceToTarget(double[] ballState) {
         return distanceToTarget(ballState[0], ballState[1]);
+    }
+
+    // Global map elevation for Perlin Noise
+    private double globalElevation = 0.0;
+
+    public void setGlobalElevation(double elevation) {
+        this.globalElevation = elevation;
+    }
+    
+    public double getGlobalElevation() {
+        return this.globalElevation;
     }
 }
