@@ -1,7 +1,6 @@
 package SimpleGUI;
 
-import Bots.MLBot;
-import Bots.SimpleBot;
+import Bots.*;
 
 import GolfCourseData.GolfCourse;
 //import ShotEngine.PhysicsShotSimulator;
@@ -79,6 +78,10 @@ public class ShotPanel {
         // mlBotBtn.setOnAction(e -> shotResultLabel.setText("MLBot not yet
         // connected."));
 
+        Button hillBotBtn = new Button("HillBot shot");
+        hillBotBtn.setMaxWidth(Double.MAX_VALUE);
+        hillBotBtn.setOnAction(e -> onHillBotShot());
+
         Button resetBtn = new Button("Reset ball");
         resetBtn.setMaxWidth(Double.MAX_VALUE);
         resetBtn.setOnAction(e -> onReset());
@@ -109,6 +112,8 @@ public class ShotPanel {
             separator(),
             simpleBotBtn,
             mlBotBtn,
+            separator(),
+            hillBotBtn,
             separator(),
             resetBtn
         );
@@ -164,7 +169,25 @@ public class ShotPanel {
         gameCanvas.fireShot(vx, vy);
 
     }
-   
+
+    private void onHillBotShot() {
+        GolfCourse course = gui.getCourseRelated();
+        double[] ballState = gui.getBall().getState();
+        course.setBallPosition(ballState[0], ballState[1]);
+        RungeKuttaSolver solver = new RungeKuttaSolver();
+        HillBot bot = new HillBot(course, solver);
+
+        double[] velocity = bot.shoot();
+        double vx = velocity[0];
+        double vy = velocity[1];
+
+        shotResultLabel.setText(String.format("HillBot shot: vx = %.5f, vy = %.5f", vx, vy)); // this doesnt work heeelp :( ~Damian
+        shotResultLabel.setTextFill(Color.BLACK);
+
+        recordShot();
+        gameCanvas.fireShot(vx, vy);
+
+    }
 
     // reads manual velocity fields and triggers a shot with those values
     private void onFireManual() {
