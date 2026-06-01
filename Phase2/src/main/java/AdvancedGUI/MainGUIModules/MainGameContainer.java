@@ -2,6 +2,7 @@ package AdvancedGUI.MainGUIModules;
 
 import GameEngine.GameManager;
 import GameEngine.GameState;
+import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.control.Alert;
@@ -13,6 +14,7 @@ public class MainGameContainer extends StackPane {
     private final GameManager gameManager;
     private final Game3DScene game3DScene;
     private final GameHUDOverlay hudOverlay;
+    private Timeline currentShotTimeline;
 
     public MainGameContainer(GameManager gameManager) {
         this.gameManager = gameManager;
@@ -31,7 +33,9 @@ public class MainGameContainer extends StackPane {
 
     private void configureActions() {
         hudOverlay.getShootButton().setOnAction(e -> executeShotAnimation());
+        game3DScene.setShotHandler(velocity -> executeShotAnimation(velocity[0], velocity[1]));
         hudOverlay.getResetButton().setOnAction(e -> {
+            stopShotAnimation();
             gameManager.resetGame();
             syncVisualPositions();
         });
@@ -63,17 +67,36 @@ public class MainGameContainer extends StackPane {
         );
     }
 
+    public void refreshCourseFromBuilder() {
+        stopShotAnimation();
+        gameManager.resetGame();
+        game3DScene.refreshCourseGeometry();
+        syncVisualPositions();
+    }
+
     private void executeShotAnimation() {
         try {
             double vx = hudOverlay.getVelocityX();
             double vy = hudOverlay.getVelocityY();
+            executeShotAnimation(vx, vy);
+
+        } catch (NumberFormatException ex) {
+            System.out.println("Error: Invalid numerical values inside text input field blocks.");
+        }
+    }
+
+    private void executeShotAnimation(double vx, double vy) {
+        try {
+            if (currentShotTimeline != null && currentShotTimeline.getStatus() == Animation.Status.RUNNING) {
+                return;
+            }
 
             // Run calculations matrix profile out
             double[][] trajectory = gameManager.hitBall(vx, vy);
             if (trajectory == null || trajectory.length == 0) return;
 
-            Timeline timeline = new Timeline();
-            timeline.setCycleCount(1);
+            currentShotTimeline = new Timeline();
+            currentShotTimeline.setCycleCount(1);
             Duration frameDuration = Duration.millis(12);
 
             for (int i = 0; i < trajectory.length; i++) {
@@ -91,11 +114,15 @@ public class MainGameContainer extends StackPane {
                         gameManager.updateLivePosition(stepX, stepY);
                     }
                 );
-                timeline.getKeyFrames().add(keyFrame);
+                currentShotTimeline.getKeyFrames().add(keyFrame);
             }
 
-            timeline.setOnFinished(e -> syncVisualPositions());
-            timeline.play();
+            currentShotTimeline.setOnFinished(e -> {
+                gameManager.finishShot();
+                currentShotTimeline = null;
+                syncVisualPositions();
+            });
+            currentShotTimeline.play();
 
         } catch (NumberFormatException ex) {
             System.out.println("Error: Invalid numerical values inside text input field blocks.");
@@ -108,5 +135,12 @@ public class MainGameContainer extends StackPane {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    private void stopShotAnimation() {
+        if (currentShotTimeline != null) {
+            currentShotTimeline.stop();
+            currentShotTimeline = null;
+        }
     }
 }

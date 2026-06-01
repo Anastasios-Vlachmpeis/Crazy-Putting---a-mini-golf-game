@@ -46,7 +46,7 @@ public class GameManager {
 
     // The GUI or Bot triggers this method to initiate a play action
     public double[][] hitBall(double vx, double vy) {
-        if (currentState.get() != GameState.AIMING || currentState.get() != GameState.ROLLING) {
+        if (currentState.get() != GameState.AIMING) {
             System.out.println("Cannot shoot: Ball is already in motion or game over!");
             return null;
         }
@@ -79,10 +79,13 @@ public class GameManager {
         //update the location
         course.setBallPosition(currentBallX, currentBallY);
 
-        // Evaluate final landing conditions using targets configuration thresholds
-        evaluateMatchRules();
-
         return trajectory; // Pass coordinates array straight back to GUI timeline to animate
+    }
+
+    public void finishShot() {
+        if (currentState.get() == GameState.ROLLING) {
+            evaluateMatchRules();
+        }
     }
 
     public void resetGame() {
