@@ -6,7 +6,7 @@ package Obstacles;
  * Implementations decide whether a coordinate belongs to the object and how the
  * object should affect the ball. This keeps water, sand, and future objects
  * interchangeable for collision detection and physics updates.
- */
+ */ 
 public interface Objects {
 
     /**
