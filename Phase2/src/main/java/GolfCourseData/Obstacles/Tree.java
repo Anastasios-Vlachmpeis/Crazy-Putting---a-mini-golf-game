@@ -36,7 +36,7 @@ public class Tree implements ObstacleObjects {
 
     @Override
     public double getDisplayHeight(double terrainHeight) {
-        return displayHeight;
+        return terrainHeight;
     }
 
     public double getCenterX() {

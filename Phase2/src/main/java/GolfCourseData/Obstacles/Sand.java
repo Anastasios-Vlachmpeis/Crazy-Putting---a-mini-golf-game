@@ -1,4 +1,4 @@
-package Objects;
+package Obstacles;
 
 /**
  * Circular sand pit object.
@@ -21,8 +21,6 @@ public class Sand implements ObstacleObjects {
         this.centerX = centerX;
         this.centerY = centerY;
         this.radius = Math.max(0.0, radius);
-        this.miuK = miuK;
-        this.miuS = miuS;
     }
 
     @Override
