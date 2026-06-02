@@ -34,7 +34,7 @@ public class GameManager {
     private ShotResult lastShotResult = ShotResult.NORMAL;
     
     private final int MAX_STROKES = 10; //max number of shots until game over
-    private final double stepSize = 0.01; //100fps
+    private double stepSize;
 
     public GameManager(GolfCourse course, Solver solver) {
         this.course = course;
@@ -42,6 +42,8 @@ public class GameManager {
         this.simulator = new ShotSimulatorV2(); // Centered physics loop processor
         //this.currentState = GameState.AIMING;
         //this.strokeCount = 0;
+
+        this.stepSize = course.getStepSize(); //default is 100fps
 
         // Just for the first initialisation
         resetGame();

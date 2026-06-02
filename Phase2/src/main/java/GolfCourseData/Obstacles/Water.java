@@ -1,9 +1,8 @@
+/*
 package Obstacles;
-
-/**
- * Circular water hazard object.
- * A ball inside this circle is considered to be in water and receives the water penalty.
- */
+// Circular water hazard object.
+// A ball inside this circle is considered to be in water and receives the water penalty.
+/
 public class Water implements ObstacleObjects {
 
     private double centerX;
@@ -11,10 +10,10 @@ public class Water implements ObstacleObjects {
     private double radius;
     private double displayHeight = -0.25;
 
-    /** Required for Gson JSON loading. */
+    //Required for Gson JSON loading.
     public Water() {}
 
-    /** Creates a circular water hazard. */
+    // Creates a circular water hazard.
     public Water(double centerX, double centerY, double radius) {
         this.centerX = centerX;
         this.centerY = centerY;
@@ -60,3 +59,4 @@ public class Water implements ObstacleObjects {
         return radius;
     }
 }
+*/
