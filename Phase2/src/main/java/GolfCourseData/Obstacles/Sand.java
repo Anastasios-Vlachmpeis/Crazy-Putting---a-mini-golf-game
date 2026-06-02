@@ -10,14 +10,14 @@ public class Sand implements ObstacleObjects {
     private double centerX;
     private double centerY;
     private double radius;
-    private double miuK = 0.35;
-    private double miuS = 0.65;
+    private final double miuK = 0.35;
+    private final double miuS = 0.65;
 
     /** Required for Gson JSON loading. */
     public Sand() {}
 
     /** Creates a circular sand pit. */
-    public Sand(double centerX, double centerY, double radius, double miuK, double miuS) {
+    public Sand(double centerX, double centerY, double radius) {
         this.centerX = centerX;
         this.centerY = centerY;
         this.radius = Math.max(0.0, radius);
