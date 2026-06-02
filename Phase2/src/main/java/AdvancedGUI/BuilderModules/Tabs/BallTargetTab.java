@@ -35,7 +35,7 @@ public class BallTargetTab extends BorderPane {
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
         Label instructionLabel = new Label("• Left-Click: Place Ball\n• Right-Click: Place Target Hole");
-        instructionLabel.setStyle("-fx-text-fill: #555555; -fx-font-size: 11px;");
+        //instructionLabel.setStyle("-fx-text-fill: #555555; -fx-font-size: 11px;");
         /* 
         TextField xField = new TextField();
         xField.setPromptText("Target X");

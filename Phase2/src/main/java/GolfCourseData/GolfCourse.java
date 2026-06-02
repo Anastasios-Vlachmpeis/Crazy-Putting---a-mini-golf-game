@@ -22,16 +22,16 @@ public class GolfCourse {
     private String[] start;
     private double[] currentBallPosition = {0, 0, 0}; //updates after every shot
     private double[] initialBallPosition = {0.0, 0.0, 0.0};
-    private String terrainFormula = "(sin(x-y)/7)+0.5"; //Default terrain
+    private String terrainFormula = "1"; //Default terrain (sin(x-y)/7)+0.5"
     //Gameborders
-    private double[] size = {-50,50,-50,50}; //{minX, maxX, minY, maxY}
+    private double[] size = {-25,25,-25,25}; //{minX, maxX, minY, maxY}
     private double borderSteepness = 2;
 
     public double stepSize = 0.01;
 
     //PerlinNoise terrain generation
     public boolean usePerlinNoise = false;
-    double widthScale = 0.08; // Adjust the scale to make hills/ valleys wider
+    double widthScale = 0.2; // Adjust the scale to make hills/ valleys wider
     double heightScale = 1.0; //Adjust height stretching
     public double noiseOffset = 0.0; // Changes the map layout completely
 
@@ -147,11 +147,6 @@ public class GolfCourse {
     public void setTerrainFormula(String formula){
         terrainFormula = formula;
     }
-    /* 
-    public String getTerrainFormula() {
-        return this.terrainFormula;
-    }
-    */
 
     public void addHill(double centerX, double centerY, double peakHeight, double width) {
         // Forward the parameters straight down to your existing terrain manager
@@ -164,7 +159,6 @@ public class GolfCourse {
             this.frictionValues[1] = miuS;
         }  
     }
-    
 
     public double getStepSize() {
         return this.stepSize;
@@ -216,7 +210,7 @@ public class GolfCourse {
     }
 
     public double dhdx(double x, double y){
-        fetchSize();
+        //fetchSize();
         if(x < size[0]) return -1 * borderSteepness;
         if(x > size[1]) return borderSteepness;
         
@@ -225,7 +219,7 @@ public class GolfCourse {
     }
 
     public double dhdy(double x, double y){
-        fetchSize();
+        //fetchSize();
         if(y < size[2]) return -1 * borderSteepness;
         if(y > size[3]) return borderSteepness;
 

@@ -35,7 +35,7 @@ public class PerlinNoiseTab extends BorderPane {
         enableToggle.setSelected(course.usePerlinNoise);
 
         Label seedLabel = new Label("World Seed (Text or Numbers):");
-        TextField seedField = new TextField("maastricht"); // Default starting seed
+        TextField seedField = new TextField("Maastricht"); // Default starting seed
         seedField.setDisable(!course.usePerlinNoise);
 
         Button randomSeedBtn = new Button("Generate Random Seed");

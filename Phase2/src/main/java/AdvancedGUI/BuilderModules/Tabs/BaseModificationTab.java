@@ -34,8 +34,8 @@ public class BaseModificationTab extends BorderPane{
         Label title = new Label("Course Dimensions");
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
-        TextField widthXString = new TextField("100");
-        TextField widthYString = new TextField("100");
+        TextField widthXString = new TextField("50");
+        TextField widthYString = new TextField("50");
 
         //TextField terrainFormula = new TextField("(sin(x-y)/7)+0.5");
         terrainFormula = new TextField("(sin(x-y)/7)+0.5");
