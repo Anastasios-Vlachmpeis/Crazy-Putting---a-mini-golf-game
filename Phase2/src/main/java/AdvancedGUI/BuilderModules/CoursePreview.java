@@ -64,16 +64,7 @@ public class CoursePreview extends Canvas {
                 // Only colotr the canvas if in bounds
                 if (gameX >= minX && gameX <= maxX && gameY >= minY && gameY <= maxY) {
                     double heightVal = course.height(gameX, gameY);
-                    Color terrainColor;
-                    
-                    if (heightVal < 0) {
-                        terrainColor = Color.web("#3498db"); //for water
-                    } else {
-                        // shading
-                        double greenIntensity = 0.4 + (heightVal * 0.05); 
-                        greenIntensity = Math.max(0.1, Math.min(0.9, greenIntensity)); 
-                        terrainColor = Color.color(0.2, greenIntensity, 0.2); 
-                    }
+                    Color terrainColor = getColorForHeight(heightVal);
                     
                     gc.setFill(terrainColor);
                     gc.fillRect(screenX, screenY, resolutionSize, resolutionSize); 
@@ -107,23 +98,38 @@ public class CoursePreview extends Canvas {
         gc.fillOval(ballScreenX - ballRadius, ballScreenY - ballRadius, ballRadius * 2, ballRadius * 2);
     }
 
-    /* 
-    private Color getColorForPosition(double gameX, double gameY) {
-        // Check for water
-        if (course.isWater(gameX, gameY)) {
-            return Color.web("#3498db"); // Blue for water
-        } 
-    
-        //  Otherwise, calculate the green terrain shading based on height
-        double heightVal = course.height(gameX, gameY);
+    private Color getColorForHeight(double heightVal) {
+        if (heightVal < 0) {
+            return Color.web("#3498db");
+        }
 
-        // Simple procedural shading: higher ground is lighter green
-        double greenIntensity = 0.4 + (heightVal * 0.05);
-    
-        // Clamp the value strictly between 0.1 and 0.9 to prevent out-of-bounds color ranges
-        greenIntensity = Math.max(0.1, Math.min(0.9, greenIntensity));
+        if (heightVal >= 3.0) {
+            double t = clamp((heightVal - 3.0) / 2.0);
+            return Color.rgb(
+                (int)(165 + t * 70),
+                (int)(155 + t * 80),
+                (int)(135 + t * 95)
+            );
+        }
 
-        return Color.color(0.2, greenIntensity, 0.2);
+        if (heightVal >= 1.5) {
+            double t = clamp((heightVal - 1.5) / 1.5);
+            return Color.rgb(
+                (int)(130 + t * 35),
+                (int)(150 + t * 5),
+                (int)(70 + t * 65)
+            );
+        }
+
+        double t = clamp(heightVal / 1.5);
+        return Color.rgb(
+            (int)(35 + t * 95),
+            (int)(110 + t * 105),
+            (int)(45 + t * 25)
+        );
     }
-    */
+
+    private double clamp(double value) {
+        return Math.max(0.0, Math.min(1.0, value));
+    }
 }

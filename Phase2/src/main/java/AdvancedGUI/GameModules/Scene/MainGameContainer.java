@@ -12,6 +12,8 @@ import javafx.util.Duration;
 
 public class MainGameContainer extends StackPane {
 
+    private static final double MAX_SHOT_SPEED = 5.0;
+
     private final GameManager gameManager;
     private final Game3DScene game3DScene;
     private final GameHUDOverlay hudOverlay;
@@ -95,6 +97,11 @@ public class MainGameContainer extends StackPane {
                 return;
             }
 
+            double[] cappedVelocity = capShotVelocity(vx, vy);
+            vx = cappedVelocity[0];
+            vy = cappedVelocity[1];
+            hudOverlay.setVelocity(vx, vy);
+
             // Run calculations matrix profile out
             double[][] trajectory = gameManager.hitBall(vx, vy);
             if (trajectory == null || trajectory.length == 0) return;
@@ -136,6 +143,17 @@ public class MainGameContainer extends StackPane {
         } catch (NumberFormatException ex) {
             System.out.println("Error: Invalid numerical values inside text input field blocks.");
         }
+    }
+
+    private double[] capShotVelocity(double vx, double vy) {
+        double speed = Math.sqrt(vx * vx + vy * vy);
+
+        if (speed > MAX_SHOT_SPEED) {
+            vx = vx / speed * MAX_SHOT_SPEED;
+            vy = vy / speed * MAX_SHOT_SPEED;
+        }
+
+        return new double[] {vx, vy};
     }
 
     private void showModalAlert(String title, String content) {

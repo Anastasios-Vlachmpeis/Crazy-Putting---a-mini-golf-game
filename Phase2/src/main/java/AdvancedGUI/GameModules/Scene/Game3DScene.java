@@ -29,6 +29,7 @@ public class Game3DScene extends SubScene {
     private PerspectiveCamera camera;
     private Sphere ballNode;
     private Cylinder flagPoleNode;
+    private MeshView flagBannerNode;
     private AimingShotController aimingShotController;
 
     // Mouse rotation tracking
@@ -188,9 +189,7 @@ public class Game3DScene extends SubScene {
     }
 
     private double getHeightShadeTextureX(double elevation) {
-        double greenIntensity = 0.4 + (elevation * 0.05);
-        greenIntensity = clamp(greenIntensity, 0.1, 0.9);
-        return (greenIntensity - 0.1) / 0.8;
+        return clamp(elevation / 5.0, 0.0, 1.0);
     }
 
     private WritableImage createHeightShadeTexture() {
@@ -199,24 +198,55 @@ public class Game3DScene extends SubScene {
         PixelWriter writer = image.getPixelWriter();
 
         for (int x = 0; x < width; x++) {
-            double greenIntensity = 0.1 + (x / (double)(width - 1)) * 0.8;
-            writer.setColor(x, 0, Color.color(0.2, greenIntensity, 0.2));
+            double elevation = (x / (double)(width - 1)) * 5.0;
+            writer.setColor(x, 0, getColorForHeight(elevation));
         }
 
         return image;
     }
 
+    private Color getColorForHeight(double elevation) {
+        if (elevation >= 3.0) {
+            double t = clamp((elevation - 3.0) / 2.0, 0.0, 1.0);
+            return Color.rgb(
+                (int)(165 + t * 70),
+                (int)(155 + t * 80),
+                (int)(135 + t * 95)
+            );
+        }
+
+        if (elevation >= 1.5) {
+            double t = clamp((elevation - 1.5) / 1.5, 0.0, 1.0);
+            return Color.rgb(
+                (int)(130 + t * 35),
+                (int)(150 + t * 5),
+                (int)(70 + t * 65)
+            );
+        }
+
+        double t = clamp(elevation / 1.5, 0.0, 1.0);
+        return Color.rgb(
+            (int)(35 + t * 95),
+            (int)(110 + t * 105),
+            (int)(45 + t * 25)
+        );
+    }
+
     private void buildGameObjects() {
-        ballNode = new Sphere(0.1);
+        ballNode = new Sphere(0.25);
         PhongMaterial ballMat = new PhongMaterial(Color.WHITE);
         ballMat.setSpecularColor(Color.LIGHTGRAY);
         ballNode.setMaterial(ballMat);
 
-        flagPoleNode = new Cylinder(0.05, 1.0); 
-        PhongMaterial flagMat = new PhongMaterial(Color.DARKRED);
+        flagPoleNode = new Cylinder(0.1, 2.5); 
+        PhongMaterial flagMat = new PhongMaterial(Color.BLACK);
         flagPoleNode.setMaterial(flagMat);
 
-        worldGroup.getChildren().addAll(ballNode, flagPoleNode);
+        flagBannerNode = createFlagBanner();
+        PhongMaterial flagBannerMat = createUnlitMaterial(Color.RED);
+        flagBannerNode.setMaterial(flagBannerMat);
+
+        worldGroup.getChildren().addAll(ballNode, flagPoleNode, flagBannerNode);
 
         AimingArrow aimingArrow = new AimingArrow(gameManager, ballNode);
         worldGroup.getChildren().add(aimingArrow.getView());
@@ -226,7 +256,7 @@ public class Game3DScene extends SubScene {
     public void renderBallPosition(double physX, double physY, double physHeight) {
         ballNode.setTranslateX(physX);
         ballNode.setTranslateZ(physY); 
-        ballNode.setTranslateY(-physHeight - 0.1); 
+        ballNode.setTranslateY(-physHeight - 0.25); 
     }
 
     public void setBallVisible(boolean visible) {
@@ -236,7 +266,42 @@ public class Game3DScene extends SubScene {
     public void renderFlagPosition(double physX, double physY, double physHeight) {
         flagPoleNode.setTranslateX(physX);
         flagPoleNode.setTranslateZ(physY); 
-        flagPoleNode.setTranslateY(-physHeight - 0.5); 
+        flagPoleNode.setTranslateY(-physHeight - 1.25);
+
+        flagBannerNode.setTranslateX(physX);
+        flagBannerNode.setTranslateZ(physY);
+        flagBannerNode.setTranslateY(-physHeight - 2.5);
+    }
+
+    private MeshView createFlagBanner() {
+        TriangleMesh mesh = new TriangleMesh();
+        mesh.getPoints().addAll(
+            0.0f, 0.0f, 0.0f,
+            0.0f, 0.45f, 0.0f,
+            0.8f, 0.2f, 0.0f
+        );
+        mesh.getTexCoords().addAll(0, 0);
+        mesh.getFaces().addAll(
+            0, 0, 1, 0, 2, 0,
+            2, 0, 1, 0, 0, 0
+        );
+
+        MeshView flagBanner = new MeshView(mesh);
+        flagBanner.setCullFace(CullFace.NONE);
+        return flagBanner;
+    }
+
+    private PhongMaterial createUnlitMaterial(Color color) {
+        PhongMaterial material = new PhongMaterial(color);
+        material.setSpecularColor(color);
+        material.setSelfIlluminationMap(createSolidColorTexture(color));
+        return material;
+    }
+
+    private WritableImage createSolidColorTexture(Color color) {
+        WritableImage image = new WritableImage(1, 1);
+        image.getPixelWriter().setColor(0, 0, color);
+        return image;
     }
 
     public void setShotHandler(Consumer<double[]> shotHandler) {
