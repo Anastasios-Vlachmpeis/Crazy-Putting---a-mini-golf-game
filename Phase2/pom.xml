@@ -50,7 +50,7 @@
                 <version>0.0.8</version>
                 <configuration>
                     <!-- <mainClass>AdvancedGUI.GUI_phase3</mainClass> -->
-                    <mainClass>SimpleGUI.GUI_phase2</mainClass>
+                    <mainClass>AdvancedGUI.GUI_phase3</mainClass>
                 </configuration>
             </plugin>
             <plugin>
