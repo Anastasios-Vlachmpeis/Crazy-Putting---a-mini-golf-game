@@ -1,4 +1,4 @@
-package Obstacles
+package Obstacles;
 
 public class Tree implements ObstacleObjects {
     private double centerX;
