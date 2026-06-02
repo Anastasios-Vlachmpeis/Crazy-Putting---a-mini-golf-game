@@ -4,7 +4,7 @@ package Obstacles;
  * Circular water hazard object.
  * A ball inside this circle is considered to be in water and receives the water penalty.
  */
-public class Water implements Objects {
+public class Water implements ObstacleObjects {
 
     private double centerX;
     private double centerY;

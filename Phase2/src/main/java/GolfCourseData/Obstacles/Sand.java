@@ -5,13 +5,13 @@ package Objects;
  * Sand does not cause a penalty, but increases kinetic and static friction while
  * the ball is inside the circle.
  */
-public class Sand implements Objects {
+public class Sand implements ObstacleObjects {
 
     private double centerX;
     private double centerY;
     private double radius;
-    private double miuK;
-    private double miuS;
+    private double miuK = 0.35;
+    private double miuS = 0.65;
 
     /** Required for Gson JSON loading. */
     public Sand() {}
