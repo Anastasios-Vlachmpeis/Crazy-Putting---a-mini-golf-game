@@ -14,10 +14,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class GUI_courseBuilder {
     // Method to build and show the window
@@ -107,8 +110,21 @@ public class GUI_courseBuilder {
         root.setCenter(tabPane);
         */
 
-        BorderPane root = new BorderPane();
-        root.setCenter(tabPane);
+        StackPane root = new StackPane();
+
+        Image backgroundImage = new Image("file:src\\main\\java\\AdvancedGUI\\LauncherModules\\Background.png");
+        ImageView backgroundView = new ImageView(backgroundImage);
+        backgroundView.setPreserveRatio(false);
+
+        backgroundView.fitWidthProperty().bind(root.widthProperty());
+        backgroundView.fitHeightProperty().bind(root.heightProperty());
+
+        tabPane.setStyle("-fx-background-color: rgba(255, 255, 255, 0.0);");
+        tabPane.setStyle("-fx-tab-min-width: 100px;");
+        root.getChildren().addAll(backgroundView, tabPane);
+
+        //BorderPane root = new BorderPane();
+        //root.setCenter(tabPane);
         Scene scene = new Scene(root);
         builderWindow.setScene(scene);
         
