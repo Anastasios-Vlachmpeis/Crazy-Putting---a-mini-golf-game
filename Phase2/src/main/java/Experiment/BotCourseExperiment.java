@@ -1,8 +1,8 @@
 // FUNCTIONALITY TEST for THE SIMPLEBOT
 package Experiment;
 
-import Bots.SimpleBot;
-import GolfCourseData.GolfCourse;
+import Bots.*;
+import GolfCourseData.*;
 import ShotEngine.ShotSimulatorV2;
 import Solvers.RungeKuttaSolver;
 import Systems.GolfODE;

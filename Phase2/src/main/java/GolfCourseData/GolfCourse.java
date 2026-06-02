@@ -55,7 +55,7 @@ public class GolfCourse {
         convertToDouble();
     }
     //Used only in phase 2 in the old GUI
-    public void loadFromGUI(String heightFormula, String[][] inputValuesGUI)throws Exception{
+    public void loadFromGUI(String heightFormula, String[][] inputValuesGUI) throws Exception{
         friction = inputValuesGUI[0];
         target = inputValuesGUI[1];
         start = inputValuesGUI[2];

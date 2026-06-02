@@ -14,9 +14,14 @@ public class HillBot extends GolfBot {
 
     private static final double MAX_SPEED = 5.0;
     private final Random random = new Random();
+    private double iterations = 0;
 
     public HillBot(GolfCourse course, Solver solver) {
         super(course, solver);
+    }
+
+    public double getIterations() {
+        return iterations;
     }
 
     // n is total nr of neighbours, impact is a scalar that multiplies the difference (small impact small change, big impact big change)
@@ -30,6 +35,7 @@ public class HillBot extends GolfBot {
 
     public double[] shoot() {
         System.out.println("start HillBot");
+        iterations = 0;
         double[] target = course.getTargetXYR();
         double tRadius = target[2];
         double bestVx = 0;
@@ -79,24 +85,25 @@ public class HillBot extends GolfBot {
                 if (distanceToTarget <= tRadius) break;
             }
 
-            System.err.println("Shot " + i);
-            System.out.println("Best vx: " + bestVx + " bestVy: " + bestVy + " distance: " + bestDistance);
+            // System.err.println("Shot " + i);
+            // System.out.println("Best vx: " + bestVx + " bestVy: " + bestVy + " distance: " + bestDistance);
 
             // if none of the neighbours are better than the original shot, cut the impact and try again
             if (!hasImproved) {
                 impact /= 2.0; // cut the impact so it finds neighbors closer to the main shot
-                System.out.println("cut impact");
+                // System.out.println("cut impact");
 
                 // too small impact, wont make a diference anymore
                 if (impact < minImpact) {
-                    System.out.println("no good neighbor found");
+                    // System.out.println("no good neighbor found");
                     break;
                 }
             }
             i++;
         }
-        System.out.println("iteration " + (i + 1));
-        System.out.println(" bestVx = " + bestVx + " bestVy = " + bestVy + " bestDistance = " + bestDistance);
+        iterations = i;
+        // System.out.println("iteration " + (i + 1));
+        // System.out.println(" bestVx = " + bestVx + " bestVy = " + bestVy + " bestDistance = " + bestDistance);
 
         return new double[] { bestVx, bestVy };
     }
