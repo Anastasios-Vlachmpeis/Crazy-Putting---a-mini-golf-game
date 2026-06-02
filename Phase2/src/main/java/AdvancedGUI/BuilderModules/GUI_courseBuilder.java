@@ -85,33 +85,6 @@ public class GUI_courseBuilder {
             }
         });
 
-
-        /* 
-        // Create Tab: Base Confuguration tab
-        Tab baseTab = new Tab("Base Course Configuration");
-        baseTab.setClosable(false);
-        // Set its content to an instance of your separate class
-        baseTab.setContent(new BaseModificationView(course, preViewSize));
-
-        // Create Tab: Terrain / Hill Modifications
-        Tab hillTab = new Tab("Hills & Slopes");
-        hillTab.setClosable(false);
-        // Set its content to an instance of your separate class
-        hillTab.setContent(new HillModificationView(course, preViewSize));
-
-        // Create Tab: Target / Hole Modifications
-        Tab targetTab = new Tab("Target / Hole");
-        targetTab.setClosable(false);
-        // Set its content to an instance of your other separate class
-        targetTab.setContent(new TargetModificationView(course, preViewSize));
-
-        tabPane.getTabs().addAll(baseTab, hillTab, targetTab);
-        BorderPane root = new BorderPane();
-        root.setCenter(tabPane);
-        */
-
-        StackPane root = new StackPane();
-
         Image backgroundImage = new Image("file:src\\main\\java\\AdvancedGUI\\LauncherModules\\Background.png");
         ImageView backgroundView = new ImageView(backgroundImage);
         backgroundView.setPreserveRatio(false);
