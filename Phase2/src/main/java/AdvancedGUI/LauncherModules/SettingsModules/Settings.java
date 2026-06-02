@@ -19,6 +19,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -31,7 +32,6 @@ import javafx.collections.ObservableList;
 public class Settings {
 
     private StackPane settingsContainer;
-    int padding = 5;
 
     public StackPane getContainer() {
         return settingsContainer;
@@ -108,78 +108,61 @@ public class Settings {
         //Bot Selection for multiplayer
         Label botLabel = new Label("Select your prefered bot: ");
         styleSettingsLabel(botLabel);
-        ObservableList<String> bot = FXCollections.observableArrayList(
-            "Simple Bot", 
-            "ML Bot", 
-            "Hill Bot",
-            "ManHattan Bot",
-            "Newton Bot",
-            "Search Bot"
-        );
-        ComboBox<String> botSelection = new ComboBox<>(bot);
-        botSelection.setValue("Simple Bot");
-        //botSelection.setPadding(new Insets(20, 0, 0, 50));
+
+        ComboBox<String> botSelection = createStyledBotSelection();
 
         //Add all title Labels
         Label generalSettingsLabel = new Label("General Settings");
         styleTitleLabel(generalSettingsLabel);
 
-        //Label singlePlayerSettingsLabel = new Label("Single player Settings");
+        //Label singlePlayerSettingsLabel = new Label("Singleplayer Settings");
         //styleTitleLabel(singlePlayerSettingsLabel);
 
-        Label multiPlayerSettingsLabel = new Label("Multi Player Settings");
+        Label multiPlayerSettingsLabel = new Label("Multiplayer Settings");
         styleTitleLabel(multiPlayerSettingsLabel);
 
         //Building the menu
-        //We make a VBox for the Labels and another VBox for the Fields/slider so they are side by side and globally alligned
-        VBox generalLeft = new VBox(padding);
-        generalLeft.setPadding(new Insets(0, 0, 0, 20));
-        generalLeft.getChildren().addAll(stepSizelabel, MiuK, MiuS, MiuKSand, MiuSSand);
-
-        VBox generalRight = new VBox(padding*2.2);
-        generalRight.setPadding(new Insets(5, 0, 25, 50));
-        generalRight.getChildren().addAll(stepSizeText, MiuKString, MiuSString, MiuKSandString, MiuSSandString);
-
-
-        //VBox singlePlayerLeft = new VBox(padding);
-        //VBox singlePlayerRight = new VBox(padding*2.2);
-
-
-        VBox multiPlayerLeft = new VBox(padding);
-        multiPlayerLeft.setPadding(new Insets(0, 0, 0, 20));
-        multiPlayerLeft.getChildren().addAll(botLabel);
-        VBox multiPlayerRight = new VBox(padding*2.2);
-        multiPlayerRight.setPadding(new Insets(10, 0, 0, 100));
-        multiPlayerRight.getChildren().addAll(botSelection);
-
-        //put both Left and Right next to each other
-        HBox generalBox = new HBox(padding);
-        generalBox.getChildren().addAll(generalLeft, generalRight);
-
-        //HBox singlePlayerBox = new HBox(padding);
-        //singlePlayerBox.getChildren().addAll(singlePlayerLeft, singlePlayerRight);
-
-        HBox multiPlayerBox = new HBox(padding);
-        multiPlayerBox.getChildren().addAll(multiPlayerLeft, multiPlayerRight);
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setVgap(15); 
+        grid.setHgap(20); 
         
+        // General Settings
+        grid.add(generalSettingsLabel, 0, 0, 2, 1);
+        GridPane.setHalignment(generalSettingsLabel, javafx.geometry.HPos.CENTER); 
 
-        //Add all settings components
+        grid.add(stepSizelabel, 0, 1);
+        grid.add(stepSizeText, 1, 1);
+
+        grid.add(MiuK, 0, 2);
+        grid.add(MiuKString, 1, 2);
+
+        grid.add(MiuS, 0, 3);
+        grid.add(MiuSString, 1, 3);
+
+        grid.add(MiuKSand, 0, 4);
+        grid.add(MiuKSandString, 1, 4);
+
+        grid.add(MiuSSand, 0, 5);
+        grid.add(MiuSSandString, 1, 5);
+
+        //multiplayer
+        GridPane.setMargin(multiPlayerSettingsLabel, new Insets(30, 0, 0, 0)); 
+        grid.add(multiPlayerSettingsLabel, 0, 6, 2, 1);
+        GridPane.setHalignment(multiPlayerSettingsLabel, javafx.geometry.HPos.CENTER);
+
+        grid.add(botLabel, 0, 7);
+        grid.add(botSelection, 1, 7);
+
         rootBox.setAlignment(Pos.CENTER);
-        rootBox.setMaxWidth(600);
-        rootBox.setMaxHeight(300);
-        rootBox.setPadding(new Insets(0, 10, 30, 10));
+        rootBox.setMaxWidth(600); 
+        rootBox.setMaxHeight(600);
+        rootBox.setPadding(new Insets(20, 20, 30, 20));
         rootBox.setStyle(
             "-fx-background-color: rgba(255, 255, 255, 0.75); " +
             "-fx-background-radius: 50;"
         );
-        rootBox.getChildren().addAll(
-            generalSettingsLabel,
-            generalBox,
-            //singlePlayerSettingsLabel,
-            //singlePlayerBox,
-            multiPlayerSettingsLabel,
-            multiPlayerBox
-        );
+        rootBox.getChildren().add(grid);
 
         //Add background to scene
         Image backgroundImage = new Image("file:src\\main\\java\\AdvancedGUI\\LauncherModules\\Background.png");
@@ -199,32 +182,114 @@ public class Settings {
         //this.scene = new Scene(settingsContainer, 1000, 800);
         StackPane.setAlignment(rootBox, Pos.TOP_CENTER);
         StackPane.setMargin(rootBox, new Insets(100, 0, 250, 0));
-
-        //this.settingsGUI = new Stage();
-        //settingsGUI.setTitle(title);
-        //settingsGUI.setMinWidth(1500);
-        //settingsGUI.setMinHeight(1000);
-        //settingsGUI.setScene(scene);
-        //settingsGUI.setMaximized(true);
-
-        //settingsGUI.show();
     }
 
     private void styleTitleLabel(Label label) {
-        label.setPadding(new Insets(25, 10, 25, 10));
+        label.setPadding(new Insets(25, 10, 0, 10));
         label.setFont(Font.font("Arial", FontWeight.BOLD, 50));
         label.setStyle("-fx-text-fill: #FFFFFF;");
         label.setEffect(new DropShadow(10, Color.BLACK));
     }
 
     private void styleSettingsLabel(Label label) {
-        label.setPadding(new Insets(10, 10, 10, 30));
+        label.setPadding(new Insets(10, 20, 15, 10));
         label.setFont(Font.font("Arial", FontWeight.BOLD, 20));
         label.setStyle("-fx-text-fill: #FFFFFF;");
         label.setEffect(new DropShadow(10, Color.BLACK));
     }
 
-    private void styleTextBox(TextField textfield){
-        textfield.setPadding(new Insets(10, 0, 10, 7));
+    private void styleTextBox(TextField textfield) {
+        //When not typing
+        String idleStyle = 
+            "-fx-background-color: rgba(255, 255, 255, 0.95);" + 
+            "-fx-background-radius: 8;" +
+            "-fx-border-radius: 8;" +
+            "-fx-border-color: #bdc3c7;" + 
+            "-fx-border-width: 2;" +
+            "-fx-text-fill: #333333;" +    
+            "-fx-font-size: 15px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-padding: 10 15 10 15;";   
+
+        // While typing
+        String focusedStyle = 
+            "-fx-background-color: #ffffff;" +
+            "-fx-background-radius: 8;" +
+            "-fx-border-radius: 8;" +
+            "-fx-border-color: #f39c12;" + 
+            "-fx-border-width: 2;" +
+            "-fx-text-fill: #333333;" +
+            "-fx-font-size: 15px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-padding: 10 15 10 15;";
+
+        textfield.setStyle(idleStyle);
+
+        textfield.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+            textfield.setStyle(isNowFocused ? focusedStyle : idleStyle);
+        });
+        textfield.setMaxWidth(150);
+    }
+
+    private ComboBox<String> createStyledBotSelection() {
+        ObservableList<String> bot = FXCollections.observableArrayList(
+            "Simple Bot", "ML Bot", "Hill Bot", "ManHattan Bot", "Newton Bot", "Search Bot"
+        );
+        ComboBox<String> comboBox = new ComboBox<>(bot);
+
+        String comboIdleStyle = "-fx-background-color: #f39c12; -fx-background-radius: 15; -fx-padding: 5 15 5 15; -fx-cursor: hand;";
+        String comboHoverStyle = "-fx-background-color: #e67e22; -fx-background-radius: 15; -fx-padding: 5 15 5 15; -fx-cursor: hand;";
+        
+        comboBox.setStyle(comboIdleStyle);
+
+        comboBox.hoverProperty().addListener((obs, wasHover, isHover) -> {
+            comboBox.setStyle(isHover ? comboHoverStyle : comboIdleStyle);
+        });
+
+        comboBox.setButtonCell(new ListCell<String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item);
+                    setFont(Font.font("Arial", FontWeight.BOLD, 16));
+                    setTextFill(Color.WHITE);
+                }
+            }
+        });
+
+        comboBox.setCellFactory(lv -> new ListCell<String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("-fx-background-color: transparent;");
+                } else {
+                    setText(item);
+                    setFont(Font.font("Arial", FontWeight.BOLD, 14));
+                    setTextFill(Color.web("#333333"));
+                    setStyle("-fx-padding: 10 15; -fx-background-radius: 5; -fx-background-color: transparent;");
+
+                    hoverProperty().addListener((obs, wasHover, isHover) -> {
+                        if (isHover) {
+                            setStyle("-fx-background-color: #f39c12; -fx-padding: 10 15; -fx-background-radius: 5;");
+                            setTextFill(Color.WHITE);
+                        } else if (isSelected()) {
+                            setStyle("-fx-background-color: #e67e22; -fx-padding: 10 15; -fx-background-radius: 5;");
+                            setTextFill(Color.WHITE);
+                        } else {
+                            setStyle("-fx-background-color: transparent; -fx-padding: 10 15; -fx-background-radius: 5;");
+                            setTextFill(Color.web("#333333"));
+                        }
+                    });
+                }
+            }
+        });
+
+        comboBox.setValue("Simple Bot");
+        return comboBox;
     }
 }

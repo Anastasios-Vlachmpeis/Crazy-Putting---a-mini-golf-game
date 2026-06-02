@@ -12,8 +12,8 @@
     0.2
   ],
   "currentBallPosition": [
-    -6.510969904860738,
-    3.687334997140502,
+    0.0,
+    0.0,
     0.0
   ],
   "initialBallPosition": [
@@ -37,150 +37,151 @@
   "TerrainManipulator": {
     "hills": [
       {
-        "centerX": 6.8,
-        "centerY": 12.8,
+        "centerX": 16.8,
+        "centerY": 15.9,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 10.55,
+        "centerY": 16.0,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 2.55,
+        "centerY": 14.95,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": -1.95,
+        "centerY": 12.9,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 6.65,
+        "centerY": 15.8,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 12.25,
+        "centerY": 16.25,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 2.25,
+        "centerY": 14.45,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 1.55,
+        "centerY": 13.75,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 4.45,
+        "centerY": 13.15,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 8.3,
+        "centerY": 12.35,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 8.35,
+        "centerY": 10.9,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 9.05,
+        "centerY": 10.45,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 6.55,
+        "centerY": 11.2,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 7.55,
+        "centerY": 9.9,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 8.55,
+        "centerY": 6.6,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 8.3,
+        "centerY": 4.7,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 6.95,
+        "centerY": 2.15,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 6.45,
+        "centerY": 1.35,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 5.85,
+        "centerY": -0.05,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 6.0,
+        "centerY": 0.45,
         "peakHeight": 2.5,
         "width": 2.0
       },
       {
-        "centerX": 6.8,
-        "centerY": 12.75,
+        "centerX": 6.7,
+        "centerY": 5.35,
+        "peakHeight": 2.5,
+        "width": 2.0
+      },
+      {
+        "centerX": 5.65,
+        "centerY": 9.9,
+        "peakHeight": 2.5,
+        "width": 2.0
+      },
+      {
+        "centerX": 2.25,
+        "centerY": 11.75,
+        "peakHeight": 2.5,
+        "width": 2.0
+      },
+      {
+        "centerX": -1.9,
+        "centerY": 11.9,
         "peakHeight": 2.5,
         "width": 2.0
       }
     ],
-    "lastFormula": "1",
-    "compiledExpression": {
-      "tokens": [
-        {
-          "value": 1.0,
-          "type": 1
-        }
-      ],
-      "variables": {
-        "π": 3.141592653589793,
-        "x": -6.510969904860738,
-        "pi": 3.141592653589793,
-        "y": 3.687334997140502,
-        "e": 2.718281828459045,
-        "φ": 1.61803398874
-      },
-      "userFunctionNames": []
-    }
+    "lastFormula": "1"
   },
   "globalElevation": 0.0
 }
