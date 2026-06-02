@@ -43,7 +43,7 @@ public class Launcher extends Application{
 
         //Add Big launcher title
         Label gameName = new Label("Crazy Putting!");
-        gameName.setPadding(new Insets(15, 10, 50, 10));
+        gameName.setPadding(new Insets(100, 10, 100, 10));
         gameName.setFont(Font.font("Arial", FontWeight.BOLD, 150));
         gameName.setStyle("-fx-text-fill: #FFFFFF;");
         gameName.setEffect(new DropShadow(10, Color.BLACK));
@@ -61,13 +61,17 @@ public class Launcher extends Application{
         styleGameButton(builderButton);
         builderButton.setOnAction(e -> {builder.show(); });
 
-        Button settingsButton = new Button("Open settings");
+        Button settingsButton = new Button("Open Settings");
         styleGameButton(settingsButton);
         settingsButton.setOnAction(e -> settings.show());
 
+        Button quitButton = new Button("Quit Game");
+        styleGameButton(quitButton);
+        quitButton.setOnAction(e -> javafx.application.Platform.exit());
+
         //make layout
         VBox layout = new VBox(15);
-        layout.getChildren().addAll(gameName, singlePlayerButton, multiPlayerButton, builderButton, settingsButton);
+        layout.getChildren().addAll(gameName, singlePlayerButton, multiPlayerButton, builderButton, settingsButton, quitButton);
         layout.setAlignment(Pos.CENTER);
 
         //Add background to scene
@@ -96,10 +100,20 @@ public class Launcher extends Application{
         //Show stage
         Stage launcher = new Stage();
         launcher.setTitle("Crazy Putting!");
-        launcher.setMinWidth(600);
-        launcher.setMinHeight(400);
+        launcher.setMinWidth(1850);
+        launcher.setMinHeight(1000);
         launcher.setMaximized(true);
+        launcher.setFullScreen(true);
+        //launcher.setResizable(false);
         launcher.setScene(scene);
+
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == javafx.scene.input.KeyCode.F11) {
+                // Toggle de fullscreen status: zet hem op het tegenovergestelde van wat het nu is
+                launcher.setFullScreen(!launcher.isFullScreen());
+            }
+        });
+
         launcher.show();
     }
 
