@@ -78,7 +78,7 @@ public class SaveLoadPresetsTab extends BorderPane{
             if (selectedFile != null) {
                 try {
                     // Load the map data into your shared course object memory model
-                    course.loadFromJson(selectedFile.getAbsolutePath()); //
+                    course.loadFromJson(selectedFile.getAbsolutePath()); 
 
                     coursePreview.updatePreview();
             

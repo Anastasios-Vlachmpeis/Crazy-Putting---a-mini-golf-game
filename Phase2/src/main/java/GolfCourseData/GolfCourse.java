@@ -16,7 +16,7 @@ public class GolfCourse {
 
     //these values are just test/default values
     private String[] friction;
-    private double[] frictionValues = {0.15, 0.5, 0.0};
+    private double[] frictionValues = {0.15, 0.5, 0.3, 0.75}; //TO DO: ADD DEFAULT SAND FRICTION!!!
     private String[] target;
     private double[] targetValues = {3, 0, 0.2};
     private String[] start;
@@ -26,6 +26,8 @@ public class GolfCourse {
     //Gameborders
     private double[] size = {-50,50,-50,50}; //{minX, maxX, minY, maxY}
     private double borderSteepness = 2;
+
+    public double stepSize = 0.01;
 
     //PerlinNoise terrain generation
     public boolean usePerlinNoise = false;
@@ -153,6 +155,15 @@ public class GolfCourse {
             this.frictionValues[1] = miuS;
         }  
     }
+    
+
+    public double getStepSize() {
+        return this.stepSize;
+    }
+
+    public void setStepSize(double stepSize) {
+        this.stepSize = stepSize;
+    }
 
     public double getMiuK() {
         return frictionValues[0];
@@ -161,6 +172,19 @@ public class GolfCourse {
     public double getMiuS() {
         return frictionValues[1];
     }
+
+    public double getMiuKSand() {
+        return frictionValues[2];
+    }
+
+    public double getMiuSSand() {
+        return frictionValues[3];
+    }
+
+    public void setFrictions(double MiuK, double MiuS, double MiuKSand, double MiuSSand) {
+        this.frictionValues = new double[]{MiuK, MiuS, MiuKSand, MiuSSand};
+    }
+
 
     public double height(double x, double y){
         /* 

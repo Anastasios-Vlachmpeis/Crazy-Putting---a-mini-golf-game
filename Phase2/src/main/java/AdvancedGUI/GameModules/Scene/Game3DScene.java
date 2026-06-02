@@ -1,4 +1,4 @@
-package AdvancedGUI.MainGUIModules;
+package AdvancedGUI.GameModules.Scene;
 
 import GameEngine.GameManager;
 import GolfCourseData.GolfCourse;

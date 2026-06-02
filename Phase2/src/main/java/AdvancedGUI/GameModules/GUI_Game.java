@@ -1,10 +1,10 @@
-package AdvancedGUI;
+package AdvancedGUI.GameModules;
 
 import GolfCourseData.GolfCourse;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import AdvancedGUI.BuilderModules.GUI_courseBuilder;
-import AdvancedGUI.MainGUIModules.MainGameContainer;
+import AdvancedGUI.GameModules.Scene.MainGameContainer;
 import GameEngine.GameState;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -29,18 +29,18 @@ import javafx.scene.transform.Rotate;
 import javafx.util.Duration;
 
 
-public class GUI_phase3 extends Application {
+public class GUI_Game{
     //Main GUI phase 3
-    @Override
-    public void start(Stage GameStage) {
+    public void display(String title, GolfCourse course, GameManager gameManager) {
         // Instantiate builder window
-        GUI_courseBuilder builderWindow = new GUI_courseBuilder();
-        GolfCourse course = new GolfCourse();
-        Solver solver = new RungeKuttaSolver();
+        //GUI_courseBuilder builderWindow = new GUI_courseBuilder();
+        //GolfCourse course = new GolfCourse();
+        //Solver solver = new RungeKuttaSolver();
+        //GameManager gameManager = new GameManager(course, solver);
 
-        GameManager gameManager = new GameManager(course, solver);
-        MainGameContainer gamePlayRoot = new MainGameContainer(gameManager);
+        MainGameContainer gamePlayRoot =  new MainGameContainer(gameManager);
 
+        /* 
         Button builderButton = new Button("Open Builder");
         //Made the button more beautiful :)
         builderButton.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 5;");
@@ -50,6 +50,7 @@ public class GUI_phase3 extends Application {
         StackPane.setAlignment(builderButton, Pos.TOP_RIGHT);
         StackPane.setMargin(builderButton, new Insets(25));
         gamePlayRoot.getChildren().add(builderButton);
+        */
 
         /* 
         // Create a layout and add the components
@@ -58,9 +59,10 @@ public class GUI_phase3 extends Application {
         layout.setAlignment(Pos.CENTER);
         */
 
+        
         Stage mainGameGUI = new Stage();
         Scene scene = new Scene(gamePlayRoot, 1000, 800);
-        mainGameGUI.setTitle("Crazy Putting!");
+        mainGameGUI.setTitle(title);
         mainGameGUI.setMinWidth(600);
         mainGameGUI.setMinHeight(400);
         mainGameGUI.setScene(scene);
@@ -109,10 +111,12 @@ public class GUI_phase3 extends Application {
         */
 
 
+    /* 
     // Add a standard main method to launch the application
     //change in pom.xml <mainClass>SimpleGUI.GUI_phase2</mainClass> to <mainClass>AdvancedGUI.GUI_phase3</mainClass>
     public static void main(String[] args) {
         launch(args);
     }
+    */
     
 }
