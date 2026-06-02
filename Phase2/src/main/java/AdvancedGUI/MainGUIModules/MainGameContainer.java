@@ -1,12 +1,13 @@
 package AdvancedGUI.MainGUIModules;
 
-import GameEngine.GameManager;
-import GameEngine.GameState;
+import GameEngine.*;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Modality;
+import javafx.stage.Window;
 import javafx.util.Duration;
 
 public class MainGameContainer extends StackPane {
@@ -119,6 +120,11 @@ public class MainGameContainer extends StackPane {
 
             currentShotTimeline.setOnFinished(e -> {
                 gameManager.finishShot();
+                if (gameManager.getLastShotResult() == ShotResult.WATER) {
+                    game3DScene.setBallVisible(false);
+                    showModalAlert("Hit the water", "Your ball landed in the water. Penalty stroke applied.");
+                    game3DScene.setBallVisible(true);
+                }
                 currentShotTimeline = null;
                 syncVisualPositions();
             });
@@ -134,6 +140,11 @@ public class MainGameContainer extends StackPane {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);
+        Window owner = getScene() == null ? null : getScene().getWindow();
+        if (owner != null) {
+            alert.initOwner(owner);
+            alert.initModality(Modality.WINDOW_MODAL);
+        }
         alert.showAndWait();
     }
 

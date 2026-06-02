@@ -229,6 +229,10 @@ public class Game3DScene extends SubScene {
         ballNode.setTranslateY(-physHeight - 0.1); 
     }
 
+    public void setBallVisible(boolean visible) {
+        ballNode.setVisible(visible);
+    }
+
     public void renderFlagPosition(double physX, double physY, double physHeight) {
         flagPoleNode.setTranslateX(physX);
         flagPoleNode.setTranslateZ(physY); 

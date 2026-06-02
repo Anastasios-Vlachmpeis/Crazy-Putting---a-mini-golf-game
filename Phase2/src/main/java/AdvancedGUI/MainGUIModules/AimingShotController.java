@@ -89,8 +89,12 @@ public class AimingShotController {
         double dx = mouseX - aimStartX;
         double dy = aimStartY - mouseY;
 
-        double vx = dx * (MAX_SHOT_SPEED / AIM_PIXELS_FOR_MAX_SPEED);
-        double vy = dy * (MAX_SHOT_SPEED / AIM_PIXELS_FOR_MAX_SPEED);
+        double screenVx = dx * (MAX_SHOT_SPEED / AIM_PIXELS_FOR_MAX_SPEED);
+        double screenVy = dy * (MAX_SHOT_SPEED / AIM_PIXELS_FOR_MAX_SPEED);
+        double cameraAngleRadians = Math.toRadians(cameraAngleY.get());
+
+        double vx = screenVx * Math.cos(cameraAngleRadians) - screenVy * Math.sin(cameraAngleRadians);
+        double vy = screenVx * Math.sin(cameraAngleRadians) + screenVy * Math.cos(cameraAngleRadians);
         double speed = Math.sqrt(vx * vx + vy * vy);
 
         if (speed > MAX_SHOT_SPEED) {
