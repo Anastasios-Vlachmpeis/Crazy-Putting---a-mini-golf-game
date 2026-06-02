@@ -1,4 +1,4 @@
-package Objects;
+package Obstacles;
 
 /**
  * Circular sand pit object.
