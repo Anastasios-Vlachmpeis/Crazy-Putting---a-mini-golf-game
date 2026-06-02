@@ -117,7 +117,7 @@ public class Game3DScene extends SubScene {
         terrainGroup.getChildren().add(meshView);
 
         // A single giant flat blue box placed exactly at height 0.0. 
-        // If the green mesh dips below 0.0, the blue water covers it naturally!
+        // If the green mesh dips below 0.0, the blue water covers it naturally
         Box waterPlane = new Box(gameWidth, 0.1, gameHeight);
         waterPlane.setTranslateX((minX + maxX) / 2.0);
         waterPlane.setTranslateZ((minY + maxY) / 2.0);

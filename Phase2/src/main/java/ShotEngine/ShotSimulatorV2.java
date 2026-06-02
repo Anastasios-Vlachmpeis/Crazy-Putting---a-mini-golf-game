@@ -26,7 +26,7 @@ public class ShotSimulatorV2 {
 
         double miuS = course.getMiuS();
 
-        int MAX_STEPS = 5_000;//safety cap
+        int MAX_STEPS = 5_000;//safety cap -> 100 steps per second so a max simulation time of 50 seconds
         for (int k = 0; k < MAX_STEPS; k++){
             double speed = Math.sqrt(state[2]*state[2]+state[3]*state[3]);
 
