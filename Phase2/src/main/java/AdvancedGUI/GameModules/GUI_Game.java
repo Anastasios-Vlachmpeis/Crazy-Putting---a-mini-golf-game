@@ -44,7 +44,10 @@ public class GUI_Game{
         Button builderButton = new Button("Open Builder");
         //Made the button more beautiful :)
         builderButton.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 5;");
-        builderButton.setOnAction(e -> builderWindow.display("BuilderWindow", course));
+        builderButton.setOnAction(e -> {
+            builderWindow.display("BuilderWindow", course);
+            gamePlayRoot.refreshCourseFromBuilder();
+        });
         //The main GUI is locked when builder window is open so no need to worry about crashes
 
         StackPane.setAlignment(builderButton, Pos.TOP_RIGHT);

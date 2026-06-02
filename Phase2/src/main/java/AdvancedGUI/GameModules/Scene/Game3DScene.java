@@ -5,8 +5,10 @@ import GolfCourseData.GolfCourse;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.*;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.PhongMaterial;
+import javafx.scene.paint.PhongMaterial; //how material looks 
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Cylinder;
 import javafx.scene.shape.MeshView;
@@ -14,6 +16,7 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.transform.Rotate;
 import javafx.scene.shape.CullFace;
+import java.util.function.Consumer;
 
 public class Game3DScene extends SubScene {
 
@@ -22,15 +25,18 @@ public class Game3DScene extends SubScene {
     private final Group worldGroup; 
     
     // 3D Nodes
+    private Group terrainGroup;
+    private PerspectiveCamera camera;
     private Sphere ballNode;
     private Cylinder flagPoleNode;
+    private AimingShotController aimingShotController;
 
     // Mouse rotation tracking
-    private double anchorX, anchorY;
-    private double anchorAngleX = 0;
-    private double anchorAngleY = 0;
-    private final DoubleProperty angleX = new SimpleDoubleProperty(0);
     private final DoubleProperty angleY = new SimpleDoubleProperty(0);
+    private double zoomMultiplier = 1.0;
+    private double cameraCenterX;
+    private double cameraCenterZ;
+    private double cameraMaxDim;
 
     public Game3DScene(GameManager gameManager, double width, double height) {
         super(new Group(), width, height, true, SceneAntialiasing.BALANCED);
@@ -57,7 +63,15 @@ public class Game3DScene extends SubScene {
     }
 
     private void buildSmoothTerrainAndCamera() {
-        Group terrainGroup = new Group();
+        if (terrainGroup != null) {
+            worldGroup.getChildren().remove(terrainGroup);
+        }
+        if (camera != null) {
+            rootGroup.getChildren().remove(camera);
+        }
+        worldGroup.getTransforms().clear();
+
+        terrainGroup = new Group();
         GolfCourse course = gameManager.getCourse();
         double[] size = course.getSize(); 
         
@@ -77,9 +91,6 @@ public class Game3DScene extends SubScene {
         int rows = (int) (gameHeight / step) + 1;
 
         TriangleMesh mesh = new TriangleMesh();
-        
-        // Dummy texture coordinates required by JavaFX to render the mesh
-        mesh.getTexCoords().addAll(0, 0);
 
         // A. Create the vertices (The points in space)
         for (int r = 0; r < rows; r++) {
@@ -90,6 +101,7 @@ public class Game3DScene extends SubScene {
                 
                 // -elevation because JavaFX Y goes down, but we want mountains to go up
                 mesh.getPoints().addAll((float)x, (float)-elevation, (float)z); 
+                mesh.getTexCoords().addAll((float)getHeightShadeTextureX(elevation), 0.5f);
             }
         }
 
@@ -102,15 +114,16 @@ public class Game3DScene extends SubScene {
                 int br = bl + 1;                // Bottom-Right vertex
 
                 // Triangle 1: Top-Left -> Bottom-Left -> Top-Right
-                mesh.getFaces().addAll(tl, 0, bl, 0, tr, 0);
+                mesh.getFaces().addAll(tl, tl, bl, bl, tr, tr);
                 // Triangle 2: Top-Right -> Bottom-Left -> Bottom-Right
-                mesh.getFaces().addAll(tr, 0, bl, 0, br, 0);
+                mesh.getFaces().addAll(tr, tr, bl, bl, br, br);
             }
         }
 
         // Apply a green material to the terrain
         MeshView meshView = new MeshView(mesh);
-        PhongMaterial grassMat = new PhongMaterial(Color.color(0.15, 0.65, 0.2));
+        PhongMaterial grassMat = new PhongMaterial();
+        grassMat.setDiffuseMap(createHeightShadeTexture());
         meshView.setMaterial(grassMat);
         //Proper culling
         meshView.setCullFace(CullFace.NONE);
@@ -130,40 +143,67 @@ public class Game3DScene extends SubScene {
 
         worldGroup.getChildren().add(terrainGroup);
 
-        double centerX = (minX + maxX) / 2.0;
-        double centerZ = (minY + maxY) / 2.0;
+        cameraCenterX = (minX + maxX) / 2.0;
+        cameraCenterZ = (minY + maxY) / 2.0;
+        cameraMaxDim = maxDim;
 
-        PerspectiveCamera camera = new PerspectiveCamera(true);
+        camera = new PerspectiveCamera(true);
         camera.setNearClip(0.1);
         camera.setFarClip(maxDim * 5.0); 
         
-        camera.setTranslateX(centerX);
-        camera.setTranslateZ(centerZ - (maxDim * 1.2));
-        //GODS view 
-        camera.setTranslateY(-(maxDim * 0.8));
+        updateCameraZoom();
         camera.getTransforms().add(new Rotate(-35, Rotate.X_AXIS)); 
         
         this.setCamera(camera);
         rootGroup.getChildren().add(camera);
 
-        Rotate xRotate = new Rotate(0, centerX, 0, centerZ, Rotate.X_AXIS);
-        Rotate yRotate = new Rotate(0, centerX, 0, centerZ, Rotate.Y_AXIS);
-        worldGroup.getTransforms().addAll(xRotate, yRotate);
+        Rotate yRotate = new Rotate(0, cameraCenterX, 0, cameraCenterZ, Rotate.Y_AXIS);
+        worldGroup.getTransforms().add(yRotate);
 
-        xRotate.angleProperty().bind(angleX);
         yRotate.angleProperty().bind(angleY);
 
-        this.setOnMousePressed(event -> {
-            anchorX = event.getSceneX();
-            anchorY = event.getSceneY();
-            anchorAngleX = angleX.get();
-            anchorAngleY = angleY.get();
+        this.setOnScroll(event -> {
+            double zoomStep = event.getDeltaY() > 0 ? 0.9 : 1.1;
+            zoomMultiplier = clamp(zoomMultiplier * zoomStep, 0.35, 2.5);
+            updateCameraZoom();
+            event.consume();
         });
+    }
 
-        this.setOnMouseDragged(event -> {
-            angleX.set(anchorAngleX - (anchorY - event.getSceneY()) * 0.5);
-            angleY.set(anchorAngleY + (anchorX - event.getSceneX()) * 0.5);
-        });
+    public void refreshCourseGeometry() {
+        buildSmoothTerrainAndCamera();
+    }
+
+    private void updateCameraZoom() {
+        if (camera == null) return;
+
+        camera.setTranslateX(cameraCenterX);
+        camera.setTranslateZ(cameraCenterZ - (cameraMaxDim * 1.2 * zoomMultiplier));
+        // GODS view
+        camera.setTranslateY(-(cameraMaxDim * 0.8 * zoomMultiplier));
+    }
+
+    private double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    private double getHeightShadeTextureX(double elevation) {
+        double greenIntensity = 0.4 + (elevation * 0.05);
+        greenIntensity = clamp(greenIntensity, 0.1, 0.9);
+        return (greenIntensity - 0.1) / 0.8;
+    }
+
+    private WritableImage createHeightShadeTexture() {
+        int width = 256;
+        WritableImage image = new WritableImage(width, 1);
+        PixelWriter writer = image.getPixelWriter();
+
+        for (int x = 0; x < width; x++) {
+            double greenIntensity = 0.1 + (x / (double)(width - 1)) * 0.8;
+            writer.setColor(x, 0, Color.color(0.2, greenIntensity, 0.2));
+        }
+
+        return image;
     }
 
     private void buildGameObjects() {
@@ -177,6 +217,10 @@ public class Game3DScene extends SubScene {
         flagPoleNode.setMaterial(flagMat);
 
         worldGroup.getChildren().addAll(ballNode, flagPoleNode);
+
+        AimingArrow aimingArrow = new AimingArrow(gameManager, ballNode);
+        worldGroup.getChildren().add(aimingArrow.getView());
+        aimingShotController = new AimingShotController(this, gameManager, angleY, aimingArrow);
     }
 
     public void renderBallPosition(double physX, double physY, double physHeight) {
@@ -185,9 +229,25 @@ public class Game3DScene extends SubScene {
         ballNode.setTranslateY(-physHeight - 0.1); 
     }
 
+    public void setBallVisible(boolean visible) {
+        ballNode.setVisible(visible);
+    }
+
     public void renderFlagPosition(double physX, double physY, double physHeight) {
         flagPoleNode.setTranslateX(physX);
         flagPoleNode.setTranslateZ(physY); 
         flagPoleNode.setTranslateY(-physHeight - 0.5); 
+    }
+
+    public void setShotHandler(Consumer<double[]> shotHandler) {
+        if (aimingShotController != null) {
+            aimingShotController.setShotHandler(shotHandler);
+        }
+    }
+
+    public void setVelocityPreviewHandler(Consumer<double[]> velocityPreviewHandler) {
+        if (aimingShotController != null) {
+            aimingShotController.setVelocityPreviewHandler(velocityPreviewHandler);
+        }
     }
 }

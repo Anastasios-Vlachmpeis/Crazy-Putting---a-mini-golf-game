@@ -168,7 +168,12 @@ public class HillModificationTab extends BorderPane{
                 if (clickGameX >= minX && clickGameX <= maxX && clickGameY >= minY && clickGameY <= maxY) {
                     course.addHill(clickGameX, clickGameY, hillHeight, hillWidth);
                     coursePreview.updatePreview();
-                    System.out.println("Hill/ Valley spawned at: (" + clickGameX + ", " + clickGameY + ")");
+                    if (actionType == "Hill") { 
+                        System.out.println("Hill spawned at: (" + clickGameX + ", " + clickGameY + ")");
+                    }
+                    else {
+                        System.out.println("Valley spawned at: (" + clickGameX + ", " + clickGameY + ")");
+                    }
                 }
 
             } catch (NumberFormatException ex) {

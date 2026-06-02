@@ -22,6 +22,8 @@ public class GameManager {
     private double currentBallY;
     private double lastSafeX;
     private double lastSafeY;
+    private double waterRecoveryX;
+    private double waterRecoveryY;
 
     //private GameState currentState;
     //private int strokeCount;
@@ -29,6 +31,7 @@ public class GameManager {
     // JavaFX Observable Properties for instant GUI text/label bindings
     private final ObjectProperty<GameState> currentState = new SimpleObjectProperty<>(GameState.AIMING);
     private final IntegerProperty strokeCount = new SimpleIntegerProperty(0);
+    private ShotResult lastShotResult = ShotResult.NORMAL;
     
     private final int MAX_STROKES = 10; //max number of shots until game over
     private double stepSize;
@@ -48,12 +51,13 @@ public class GameManager {
 
     // The GUI or Bot triggers this method to initiate a play action
     public double[][] hitBall(double vx, double vy) {
-        if (currentState.get() != GameState.AIMING || currentState.get() != GameState.ROLLING) {
+        if (currentState.get() != GameState.AIMING) {
             System.out.println("Cannot shoot: Ball is already in motion or game over!");
             return null;
         }
 
         currentState.set(GameState.ROLLING);
+        lastShotResult = ShotResult.NORMAL;
         //strokeCount++;
         strokeCount.set(strokeCount.get() + 1);
 
@@ -71,6 +75,7 @@ public class GameManager {
         GolfODE physicsEngine = new GolfODE(course); 
         // Process full resolution trajectory array path output matrices
         double[][] trajectory = simulator.schoot(physicsEngine, solver, startState, stepSize); 
+        updateWaterRecoveryPosition(trajectory);
 
         // Update the resting coordinate models using the final row element index
         double[] finalState = trajectory[trajectory.length - 1]; 
@@ -81,10 +86,13 @@ public class GameManager {
         //update the location
         course.setBallPosition(currentBallX, currentBallY);
 
-        // Evaluate final landing conditions using targets configuration thresholds
-        evaluateMatchRules();
-
         return trajectory; // Pass coordinates array straight back to GUI timeline to animate
+    }
+
+    public void finishShot() {
+        if (currentState.get() == GameState.ROLLING) {
+            evaluateMatchRules();
+        }
     }
 
     public void resetGame() {
@@ -107,13 +115,19 @@ public class GameManager {
         boolean outOfBounds = (currentBallX < boundaries[0] || currentBallX > boundaries[1] ||
                                currentBallY < boundaries[2] || currentBallY > boundaries[3]);
         if (outOfBounds) {
+            lastShotResult = ShotResult.OUT_OF_BOUNDS;
             processPenalty("OUT OF BOUNDS! +1 Penalty Stroke. Resetting to last position.");
             return;
         }
 
         // CHECK FOR WATER
         if (course.isWater(currentBallX, currentBallY)) { //
-            processPenalty("SPLASH! Ball landed in water. +1 Penalty Stroke. Resetting.");
+            lastShotResult = ShotResult.WATER;
+            processPenalty(
+                "SPLASH! Ball landed in water. +1 Penalty Stroke. Resetting near water edge.",
+                waterRecoveryX,
+                waterRecoveryY
+            );
             return;
         }
 
@@ -121,6 +135,7 @@ public class GameManager {
         double[] target = course.getTargetXYR(); // {x, y, r]
         double distance = course.distanceToTarget(currentBallX, currentBallY);
         if (distance <= target[2]) {
+            lastShotResult = ShotResult.HOLED_OUT;
             currentState.set(GameState.HOLED_OUT);
             System.out.println("Victory achieved in " + strokeCount.get() + " strokes!");
             return;
@@ -128,27 +143,78 @@ public class GameManager {
 
         // 4. CHECK FOR DEFEAT (Max strokes)
         if (strokeCount.get() >= MAX_STROKES) {
+            lastShotResult = ShotResult.GAME_OVER;
             currentState.set(GameState.GAME_OVER);
             System.out.println("Defeat: Exceeded maximum stroke limits.");
             return;
         }
 
         // If none of the above are met, ball is at rest safely on the green. Allow next shot.
+        lastShotResult = ShotResult.NORMAL;
         currentState.set(GameState.AIMING);
     }
 
     private void processPenalty(String consoleMessage) {
+        processPenalty(consoleMessage, lastSafeX, lastSafeY);
+    }
+
+    private void processPenalty(String consoleMessage, double recoveryX, double recoveryY) {
         System.out.println(consoleMessage);
         strokeCount.set(strokeCount.get() + 1); // Extra penalty stroke
         
         // Roll back positions to where the player last shot from safely
-        this.currentBallX = lastSafeX;
-        this.currentBallY = lastSafeY;
-        //course.setBallPosition(currentBallX, currentBallY);
+        this.currentBallX = recoveryX;
+        this.currentBallY = recoveryY;
+        course.setBallPosition(currentBallX, currentBallY);
         updateLivePosition(currentBallX, currentBallY);
         
         // Ready for recovery shot
         currentState.set(GameState.AIMING);
+    }
+
+    private void updateWaterRecoveryPosition(double[][] trajectory) {
+        waterRecoveryX = lastSafeX;
+        waterRecoveryY = lastSafeY;
+
+        if (trajectory == null || trajectory.length < 2) {
+            return;
+        }
+
+        for (int i = 1; i < trajectory.length; i++) {
+            double x = trajectory[i][1];
+            double y = trajectory[i][2];
+
+            if (course.isWater(x, y)) {
+                double previousX = trajectory[i - 1][1];
+                double previousY = trajectory[i - 1][2];
+                setRecoveryAwayFromWater(previousX, previousY, x, y);
+                return;
+            }
+        }
+    }
+
+    private void setRecoveryAwayFromWater(double safeX, double safeY, double waterX, double waterY) {
+        double dx = safeX - waterX;
+        double dy = safeY - waterY;
+        double distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < 0.0001) {
+            waterRecoveryX = safeX;
+            waterRecoveryY = safeY;
+            return;
+        }
+
+        double clearance = 0.5;
+        double candidateX = safeX + (dx / distance) * clearance;
+        double candidateY = safeY + (dy / distance) * clearance;
+
+        if (course.isWater(candidateX, candidateY)) {
+            waterRecoveryX = safeX;
+            waterRecoveryY = safeY;
+        } else {
+            waterRecoveryX = candidateX;
+            waterRecoveryY = candidateY;
+        }
     }
 
     // Getters for the GUI view layer properties
@@ -157,6 +223,7 @@ public class GameManager {
 
     public IntegerProperty strokeCountProperty() { return strokeCount; }
     public int getStrokeCount() { return strokeCount.get(); }
+    public ShotResult getLastShotResult() { return lastShotResult; }
 
     //For the 3D modeling
     private final DoubleProperty liveX = new SimpleDoubleProperty(0);

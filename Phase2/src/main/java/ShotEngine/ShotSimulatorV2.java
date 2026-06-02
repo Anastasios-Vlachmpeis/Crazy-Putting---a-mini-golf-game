@@ -55,6 +55,9 @@ public class ShotSimulatorV2 {
             t += h;
             
             trajectoryList.add(solver.storeRow(t, state));
+            if (course.isWater(state[0], state[1])) {
+                break;
+            }
         }
         //Convert to simple array
         double[][] solution = trajectoryList.toArray(new double[0][]);

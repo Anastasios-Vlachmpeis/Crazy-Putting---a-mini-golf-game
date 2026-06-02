@@ -20,8 +20,8 @@ public class GolfCourse {
     private String[] target;
     private double[] targetValues = {3, 0, 0.2};
     private String[] start;
-    private double[] startValues = {-3, 0, 0};
-    private double[] originalStartValues = {0.0, 0.0, 0.0};
+    private double[] currentBallPosition = {0, 0, 0}; //updates after every shot
+    private double[] initialBallPosition = {0.0, 0.0, 0.0};
     private String terrainFormula = "(sin(x-y)/7)+0.5"; //Default terrain
     //Gameborders
     private double[] size = {-50,50,-50,50}; //{minX, maxX, minY, maxY}
@@ -57,7 +57,7 @@ public class GolfCourse {
         convertToDouble();
     }
     //Used only in phase 2 in the old GUI
-    public void loadFromGUI(String heightFormula, String[][] inputValuesGUI)throws Exception{
+    public void loadFromGUI(String heightFormula, String[][] inputValuesGUI) throws Exception{
         friction = inputValuesGUI[0];
         target = inputValuesGUI[1];
         start = inputValuesGUI[2];
@@ -91,7 +91,16 @@ public class GolfCourse {
             this.size = loadedData.size;                     
             this.targetValues = loadedData.targetValues;     
             this.frictionValues = loadedData.frictionValues; 
-            this.startValues = loadedData.startValues;       
+            this.currentBallPosition = loadedData.currentBallPosition;
+
+            if (loadedData.initialBallPosition != null) {
+                this.initialBallPosition = loadedData.initialBallPosition;
+            } else {
+                this.initialBallPosition = Arrays.copyOf(
+                    loadedData.currentBallPosition,
+                    loadedData.currentBallPosition.length
+                );
+            }       
         
             // Wipe and rebuild the active hill list seamlessly
             this.clearAllHills(); 
@@ -117,10 +126,10 @@ public class GolfCourse {
             .mapToDouble(Double::parseDouble)
             .toArray();
 
-        startValues = Arrays.stream(start)
+        currentBallPosition = Arrays.stream(start)
             .mapToDouble(Double::parseDouble)
             .toArray();
-        originalStartValues = Arrays.copyOf(startValues, startValues.length);
+        initialBallPosition = Arrays.copyOf(currentBallPosition, currentBallPosition.length);
     }
     
     public void fetchSize(){//For phase 2 GUI
@@ -243,28 +252,28 @@ public class GolfCourse {
     }
 
     public double[] getStartPosition(){
-        double x = startValues[0];
-        double y = startValues[1];
+        double x = currentBallPosition[0];
+        double y = currentBallPosition[1];
         double height = TerrainManipulator.calculateHeight(terrainFormula, x,y, targetValues);
         return new double[] {x, y, height};
     }
 
     public double[] getOriginalStartPosition(){
-        double x = originalStartValues[0];
-        double y = originalStartValues[1];
+        double x = initialBallPosition[0];
+        double y = initialBallPosition[1];
         double height = TerrainManipulator.calculateHeight(terrainFormula, x,y, targetValues);
         return new double[] {x, y, height};
     }
 
     public void setOriginalStartPosition(double x, double y){
-        originalStartValues = new double[]{x, y, 0.0};
+        initialBallPosition = new double[]{x, y, 0.0};
     }
 
     //Set the current ball position for the next stroke
     // Position needs to be updated before the bot shoots again
     public void setBallPosition(double x, double y) {
-        startValues[0] = x;
-        startValues[1] = y;
+        currentBallPosition[0] = x;
+        currentBallPosition[1] = y;
     }
 
     //we pass different things around in classes so we nee dthe same method twice but slightly different input
