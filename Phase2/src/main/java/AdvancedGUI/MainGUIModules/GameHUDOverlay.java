@@ -2,6 +2,7 @@ package AdvancedGUI.MainGUIModules;
 
 import GameEngine.GameManager;
 import GameEngine.GameState;
+import java.util.Locale;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -87,4 +88,9 @@ public class GameHUDOverlay extends VBox {
     
     public double getVelocityX() { return Double.parseDouble(vxField.getText().trim()); }
     public double getVelocityY() { return Double.parseDouble(vyField.getText().trim()); }
+
+    public void setVelocity(double vx, double vy) {
+        vxField.setText(String.format(Locale.US, "%.2f", vx));
+        vyField.setText(String.format(Locale.US, "%.2f", vy));
+    }
 }

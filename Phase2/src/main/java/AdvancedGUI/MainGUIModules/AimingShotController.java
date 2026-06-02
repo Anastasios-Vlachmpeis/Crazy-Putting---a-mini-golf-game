@@ -9,7 +9,7 @@ import javafx.scene.input.MouseButton;
 
 public class AimingShotController {
 
-    private static final double MAX_SHOT_SPEED = 15.0;
+    private static final double MAX_SHOT_SPEED = 5.0;
     private static final double AIM_PIXELS_FOR_MAX_SPEED = 240.0;
 
     private final SubScene scene;
@@ -18,6 +18,7 @@ public class AimingShotController {
     private final AimingArrow aimingArrow;
 
     private Consumer<double[]> shotHandler;
+    private Consumer<double[]> velocityPreviewHandler;
     private boolean aimingShot = false;
     private double aimStartX;
     private double aimStartY;
@@ -44,6 +45,10 @@ public class AimingShotController {
         this.shotHandler = shotHandler;
     }
 
+    public void setVelocityPreviewHandler(Consumer<double[]> velocityPreviewHandler) {
+        this.velocityPreviewHandler = velocityPreviewHandler;
+    }
+
     private void attachMouseHandlers() {
         scene.setOnMousePressed(event -> {
             if (event.getButton() == MouseButton.PRIMARY && gameManager.getCurrentState() == GameState.AIMING) {
@@ -65,6 +70,9 @@ public class AimingShotController {
                 latestAimVx = velocity[0];
                 latestAimVy = velocity[1];
                 aimingArrow.update(latestAimVx, latestAimVy);
+                if (velocityPreviewHandler != null) {
+                    velocityPreviewHandler.accept(new double[] {latestAimVx, latestAimVy});
+                }
             } else if (event.isSecondaryButtonDown()) {
                 cameraAngleY.set(rotationStartAngleY + (rotationStartX - event.getSceneX()) * 0.5);
             }

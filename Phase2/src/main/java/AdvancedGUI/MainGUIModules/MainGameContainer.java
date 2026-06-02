@@ -35,6 +35,7 @@ public class MainGameContainer extends StackPane {
     private void configureActions() {
         hudOverlay.getShootButton().setOnAction(e -> executeShotAnimation());
         game3DScene.setShotHandler(velocity -> executeShotAnimation(velocity[0], velocity[1]));
+        game3DScene.setVelocityPreviewHandler(velocity -> hudOverlay.setVelocity(velocity[0], velocity[1]));
         hudOverlay.getResetButton().setOnAction(e -> {
             stopShotAnimation();
             gameManager.resetGame();

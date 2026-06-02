@@ -244,4 +244,10 @@ public class Game3DScene extends SubScene {
             aimingShotController.setShotHandler(shotHandler);
         }
     }
+
+    public void setVelocityPreviewHandler(Consumer<double[]> velocityPreviewHandler) {
+        if (aimingShotController != null) {
+            aimingShotController.setVelocityPreviewHandler(velocityPreviewHandler);
+        }
+    }
 }
