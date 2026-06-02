@@ -29,13 +29,13 @@ public class BallTargetTab extends BorderPane {
         rightMenu.setPadding(new Insets(20));
         rightMenu.setAlignment(Pos.TOP_LEFT);
         rightMenu.setPrefWidth(250);
-        rightMenu.setStyle("-fx-background-color: #f4f4f4; -fx-border-color: #cccccc; -fx-border-width: 0 0 0 1;");
+        rightMenu.setStyle("-fx-background-color: rgba(244, 244, 244, 0.9); -fx-border-color: #cccccc; -fx-border-width: 0 0 0 1;");
 
         Label title = new Label("Relocate Target & Ball");
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
         Label instructionLabel = new Label("• Left-Click: Place Ball\n• Right-Click: Place Target Hole");
-        instructionLabel.setStyle("-fx-text-fill: #555555; -fx-font-size: 11px;");
+        //instructionLabel.setStyle("-fx-text-fill: #555555; -fx-font-size: 11px;");
         /* 
         TextField xField = new TextField();
         xField.setPromptText("Target X");

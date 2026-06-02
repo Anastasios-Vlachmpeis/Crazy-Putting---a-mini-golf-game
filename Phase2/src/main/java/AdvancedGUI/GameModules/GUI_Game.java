@@ -1,75 +1,55 @@
 package AdvancedGUI.GameModules;
 
 import GolfCourseData.GolfCourse;
-import javafx.application.Application;
-import javafx.stage.Stage;
-import AdvancedGUI.BuilderModules.GUI_courseBuilder;
 import AdvancedGUI.GameModules.Scene.MainGameContainer;
-import GameEngine.GameState;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.stage.Screen;
-import javafx.geometry.Insets;
-import javafx.geometry.Rectangle2D;
-import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.stage.Modality;
 import GameEngine.GameManager;
-import Solvers.Solver;
-import Solvers.RungeKuttaSolver;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Box;
-import javafx.scene.shape.Cylinder;
-import javafx.scene.shape.Sphere;
-import javafx.scene.transform.Rotate;
-import javafx.util.Duration;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.geometry.Pos;
+import javafx.geometry.Insets;
 
 
 public class GUI_Game{
     //Main GUI phase 3
-    public void display(String title, GolfCourse course, GameManager gameManager) {
-        // Instantiate builder window
-        //GUI_courseBuilder builderWindow = new GUI_courseBuilder();
-        //GolfCourse course = new GolfCourse();
-        //Solver solver = new RungeKuttaSolver();
-        //GameManager gameManager = new GameManager(course, solver);
+    private StackPane gameContainer;
+    private MainGameContainer mainGameContainer;
 
-        MainGameContainer gamePlayRoot =  new MainGameContainer(gameManager);
+    public StackPane getContainer() {
+        return gameContainer;
+    }
 
-        /* 
-        Button builderButton = new Button("Open Builder");
-        //Made the button more beautiful :)
-        builderButton.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20 10 20; -fx-background-radius: 5;");
-        builderButton.setOnAction(e -> {
-            builderWindow.display("BuilderWindow", course);
-            gamePlayRoot.refreshCourseFromBuilder();
-        });
-        //The main GUI is locked when builder window is open so no need to worry about crashes
+    public void show() {
+        gameContainer.setVisible(true);
+        mainGameContainer.refreshCourseFromBuilder();
+    }
 
-        StackPane.setAlignment(builderButton, Pos.TOP_RIGHT);
-        StackPane.setMargin(builderButton, new Insets(25));
-        gamePlayRoot.getChildren().add(builderButton);
-        */
+    public void hide() {
+        gameContainer.setVisible(false);
+    }
 
-        /* 
-        // Create a layout and add the components
-        VBox layout = new VBox(15);
-        layout.getChildren().addAll(builderButton);
-        layout.setAlignment(Pos.CENTER);
-        */
+    public MainGameContainer getMainGameContainer() {
+        return mainGameContainer;
+    }
 
+    public GUI_Game(GolfCourse course, GameManager gameManager) {
+        this.gameContainer = new StackPane();
+
+        //Startup invisible
+        this.gameContainer.setVisible(false);
+        this.gameContainer.setPickOnBounds(false);
+
+        this.mainGameContainer = new MainGameContainer(gameManager);
         
-        Stage mainGameGUI = new Stage();
-        Scene scene = new Scene(gamePlayRoot, 1000, 800);
-        mainGameGUI.setTitle(title);
-        mainGameGUI.setMinWidth(600);
-        mainGameGUI.setMinHeight(400);
-        mainGameGUI.setScene(scene);
-        mainGameGUI.show();
+        //Make a button to return to menu
+        Button closeButton = new Button("Quit to Menu");
+        closeButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 5;");
+        closeButton.setOnAction(e -> this.hide());
+        StackPane.setAlignment(closeButton, Pos.TOP_LEFT);
+        StackPane.setMargin(closeButton, new Insets(10, 0, 0, 10));
+
+        this.gameContainer.getChildren().addAll(mainGameContainer, closeButton);
     }
 
 

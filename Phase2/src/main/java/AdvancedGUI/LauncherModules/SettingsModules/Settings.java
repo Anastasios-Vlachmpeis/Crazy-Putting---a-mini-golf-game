@@ -30,12 +30,25 @@ import javafx.collections.ObservableList;
 
 public class Settings {
 
+    private StackPane settingsContainer;
     int padding = 5;
 
-    public void display(String title, GolfCourse course){
-        StackPane root = new StackPane();
-        VBox rootBox = new VBox();
+    public StackPane getContainer() {
+        return settingsContainer;
+    }
 
+    public void show() {
+        settingsContainer.setVisible(true);
+    }
+
+    public void hide() {
+        settingsContainer.setVisible(false);
+    }
+
+    public Settings(GolfCourse course){
+        //StackPane root = new StackPane();
+        this.settingsContainer = new StackPane();
+        VBox rootBox = new VBox();
 
         //stepSize setting
         Label stepSizelabel = new Label("Enter Step Size: ");
@@ -172,22 +185,29 @@ public class Settings {
         Image backgroundImage = new Image("file:src\\main\\java\\AdvancedGUI\\LauncherModules\\Background.png");
         ImageView backgroundView = new ImageView(backgroundImage);
         backgroundView.setPreserveRatio(false);
-        backgroundView.fitWidthProperty().bind(root.widthProperty());
-        backgroundView.fitHeightProperty().bind(root.heightProperty());
+        backgroundView.fitWidthProperty().bind(settingsContainer.widthProperty());
+        backgroundView.fitHeightProperty().bind(settingsContainer.heightProperty());
 
-        root.getChildren().addAll(backgroundView, rootBox);
+        Button closeButton = new Button("Close Settings");
+        closeButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 5;");
+        closeButton.setOnAction(e -> this.hide());
+        StackPane.setAlignment(closeButton, Pos.TOP_LEFT);
+        StackPane.setMargin(closeButton, new Insets(10, 0, 0, 10));
 
-        Scene scene = new Scene(root, 1000, 800);
+        settingsContainer.getChildren().addAll(backgroundView, rootBox, closeButton);
+
+        //this.scene = new Scene(settingsContainer, 1000, 800);
         StackPane.setAlignment(rootBox, Pos.TOP_CENTER);
         StackPane.setMargin(rootBox, new Insets(100, 0, 250, 0));
 
-        Stage settingsGUI = new Stage();
-        settingsGUI.setTitle(title);
-        settingsGUI.setMinWidth(600);
-        settingsGUI.setMinHeight(400);
-        settingsGUI.setMaximized(true);
-        settingsGUI.setScene(scene);
-        settingsGUI.show();
+        //this.settingsGUI = new Stage();
+        //settingsGUI.setTitle(title);
+        //settingsGUI.setMinWidth(1500);
+        //settingsGUI.setMinHeight(1000);
+        //settingsGUI.setScene(scene);
+        //settingsGUI.setMaximized(true);
+
+        //settingsGUI.show();
     }
 
     private void styleTitleLabel(Label label) {

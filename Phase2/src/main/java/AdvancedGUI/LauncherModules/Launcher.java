@@ -22,18 +22,24 @@ import javafx.scene.image.ImageView;
 import javafx.scene.effect.DropShadow;
 
 public class Launcher extends Application{
+
+    private GUI_courseBuilder builder;
+    private Settings settings;
+    private GUI_Game game;
+
     @Override
     public void start(Stage LauncherStage){
         //Created stackpane for layering
         StackPane root = new StackPane();
 
-        GUI_courseBuilder builderWindow = new GUI_courseBuilder();
-        GUI_Game gameWindow = new GUI_Game();
-        Settings settings = new Settings();
-        
         GolfCourse course = new GolfCourse();
         Solver solver = new RungeKuttaSolver();
         GameManager gameManager = new GameManager(course, solver);
+
+        //For builder and settings: we use "this." because we try to pre-load it before the user actually opens the window 
+        this.builder = new GUI_courseBuilder(course);
+        this.settings = new Settings(course);
+        this.game = new GUI_Game(course, gameManager);
 
         //Add Big launcher title
         Label gameName = new Label("Crazy Putting!");
@@ -45,19 +51,19 @@ public class Launcher extends Application{
         //Add options buttons
         Button singlePlayerButton = new Button("Singleplayer");
         styleGameButton(singlePlayerButton);
-        singlePlayerButton.setOnAction(e -> gameWindow.display("Crazy Putting! Singleplayer", course, gameManager));
+        singlePlayerButton.setOnAction(e -> game.show());
 
         Button multiPlayerButton = new Button("Multiplayer");
         styleGameButton(multiPlayerButton);
-        multiPlayerButton.setOnAction(e -> gameWindow.display("Crazy Putting! Multiplayer", course, gameManager));
+        multiPlayerButton.setOnAction(e -> game.show());//Still need to implement multiplayer
 
         Button builderButton = new Button("Open Builder");
         styleGameButton(builderButton);
-        builderButton.setOnAction(e -> builderWindow.display("Builder", course));
+        builderButton.setOnAction(e -> {builder.show(); });
 
         Button settingsButton = new Button("Open settings");
         styleGameButton(settingsButton);
-        settingsButton.setOnAction(e -> settings.display("Settings", course));
+        settingsButton.setOnAction(e -> settings.show());
 
         //make layout
         VBox layout = new VBox(15);
@@ -71,9 +77,18 @@ public class Launcher extends Application{
         backgroundView.fitWidthProperty().bind(root.widthProperty());
         backgroundView.fitHeightProperty().bind(root.heightProperty());
 
-        root.getChildren().add(backgroundView);
-        root.getChildren().add(layout);
+        root.getChildren().addAll(
+            backgroundView,
+            layout,
+            settings.getContainer(),
+            builder.getContainer(),
+            game.getContainer()
+        );
 
+        settings.hide();
+        builder.hide();
+        game.hide();
+        
         Scene scene = new Scene(root, 1000, 800);
         StackPane.setAlignment(layout, Pos.TOP_CENTER);
         StackPane.setMargin(layout, new Insets(00, 0, 250, 0));
@@ -105,12 +120,12 @@ public class Launcher extends Application{
     
         // Hover Style
         String hoverStyle = 
-        "-fx-min-width: 420px;" + // Grow slightly wider if hovered
+        "-fx-min-width: 450px;" + // Grow slightly wider if hovered
         "-fx-min-height: 80px;" +
         "-fx-background-color: #e67e22;"+ 
         "-fx-text-fill: white;" +
         "-fx-font-weight: bold;" + 
-        "-fx-font-size: 28px; " + //Grow text if hovering over the button
+        "-fx-font-size: 35px; " + //Grow text if hovering over the button
         "-fx-padding: 10 20 10 20;" + 
         "-fx-background-radius: 25;";
 

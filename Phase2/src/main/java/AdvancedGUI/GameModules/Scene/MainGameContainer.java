@@ -22,6 +22,8 @@ public class MainGameContainer extends StackPane {
 
         // 1. Instantiate layout modules layers
         this.game3DScene = new Game3DScene(gameManager, 1000, 800);
+        this.game3DScene.widthProperty().bind(this.widthProperty());
+        this.game3DScene.heightProperty().bind(this.heightProperty()); //Makes the game as big as possible
         this.hudOverlay = new GameHUDOverlay(gameManager);
 
         // 2. Structural assembly order (3D back panel, 2D front HUD)

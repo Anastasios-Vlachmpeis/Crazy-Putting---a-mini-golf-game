@@ -24,7 +24,7 @@ public class GameHUDOverlay extends VBox {
         
         // CRUCIAL: Pass mouse events straight through transparent slots to the 3D subscene behind it
         this.setPickOnBounds(false); 
-        this.setPadding(new Insets(25));
+        this.setPadding(new Insets(60, 0, 0, 10));
         this.setAlignment(Pos.TOP_LEFT);
 
         buildScoreCard();

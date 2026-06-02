@@ -7,6 +7,7 @@ import AdvancedGUI.BuilderModules.Tabs.SaveLoadPresetsTab;
 import AdvancedGUI.BuilderModules.Tabs.BallTargetTab;
 import AdvancedGUI.BuilderModules.Tabs.PerlinNoiseTab;
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -14,27 +15,39 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class GUI_courseBuilder {
+
+    private StackPane builderContainer;
+    private TabPane tabPane;
+
+    public StackPane getContainer() {
+        return builderContainer;
+    }
+
+    public void show() {
+        builderContainer.setVisible(true);
+    }
+
+    public void hide() {
+        builderContainer.setVisible(false);
+    }
+
+    //We create the window before we actually open it
     // Method to build and show the window
-    public void display(String title, GolfCourse course) {
-        //Create a brand new Stage (Window)
-        Stage builderWindow = new Stage();
+    public GUI_courseBuilder(GolfCourse course) {
+        this.builderContainer = new StackPane();
         double[] preViewSize = {1000, 1000};
-        
-        // Block interaction with other windows until this one is closed
-        builderWindow.initModality(Modality.APPLICATION_MODAL);
-        builderWindow.setTitle(title);
-        builderWindow.setMinWidth(1000); 
-        builderWindow.setMinHeight(800);
-        builderWindow.setMaximized(true);
 
         //Configure tabs
-        TabPane tabPane = new TabPane();
+        tabPane = new TabPane();
 
         // Create tab content views
         PerlinNoiseTab perlinView = new PerlinNoiseTab(course, preViewSize);
@@ -44,11 +57,34 @@ public class GUI_courseBuilder {
         BallTargetTab targetView = new BallTargetTab(course, preViewSize);
 
         //Set up the Tabs
-        Tab perlinTab = new Tab("Procedural Gen", perlinView);
-        Tab saveLoadTab = new Tab("Save & Load", saveLoadView);
-        Tab baseTab = new Tab("Dimensions & Height Function", baseView);
-        Tab hillTab = new Tab("Hills & Valleys", hillView);
-        Tab targetTab = new Tab("Target & Hole", targetView);
+        Tab perlinTab = new Tab();
+        setupCustomTab(perlinTab, "Procedural Generation");
+        perlinTab.setContent(perlinView);
+
+        Tab saveLoadTab = new Tab();
+        setupCustomTab(saveLoadTab, "Save & Load");
+        saveLoadTab.setContent(saveLoadView);
+
+        Tab baseTab = new Tab();
+        setupCustomTab(baseTab, "Dimensions & Function");
+        baseTab.setContent(baseView);
+
+        Tab hillTab = new Tab();
+        setupCustomTab(hillTab, "Hills & Valleys");
+        hillTab.setContent(hillView);
+
+        Tab targetTab = new Tab();
+        setupCustomTab(targetTab, "Target & Hole");
+        targetTab.setContent(targetView);
+
+        tabPane.getTabs().addAll(perlinTab, saveLoadTab, baseTab, hillTab, targetTab);
+        tabPane.setStyle(
+            "-fx-background-color: transparent; " +
+            "-fx-padding: 0; " +
+            "-fx-tab-min-width: 200px; " +
+            "-fx-tab-max-width: 200px; " +
+            "-fx-tab-min-height: 40px;" 
+        );
 
         perlinTab.setClosable(false);
         saveLoadTab.setClosable(false); 
@@ -61,8 +97,6 @@ public class GUI_courseBuilder {
         hillTab.disableProperty().bind(perlinView.perlinEnabledProperty());
         //Disable only certain features if Perlin is active
         baseView.bindFormulaLock(perlinView.perlinEnabledProperty());
-
-        tabPane.getTabs().addAll(perlinTab, saveLoadTab, baseTab, hillTab, targetTab);
 
         //Listening for preview updates for all tabs
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
@@ -82,39 +116,73 @@ public class GUI_courseBuilder {
             }
         });
 
+        Image backgroundImage = new Image("file:src\\main\\java\\AdvancedGUI\\LauncherModules\\Background.png");
+        ImageView backgroundView = new ImageView(backgroundImage);
+        backgroundView.setPreserveRatio(false);
+        backgroundView.fitWidthProperty().bind(builderContainer.widthProperty());
+        backgroundView.fitHeightProperty().bind(builderContainer.heightProperty());
 
-        /* 
-        // Create Tab: Base Confuguration tab
-        Tab baseTab = new Tab("Base Course Configuration");
-        baseTab.setClosable(false);
-        // Set its content to an instance of your separate class
-        baseTab.setContent(new BaseModificationView(course, preViewSize));
+        Button closeButton = new Button("Close Builder");
+        closeButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 5;");
+        closeButton.setOnAction(e -> this.hide());
+        StackPane.setAlignment(closeButton, Pos.TOP_LEFT);
+        StackPane.setMargin(closeButton, new Insets(40, 0, 0, 10));
 
-        // Create Tab: Terrain / Hill Modifications
-        Tab hillTab = new Tab("Hills & Slopes");
-        hillTab.setClosable(false);
-        // Set its content to an instance of your separate class
-        hillTab.setContent(new HillModificationView(course, preViewSize));
-
-        // Create Tab: Target / Hole Modifications
-        Tab targetTab = new Tab("Target / Hole");
-        targetTab.setClosable(false);
-        // Set its content to an instance of your other separate class
-        targetTab.setContent(new TargetModificationView(course, preViewSize));
-
-        tabPane.getTabs().addAll(baseTab, hillTab, targetTab);
-        BorderPane root = new BorderPane();
-        root.setCenter(tabPane);
-        */
-
-        BorderPane root = new BorderPane();
-        root.setCenter(tabPane);
-        Scene scene = new Scene(root);
-        builderWindow.setScene(scene);
-        
-        // showAndWait() tells Java to wait until this window is closed before moving on
-        builderWindow.showAndWait(); 
+        builderContainer.getChildren().addAll(backgroundView, tabPane, closeButton);
     }
 
+    private void setupCustomTab(Tab tab, String title) {
+        Label tabLabel = new Label(title);
+
+        // Define the inline styles as strings
+        String idleStyle = 
+            "-fx-background-color: rgba(255, 255, 255, 0.75);" +
+            "-fx-text-fill: #333333;" +
+            "-fx-font-weight: bold;" +
+            "-fx-font-size: 16px;" +
+            "-fx-padding: 10 20 10 20;" +
+            "-fx-min-width: 250px;" +       
+            "-fx-alignment: center;" +
+            "-fx-background-radius: 15 15 0 0;";
+
+        String hoverStyle = 
+            "-fx-background-color: #e67e22;" +
+            "-fx-text-fill: white;" +
+            "-fx-font-weight: bold;" +
+            "-fx-font-size: 16px;" +
+            "-fx-padding: 10 20 10 20;" +
+            "-fx-min-width: 250px;" +       
+            "-fx-alignment: center;" +
+            "-fx-background-radius: 15 15 0 0;";
+
+        String selectedStyle = 
+            "-fx-background-color: #f39c12;" +
+            "-fx-text-fill: white;" +
+            "-fx-font-weight: bold;" +
+            "-fx-font-size: 16px;" +
+            "-fx-padding: 10 20 10 20;" +
+            "-fx-min-width: 250px;" +       
+            "-fx-alignment: center;" +
+            "-fx-background-radius: 15 15 0 0;";
+
+        // Set initial state
+        tabLabel.setStyle(idleStyle);
     
+        // Replace the default tab text with our custom interactive Label
+        tab.setGraphic(tabLabel);
+        tab.setText(""); 
+
+        // Java-based Hover Logic
+        tabLabel.hoverProperty().addListener((obs, wasHover, isHover) -> {
+            // Only apply hover effect if the tab is NOT currently selected
+            if (!tab.isSelected()) {
+                tabLabel.setStyle(isHover ? hoverStyle : idleStyle);
+            }
+        });
+
+        // Java-based Selection Logic
+        tab.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
+            tabLabel.setStyle(isSelected ? selectedStyle : idleStyle);
+        });
+    }
 }

@@ -44,12 +44,12 @@ public class HillModificationTab extends BorderPane{
         rightMenu.setPadding(new Insets(20));
         rightMenu.setAlignment(Pos.TOP_LEFT);
         rightMenu.setPrefWidth(250);
-        rightMenu.setStyle("-fx-background-color: #f4f4f4; -fx-border-color: #cccccc; -fx-border-width: 0 0 0 1;");
+        rightMenu.setStyle("-fx-background-color: rgba(244, 244, 244, 0.9); -fx-border-color: #cccccc; -fx-border-width: 0 0 0 1;");
 
         Label title = new Label("Add Gaussian Hills");
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
-        Label instructions = new Label("Left click to elevate the course\nRight click to lower the course");
+        Label instructions = new Label("• Left click to elevate the course\n• Right click to lower the course");
         /* 
         TextField heightField = new TextField();
         heightField.setPromptText("Hill Height (e.g., 2.5)");

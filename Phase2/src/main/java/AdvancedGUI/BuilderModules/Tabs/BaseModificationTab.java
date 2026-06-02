@@ -29,13 +29,13 @@ public class BaseModificationTab extends BorderPane{
         rightMenu.setPadding(new Insets(20));
         rightMenu.setAlignment(Pos.TOP_LEFT);
         rightMenu.setPrefWidth(250);
-        rightMenu.setStyle("-fx-background-color: #f4f4f4; -fx-border-color: #cccccc; -fx-border-width: 0 0 0 1;");
+        rightMenu.setStyle("-fx-background-color: rgba(244, 244, 244, 0.9); -fx-border-color: #cccccc; -fx-border-width: 0 0 0 1;");
 
         Label title = new Label("Course Dimensions");
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
-        TextField widthXString = new TextField("100");
-        TextField widthYString = new TextField("100");
+        TextField widthXString = new TextField("50");
+        TextField widthYString = new TextField("50");
 
         //TextField terrainFormula = new TextField("(sin(x-y)/7)+0.5");
         terrainFormula = new TextField("(sin(x-y)/7)+0.5");
