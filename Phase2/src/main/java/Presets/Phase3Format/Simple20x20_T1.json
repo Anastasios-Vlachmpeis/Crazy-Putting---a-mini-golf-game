@@ -1,0 +1,649 @@
+{
+  "epsilon": 1.0E-7,
+  "frictionValues": [
+    0.15,
+    0.5,
+    0.3,
+    0.75
+  ],
+  "targetValues": [
+    7.48,
+    7.62,
+    0.2
+  ],
+  "currentBallPosition": [
+    -3.42,
+    -5.14,
+    0.0
+  ],
+  "initialBallPosition": [
+    -3.42,
+    -5.14,
+    0.0
+  ],
+  "terrainFormula": "1",
+  "size": [
+    -10.0,
+    10.0,
+    -10.0,
+    10.0
+  ],
+  "borderSteepness": 2.0,
+  "stepSize": 0.01,
+  "usePerlinNoise": false,
+  "widthScale": 0.2,
+  "heightScale": 1.0,
+  "noiseOffset": 0.0,
+  "TerrainManipulator": {
+    "hills": [
+      {
+        "centerX": -1.22,
+        "centerY": -9.28,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -1.28,
+        "centerY": -9.58,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -1.24,
+        "centerY": -9.46,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -1.16,
+        "centerY": -9.0,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -1.14,
+        "centerY": -8.64,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -1.06,
+        "centerY": -8.12,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -1.04,
+        "centerY": -7.6,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -0.88,
+        "centerY": -6.76,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -0.74,
+        "centerY": -5.82,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -0.76,
+        "centerY": -4.72,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -0.76,
+        "centerY": -3.82,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -0.68,
+        "centerY": -2.54,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -0.7,
+        "centerY": -3.42,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -0.78,
+        "centerY": -4.68,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -0.86,
+        "centerY": -5.68,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -1.04,
+        "centerY": -6.6,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -1.12,
+        "centerY": -7.66,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -1.06,
+        "centerY": -8.52,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -1.04,
+        "centerY": -7.94,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -0.86,
+        "centerY": -5.56,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -0.78,
+        "centerY": -3.78,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -0.78,
+        "centerY": -2.98,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -0.74,
+        "centerY": -2.26,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -0.74,
+        "centerY": -2.12,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -0.74,
+        "centerY": -2.12,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -1.84,
+        "centerY": -2.28,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -2.84,
+        "centerY": -2.32,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -4.04,
+        "centerY": -2.32,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -3.64,
+        "centerY": -2.34,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -2.28,
+        "centerY": -2.34,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -1.36,
+        "centerY": -2.34,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -1.3,
+        "centerY": -2.36,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -3.72,
+        "centerY": -2.34,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -4.52,
+        "centerY": -2.32,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -4.94,
+        "centerY": -2.32,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -2.92,
+        "centerY": -2.32,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -2.0,
+        "centerY": -2.34,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -1.56,
+        "centerY": -2.4,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -4.0,
+        "centerY": -2.36,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -5.0,
+        "centerY": -2.36,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -5.42,
+        "centerY": -2.36,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -1.34,
+        "centerY": -9.58,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -1.36,
+        "centerY": -9.86,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.88,
+        "centerY": 9.9,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.88,
+        "centerY": 9.9,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 3.08,
+        "centerY": 9.24,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 3.16,
+        "centerY": 7.12,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 3.02,
+        "centerY": 6.46,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.94,
+        "centerY": 6.54,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.78,
+        "centerY": 8.48,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.9,
+        "centerY": 9.14,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 3.04,
+        "centerY": 7.54,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.98,
+        "centerY": 7.16,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.84,
+        "centerY": 6.22,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.8,
+        "centerY": 6.82,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.8,
+        "centerY": 8.4,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.8,
+        "centerY": 8.78,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.84,
+        "centerY": 9.02,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.92,
+        "centerY": 9.4,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.94,
+        "centerY": 7.92,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.86,
+        "centerY": 6.94,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.74,
+        "centerY": 6.08,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.66,
+        "centerY": 5.6,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.64,
+        "centerY": 5.16,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.64,
+        "centerY": 4.4,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.62,
+        "centerY": 4.26,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.58,
+        "centerY": 4.96,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.62,
+        "centerY": 6.08,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.68,
+        "centerY": 7.64,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 2.7,
+        "centerY": 8.82,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -9.86,
+        "centerY": 9.82,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -9.86,
+        "centerY": 9.82,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -9.52,
+        "centerY": 9.54,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -9.04,
+        "centerY": 8.92,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -8.48,
+        "centerY": 8.4,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -8.14,
+        "centerY": 7.72,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -7.72,
+        "centerY": 7.12,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -7.36,
+        "centerY": 6.54,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -7.12,
+        "centerY": 6.16,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -7.76,
+        "centerY": 7.06,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -8.4,
+        "centerY": 7.96,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -8.98,
+        "centerY": 8.86,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -9.3,
+        "centerY": 9.44,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -9.62,
+        "centerY": 9.76,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -9.08,
+        "centerY": 9.0,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -8.12,
+        "centerY": 7.86,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -7.78,
+        "centerY": 7.02,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -7.52,
+        "centerY": 6.66,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -8.7,
+        "centerY": 8.16,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -9.34,
+        "centerY": 9.08,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": -9.6,
+        "centerY": 9.6,
+        "peakHeight": 2.5,
+        "width": 0.5
+      },
+      {
+        "centerX": 7.78,
+        "centerY": -8.48,
+        "peakHeight": -0.5641025641025641,
+        "width": 2.9358974358974357
+      },
+      {
+        "centerX": -1.58,
+        "centerY": 9.76,
+        "peakHeight": -0.5641025641025641,
+        "width": 2.9358974358974357
+      },
+      {
+        "centerX": -9.5,
+        "centerY": 4.22,
+        "peakHeight": -1.4743589743589745,
+        "width": 1.7179487179487178
+      },
+      {
+        "centerX": -9.28,
+        "centerY": 6.58,
+        "peakHeight": -1.4743589743589745,
+        "width": 1.7179487179487178
+      },
+      {
+        "centerX": -9.28,
+        "centerY": 6.58,
+        "peakHeight": -1.4743589743589745,
+        "width": 1.7179487179487178
+      },
+      {
+        "centerX": 7.72,
+        "centerY": -2.8,
+        "peakHeight": -1.4743589743589745,
+        "width": 1.7179487179487178
+      },
+      {
+        "centerX": 9.38,
+        "centerY": -2.98,
+        "peakHeight": -1.4743589743589745,
+        "width": 1.7179487179487178
+      },
+      {
+        "centerX": 9.38,
+        "centerY": -2.98,
+        "peakHeight": -1.4743589743589745,
+        "width": 1.7179487179487178
+      },
+      {
+        "centerX": 0.82,
+        "centerY": -9.12,
+        "peakHeight": -1.4743589743589745,
+        "width": 1.7179487179487178
+      },
+      {
+        "centerX": 4.14,
+        "centerY": -6.88,
+        "peakHeight": -1.4743589743589745,
+        "width": 1.7179487179487178
+      }
+    ],
+    "lastFormula": "1"
+  },
+  "globalElevation": 0.0
+}
