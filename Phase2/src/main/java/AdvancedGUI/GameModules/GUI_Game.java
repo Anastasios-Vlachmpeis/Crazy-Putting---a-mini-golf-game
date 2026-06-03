@@ -20,8 +20,9 @@ public class GUI_Game{
         return gameContainer;
     }
 
-    public void show() {
+    public void show(boolean isMultiplayer, String botName) {
         gameContainer.setVisible(true);
+        mainGameContainer.setMultiplayerMode(isMultiplayer, botName);
         mainGameContainer.refreshCourseFromBuilder();
     }
 

@@ -54,6 +54,12 @@ public class PerlinNoiseTab extends BorderPane {
             coursePreview.updatePreview();
         });
 
+        Label bottomLabel = new Label("Note: \nDisable Perlin noise to \nre-enable all the tabs!");
+        bottomLabel.setStyle("-fx-text-fill: #626c6d; -fx-font-size: 20px; -fx-font-style: italic;"); // Een beetje subtiele styling
+        
+        javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
+        javafx.scene.layout.VBox.setVgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+
         rightMenu.getChildren().addAll(
             title,
             new Label("Use organic Minecraft-style terrain \ninstead of math formulas."),
@@ -62,7 +68,9 @@ public class PerlinNoiseTab extends BorderPane {
             seedField,
             randomSeedBtn,
             elevationLabel,
-            elevationSlider
+            elevationSlider,
+            spacer,
+            bottomLabel
         );
 
         // Checkbox Toggle

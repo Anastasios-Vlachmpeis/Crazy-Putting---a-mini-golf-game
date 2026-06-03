@@ -1,4 +1,4 @@
-package AdvancedGUI.LauncherModules.SettingsModules;
+package AdvancedGUI.LauncherModules;
 
 import GolfCourseData.GolfCourse;
 import javafx.application.Application;
@@ -32,6 +32,7 @@ import javafx.collections.ObservableList;
 public class Settings {
 
     private StackPane settingsContainer;
+    private ComboBox<String> botSelection;
 
     public StackPane getContainer() {
         return settingsContainer;
@@ -43,6 +44,10 @@ public class Settings {
 
     public void hide() {
         settingsContainer.setVisible(false);
+    }
+
+    public String getSelectedBot() {
+        return botSelection.getValue();
     }
 
     public Settings(GolfCourse course){
@@ -109,7 +114,7 @@ public class Settings {
         Label botLabel = new Label("Select your prefered bot: ");
         styleSettingsLabel(botLabel);
 
-        ComboBox<String> botSelection = createStyledBotSelection();
+        this.botSelection = createStyledBotSelection();
 
         //Add all title Labels
         Label generalSettingsLabel = new Label("General Settings");
