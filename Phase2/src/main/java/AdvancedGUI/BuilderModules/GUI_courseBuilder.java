@@ -44,7 +44,14 @@ public class GUI_courseBuilder {
     // Method to build and show the window
     public GUI_courseBuilder(GolfCourse course) {
         this.builderContainer = new StackPane();
-        double[] preViewSize = {1000, 1000};
+        this.builderContainer.setStyle(
+            "-fx-background-image: url('file:src/main/java/AdvancedGUI/LauncherModules/Background.png');" +
+            "-fx-background-size: cover;" +
+            "-fx-background-position: center center;" +
+            "-fx-background-repeat: no-repeat;"
+        );
+        
+        double[] preViewSize = {900, 900};
 
         //Configure tabs
         tabPane = new TabPane();
@@ -115,12 +122,13 @@ public class GUI_courseBuilder {
                 }
             }
         });
-
+        /* 
         Image backgroundImage = new Image("file:src\\main\\java\\AdvancedGUI\\LauncherModules\\Background.png");
         ImageView backgroundView = new ImageView(backgroundImage);
         backgroundView.setPreserveRatio(false);
         backgroundView.fitWidthProperty().bind(builderContainer.widthProperty());
         backgroundView.fitHeightProperty().bind(builderContainer.heightProperty());
+        */
 
         Button closeButton = new Button("Close Builder");
         closeButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 5;");
@@ -128,7 +136,7 @@ public class GUI_courseBuilder {
         StackPane.setAlignment(closeButton, Pos.TOP_LEFT);
         StackPane.setMargin(closeButton, new Insets(40, 0, 0, 10));
 
-        builderContainer.getChildren().addAll(backgroundView, tabPane, closeButton);
+        builderContainer.getChildren().addAll(/*backgroundView,*/ tabPane, closeButton);
     }
 
     private void setupCustomTab(Tab tab, String title) {

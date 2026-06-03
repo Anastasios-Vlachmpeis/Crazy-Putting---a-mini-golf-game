@@ -106,24 +106,4 @@ public class CoursePreview extends Canvas {
         gc.setFill(Color.WHITE);
         gc.fillOval(ballScreenX - ballRadius, ballScreenY - ballRadius, ballRadius * 2, ballRadius * 2);
     }
-
-    /* 
-    private Color getColorForPosition(double gameX, double gameY) {
-        // Check for water
-        if (course.isWater(gameX, gameY)) {
-            return Color.web("#3498db"); // Blue for water
-        } 
-    
-        //  Otherwise, calculate the green terrain shading based on height
-        double heightVal = course.height(gameX, gameY);
-
-        // Simple procedural shading: higher ground is lighter green
-        double greenIntensity = 0.4 + (heightVal * 0.05);
-    
-        // Clamp the value strictly between 0.1 and 0.9 to prevent out-of-bounds color ranges
-        greenIntensity = Math.max(0.1, Math.min(0.9, greenIntensity));
-
-        return Color.color(0.2, greenIntensity, 0.2);
-    }
-    */
 }

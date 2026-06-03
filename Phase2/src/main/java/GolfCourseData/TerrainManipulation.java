@@ -61,6 +61,7 @@ public class TerrainManipulation {
 
     public void addHill(double centerX, double centerY, double peakHeight, double width){
         hills.add(new Hill(centerX, centerY, peakHeight, width));
+        System.out.println("New Hill/valley added at " + centerX + centerY);
     }
 
     public java.util.List<Hill> getHills() {
