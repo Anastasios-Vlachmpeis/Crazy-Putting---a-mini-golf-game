@@ -73,57 +73,27 @@ public class BallTargetTab extends BorderPane {
         );
 
         this.coursePreview.setOnMouseClicked(e -> {
-            double canvasW = coursePreview.getWidth();
-            double canvasH = coursePreview.getHeight();
-            
-            double[] size = course.getSize(); 
-            double minX = size[0]; 
-            double maxX = size[1]; 
-            double minY = size[2]; 
-            double maxY = size[3]; 
-
-            double gameWidth = maxX - minX;
-            double gameHeight = maxY - minY;
-
-            if (gameWidth <= 0 || gameHeight <= 0) {
-                gameWidth = 40.0; gameHeight = 40.0;
-                minX = -20.0; maxX = 20.0;
-                minY = -20.0; maxY = 20.0;
+            double[] point = coursePreview.pixelToCoursePoint(e.getX(), e.getY());
+            if (point == null) {
+                return;
             }
-
-            double scale = Math.min(canvasW / gameWidth, canvasH / gameHeight);
-            
-            double canvasCenterX = canvasW / 2.0;
-            double canvasCenterY = canvasH / 2.0;
-            double gameCenterX = (minX + maxX) / 2.0;
-            double gameCenterY = (minY + maxY) / 2.0;
-
-            // Translate screen pixels back to map space meters
-            double clickGameX = gameCenterX + (e.getX() - canvasCenterX) / scale;
-            double clickGameY = gameCenterY - (e.getY() - canvasCenterY) / scale;
 
             // Verify click falls within boundaries before applying
-            if (clickGameX >= minX && clickGameX <= maxX && clickGameY >= minY && clickGameY <= maxY) {
+            if (e.getButton() == MouseButton.PRIMARY) {
+                // LEFT CLICK: Relocate the ball launch start position
+                course.setBallPosition(point[0], point[1]);
+                course.setOriginalStartPosition(point[0], point[1]);
+                System.out.printf("Ball relocated to: (%.2f, %.2f)%n", point[0], point[1]);
+            } 
+            else if (e.getButton() == MouseButton.SECONDARY) {
+                // RIGHT CLICK: Relocate target array indices directly
+                course.setTargetXYR(point[0], point[1], rTarget.getValue());
                 
-                if (e.getButton() == MouseButton.PRIMARY) {
-                    // LEFT CLICK: Relocate the ball launch start position
-                    course.setBallPosition(clickGameX, clickGameY);
-                    course.setOriginalStartPosition(clickGameX, clickGameY);
-                    System.out.printf("Ball relocated to: (%.2f, %.2f)%n", clickGameX, clickGameY);
-                } 
-                else if (e.getButton() == MouseButton.SECONDARY) {
-                    // RIGHT CLICK: Relocate target array indices directly
-                    //double[] targets = course.getTargetXYR(); 
-                    //targets[0] = clickGameX;
-                    //targets[1] = clickGameY;
-                    course.setTargetXYR(clickGameX, clickGameY, rTarget.getValue());
-                    
-                    System.out.printf("Target relocated to: (%.2f, %.2f)%n", clickGameX, clickGameY);
-                }
-
-                // Instantly repaint preview to reflect movement adjustments
-                coursePreview.updatePreview(); 
+                System.out.printf("Target relocated to: (%.2f, %.2f)%n", point[0], point[1]);
             }
+
+            // Instantly repaint preview to reflect movement adjustments
+            coursePreview.updatePreview(); 
         });
 
         //ASSEMBLE

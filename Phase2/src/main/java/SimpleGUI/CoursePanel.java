@@ -52,7 +52,7 @@ public class CoursePanel {
         double[] target = c.getTargetXYR();
         double[] ball = c.getStartPosition();
  
-        heightFormulaField = field("(sin(x - y) / 7.0) + 0.5");
+        heightFormulaField = field("(sin(x - y)/3.0) + 0.5");
         miuKField = field(String.valueOf(frictions[0]));
         miuSField = field(String.valueOf(frictions[1]));
         targetXField = field(String.valueOf(target[0]));

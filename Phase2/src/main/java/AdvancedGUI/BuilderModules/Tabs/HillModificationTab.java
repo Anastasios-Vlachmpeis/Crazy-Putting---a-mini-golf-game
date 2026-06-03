@@ -186,37 +186,12 @@ public class HillModificationTab extends BorderPane{
     private void addHillAtPixel(double pixelX, double pixelY, MouseButton button) {
         double hillHeight = strengthSlider.getValue();
         double hillWidth = widthSlider.getValue();
-    
-        // Gather layout dimensions for inverse coordinate mapping
-        double canvasW = coursePreview.getWidth();
-        double canvasH = coursePreview.getHeight();
-        
-        double[] size = course.getSize(); // {minX, maxX, minY, maxY}
-        double minX = size[0];
-        double maxX = size[1];
-        double minY = size[2];
-        double maxY = size[3];
-
-        double gameWidth = maxX - minX;
-        double gameHeight = maxY - minY;
-
-        // Calculate aspect ratio uniform scale factors
-        double scale = Math.min(canvasW / gameWidth, canvasH / gameHeight);
-
-        double canvasCenterX = canvasW / 2.0;
-        double canvasCenterY = canvasH / 2.0;
-        double gameCenterX = (minX + maxX) / 2.0;
-        double gameCenterY = (minY + maxY) / 2.0;
-
-        //INVERSE COORDINATE TRANSLATION (Pixels -> Meters)
-        // Note: The subtraction on mouse Y automatically handles the graphical vertical inversion
-        double clickGameX = gameCenterX + (pixelX - canvasCenterX) / scale;
-        double clickGameY = gameCenterY - (pixelY - canvasCenterY) / scale;
+        double[] point = coursePreview.pixelToCoursePoint(pixelX, pixelY);
 
         if (button == MouseButton.SECONDARY) hillHeight = -hillHeight;
 
-        if (clickGameX >= minX && clickGameX <= maxX && clickGameY >= minY && clickGameY <= maxY) {
-            course.addHill(clickGameX, clickGameY, hillHeight, hillWidth);
+        if (point != null) {
+            course.addHill(point[0], point[1], hillHeight, hillWidth);
             coursePreview.updatePreview();
         }
     }

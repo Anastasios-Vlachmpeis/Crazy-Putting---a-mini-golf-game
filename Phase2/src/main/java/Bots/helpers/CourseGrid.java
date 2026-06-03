@@ -1,6 +1,7 @@
 package Bots.helpers;
 
 import GolfCourseData.GolfCourse;
+import GolfCourseData.Obstacles.ObstacleObjects;
 
 /**
  * Top down grid of the course used for pathfinding.
@@ -82,6 +83,9 @@ public final class CourseGrid {
         double[] size = course.getSize();
         if (x < size[0] || x > size[1] || y < size[2] || y > size[3]) return false;
         if (course.isWater(x, y)) return false;
+        for (ObstacleObjects obstacle : course.getObstacles()) {
+            if (obstacle.isWall() && obstacle.contains(x, y)) return false;
+        }
 
         double steepness = Math.hypot(course.dhdx(x, y), course.dhdy(x, y));
         if (steepness > STEEPNESS_LIMIT) return false;
