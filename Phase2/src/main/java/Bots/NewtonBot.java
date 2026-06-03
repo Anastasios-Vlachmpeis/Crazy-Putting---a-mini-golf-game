@@ -2,6 +2,7 @@ package Bots;
 
 import Bots.helpers.BotTrialResult;
 import Bots.helpers.VelocitySearchWindow;
+import Bots.helpers.WaypointPlanner;
 import GolfCourseData.GolfCourse;
 import Solvers.Solver;
 
@@ -35,11 +36,20 @@ public class NewtonBot extends SearchBot {
         slopeDelta = 1.0;
         resetBestRest();
 
-        findSeedVelocity();
-        currentVx = seedVx;
-        currentVy = seedVy;
+        // aim at the next waypoint instead of the hole, then put the real hole back
+        double[] aim = WaypointPlanner.activeAim(course);
+        double[] realTarget = course.getTargetXYR().clone();
+        course.setTargetXYR(aim[0], aim[1], aim[2]);
 
-        return runNewtonSteps(currentVx, currentVy);
+        try {
+            findSeedVelocity();
+            currentVx = seedVx;
+            currentVy = seedVy;
+
+            return runNewtonSteps(currentVx, currentVy);
+        } finally {
+            course.setTargetXYR(realTarget[0], realTarget[1], realTarget[2]);
+        }
     }
 
     // Scan the grid of speeds and keep the one that gets closest to the hole
