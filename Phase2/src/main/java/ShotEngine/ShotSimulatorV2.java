@@ -53,7 +53,7 @@ public class ShotSimulatorV2 {
             //continue if ball did not stop
             state = solver.iteration(equation, t, state, h); 
             t += h;
-            System.out.println(Arrays.toString(state));
+            //System.out.println(Arrays.toString(state));
             
             trajectoryList.add(solver.storeRow(t, state));
             if (course.isWater(state[0], state[1])) {

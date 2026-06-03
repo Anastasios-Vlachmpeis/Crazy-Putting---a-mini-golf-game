@@ -5,7 +5,6 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import AdvancedGUI.BuilderModules.GUI_courseBuilder;
 import AdvancedGUI.GameModules.GUI_Game;
-import AdvancedGUI.LauncherModules.SettingsModules.Settings;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -36,7 +35,6 @@ public class Launcher extends Application{
         Solver solver = new RungeKuttaSolver();
         GameManager gameManager = new GameManager(course, solver);
 
-        //For builder and settings: we use "this." because we try to pre-load it before the user actually opens the window 
         this.builder = new GUI_courseBuilder(course);
         this.settings = new Settings(course);
         this.game = new GUI_Game(course, gameManager);
@@ -51,11 +49,14 @@ public class Launcher extends Application{
         //Add options buttons
         Button singlePlayerButton = new Button("Singleplayer");
         styleGameButton(singlePlayerButton);
-        singlePlayerButton.setOnAction(e -> game.show());
+        singlePlayerButton.setOnAction(e -> game.show(false, null));
 
         Button multiPlayerButton = new Button("Multiplayer");
         styleGameButton(multiPlayerButton);
-        multiPlayerButton.setOnAction(e -> game.show());//Still need to implement multiplayer
+        multiPlayerButton.setOnAction(e -> {
+            String chosenBot = settings.getSelectedBot();
+            game.show(true, chosenBot);
+        });
 
         Button builderButton = new Button("Open Builder");
         styleGameButton(builderButton);

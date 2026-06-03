@@ -40,12 +40,27 @@ public class GameHUDOverlay extends VBox {
 
         Label scoreLabel = new Label();
         scoreLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16px; -fx-text-fill: #2c3e50;");
-        // Automatic text binding updates
-        scoreLabel.textProperty().bind(gameManager.strokeCountProperty().asString("Strokes: %d"));
+        
+        scoreLabel.textProperty().bind(javafx.beans.binding.Bindings.createStringBinding(() -> {
+            if (gameManager.isMultiplayerMode()) {
+                return "Player: " + gameManager.getPlayerStrokes() + "  |  Bot: " + gameManager.getBotStrokes();
+            } else {
+                return "Strokes: " + gameManager.getPlayerStrokes();
+            }
+        }, gameManager.playerStrokesProperty(), gameManager.botStrokesProperty()));
 
         Label statusLabel = new Label();
         statusLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #7f8c8d;");
-        statusLabel.textProperty().bind(gameManager.currentStateProperty().asString("Status: %s"));
+        
+        statusLabel.textProperty().bind(javafx.beans.binding.Bindings.createStringBinding(() -> {
+            String state = gameManager.getCurrentState().toString();
+            if (gameManager.isMultiplayerMode()) {
+                String turn = gameManager.getIsPlayerTurn() ? "Player's Turn" : "Bot's Turn";
+                return turn + " - " + state;
+            } else {
+                return "Status: " + state;
+            }
+        }, gameManager.currentStateProperty(), gameManager.isPlayerTurnProperty()));
 
         card.getChildren().addAll(scoreLabel, statusLabel);
         this.getChildren().add(card);

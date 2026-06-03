@@ -27,7 +27,8 @@ public class Game3DScene extends SubScene {
     // 3D Nodes
     private Group terrainGroup;
     private PerspectiveCamera camera;
-    private Sphere ballNode;
+    private Sphere playerBall;
+    private Sphere botBall;
     private Cylinder flagPoleNode;
     private AimingShotController aimingShotController;
 
@@ -207,30 +208,40 @@ public class Game3DScene extends SubScene {
     }
 
     private void buildGameObjects() {
-        ballNode = new Sphere(0.1);
-        PhongMaterial ballMat = new PhongMaterial(Color.WHITE);
-        ballMat.setSpecularColor(Color.LIGHTGRAY);
-        ballNode.setMaterial(ballMat);
+        //player ball = white
+        playerBall = new Sphere(0.1);
+        playerBall.setMaterial(new PhongMaterial(Color.WHITE));
+        //ballMat.setSpecularColor(Color.LIGHTGRAY);
+        //ballNode.setMaterial(ballMat);
+
+        botBall = new Sphere(0.095);//little bit smaller to prevent clipping
+        botBall.setMaterial(new PhongMaterial(Color.web("#f39c12")));
+        botBall.setVisible(false);//make invisible in case of singleplayer
 
         flagPoleNode = new Cylinder(0.05, 1.0); 
-        PhongMaterial flagMat = new PhongMaterial(Color.DARKRED);
-        flagPoleNode.setMaterial(flagMat);
+        flagPoleNode.setMaterial(new PhongMaterial(Color.DARKRED));
 
-        worldGroup.getChildren().addAll(ballNode, flagPoleNode);
+        worldGroup.getChildren().addAll(playerBall, botBall, flagPoleNode);
 
-        AimingArrow aimingArrow = new AimingArrow(gameManager, ballNode);
+        AimingArrow aimingArrow = new AimingArrow(gameManager, playerBall);
         worldGroup.getChildren().add(aimingArrow.getView());
         aimingShotController = new AimingShotController(this, gameManager, angleY, aimingArrow);
     }
 
-    public void renderBallPosition(double physX, double physY, double physHeight) {
-        ballNode.setTranslateX(physX);
-        ballNode.setTranslateZ(physY); 
-        ballNode.setTranslateY(-physHeight - 0.1); 
+    public void updatePlayerBall(double x, double y, double h) {
+        playerBall.setTranslateX(x);
+        playerBall.setTranslateZ(y);
+        playerBall.setTranslateY(-h - 0.1);
     }
 
-    public void setBallVisible(boolean visible) {
-        ballNode.setVisible(visible);
+    public void updateBotBall(double x, double y, double h) {
+        botBall.setTranslateX(x);
+        botBall.setTranslateZ(y);
+        botBall.setTranslateY(-h - 0.1);
+    }
+
+    public void setMultiplayerVisibility(boolean isMultiplayer) {
+        botBall.setVisible(isMultiplayer);
     }
 
     public void renderFlagPosition(double physX, double physY, double physHeight) {

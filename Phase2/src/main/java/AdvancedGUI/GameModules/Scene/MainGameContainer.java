@@ -10,12 +10,22 @@ import javafx.stage.Modality;
 import javafx.stage.Window;
 import javafx.util.Duration;
 
+//import all bots for multiplayer
+import Bots.GolfBot;
+import Bots.SimpleBot;
+import Bots.MLBot;
+
 public class MainGameContainer extends StackPane {
 
     private final GameManager gameManager;
     private final Game3DScene game3DScene;
     private final GameHUDOverlay hudOverlay;
     private Timeline currentShotTimeline;
+
+    //multiplayer
+    private boolean isMultiplayer = false;
+    private boolean isPlayerTurn = true;
+    private GolfBot activeBot = null;
 
     public MainGameContainer(GameManager gameManager) {
         this.gameManager = gameManager;
@@ -46,29 +56,45 @@ public class MainGameContainer extends StackPane {
 
         // Event listener to pop up win/loss alert overlays instantly
         gameManager.currentStateProperty().addListener((obs, oldState, newState) -> {
-            if (newState == GameState.HOLED_OUT) {
-                showModalAlert("Victory!", "Course completed in " + gameManager.getStrokeCount() + " strokes.");
-            } else if (newState == GameState.GAME_OVER) {
-                showModalAlert("Game Over", "Maximum allowed stroke allocation limits reached!");
-            }
+            javafx.application.Platform.runLater(() -> {
+                if (newState == GameState.HOLED_OUT) {
+                    
+                    // ---> [NIEUW] Controleer wie de winnende bal sloeg
+                    String winnerName = gameManager.getIsPlayerTurn() ? "Player (White)" : "Bot (Orange)";
+                    int finalScore = gameManager.getIsPlayerTurn() ? gameManager.getPlayerStrokes() : gameManager.getBotStrokes();
+                    
+                    showModalAlert("We have a Winner!", winnerName + " completed the course in " + finalScore + " strokes.");
+                    
+                } else if (newState == GameState.GAME_OVER) {
+                    
+                    // ---> [NIEUW] Controleer wie de limiet bereikte
+                    String loserName = gameManager.getIsPlayerTurn() ? "Player" : "Bot";
+                    showModalAlert("Game Over", loserName + " reached the maximum stroke limit of 10!");
+                    
+                } else if (newState == GameState.AIMING && gameManager.isMultiplayerMode() && !gameManager.getIsPlayerTurn()) {
+                    triggerBotTurn();
+                }
+            });
         });
     }
 
     public void syncVisualPositions() {
-        // Position 3D Ball Node
-        game3DScene.renderBallPosition(
-            gameManager.liveXProperty().get(),
-            gameManager.liveYProperty().get(),
-            gameManager.liveHeightProperty().get()
-        );
+        // Update player Ball
+        double playerH = gameManager.getTerrainHeight(gameManager.getPlayerX(), gameManager.getPlayerY());
+        game3DScene.updatePlayerBall(gameManager.getPlayerX(), gameManager.getPlayerY(), playerH);
 
-        // Position 3D Target Flag Node
+        // Update Bot Ball
+        if (gameManager.isMultiplayerMode()) {
+            game3DScene.setMultiplayerVisibility(true);
+            double botH = gameManager.getTerrainHeight(gameManager.getBotX(), gameManager.getBotY());
+            game3DScene.updateBotBall(gameManager.getBotX(), gameManager.getBotY(), botH);
+        } else {
+            game3DScene.setMultiplayerVisibility(false);
+        }
+
+        // Flag
         double[] target = gameManager.getCourse().getTargetXYR();
-        game3DScene.renderFlagPosition(
-            target[0], 
-            target[1], 
-            gameManager.getTerrainHeight(target[0], target[1])
-        );
+        game3DScene.renderFlagPosition(target[0], target[1], gameManager.getTerrainHeight(target[0], target[1]));
     }
 
     public void refreshCourseFromBuilder() {
@@ -79,6 +105,10 @@ public class MainGameContainer extends StackPane {
     }
 
     private void executeShotAnimation() {
+        if (gameManager.isMultiplayerMode() && !gameManager.getIsPlayerTurn()) {
+            System.out.println("Wait for the bot to finish its turn!");
+            return;
+        }
         try {
             double vx = hudOverlay.getVelocityX();
             double vy = hudOverlay.getVelocityY();
@@ -113,8 +143,11 @@ public class MainGameContainer extends StackPane {
                     event -> {
                         double stepHeight = gameManager.getTerrainHeight(stepX, stepY);
                         
-                        // Pass parameters right down into 3D space matrix paths
-                        game3DScene.renderBallPosition(stepX, stepY, stepHeight);
+                        if (gameManager.getIsPlayerTurn()) {
+                            game3DScene.updatePlayerBall(stepX, stepY, stepHeight);
+                        } else {
+                            game3DScene.updateBotBall(stepX, stepY, stepHeight);
+                        }
                         gameManager.updateLivePosition(stepX, stepY);
                     }
                 );
@@ -124,12 +157,22 @@ public class MainGameContainer extends StackPane {
             currentShotTimeline.setOnFinished(e -> {
                 gameManager.finishShot();
                 if (gameManager.getLastShotResult() == ShotResult.WATER) {
-                    game3DScene.setBallVisible(false);
-                    showModalAlert("Hit the water", "Your ball landed in the water. Penalty stroke applied.");
-                    game3DScene.setBallVisible(true);
+                    javafx.application.Platform.runLater(() -> {
+                        showModalAlert("Hit the water", "Your ball landed in the water. Penalty stroke applied.");
+                    });
                 }
                 currentShotTimeline = null;
                 syncVisualPositions();
+
+                // If we are in multiplayer and the game is ready for the next shot, swap turns
+                if (isMultiplayer && gameManager.getCurrentState() == GameState.AIMING) {
+                    isPlayerTurn = !isPlayerTurn; 
+                    
+                    // If it is now the bot's turn, trigger the bot
+                    if (!isPlayerTurn && activeBot != null) {
+                        triggerBotTurn();
+                    }
+                }
             });
             currentShotTimeline.play();
 
@@ -138,23 +181,92 @@ public class MainGameContainer extends StackPane {
         }
     }
 
-    private void showModalAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        Window owner = getScene() == null ? null : getScene().getWindow();
-        if (owner != null) {
-            alert.initOwner(owner);
-            alert.initModality(Modality.WINDOW_MODAL);
-        }
-        alert.showAndWait();
-    }
-
     private void stopShotAnimation() {
         if (currentShotTimeline != null) {
             currentShotTimeline.stop();
             currentShotTimeline = null;
         }
+    }
+
+    public void setMultiplayerMode(boolean isMultiplayer, String botName) {
+        Bots.GolfBot bot = null;
+        if (isMultiplayer && botName != null) {
+            if (botName.equals("Simple Bot")) {
+                bot = new Bots.SimpleBot(gameManager.getCourse(), gameManager.getSolver());
+            } else if (botName.equals("ML Bot")) {
+                bot = new Bots.MLBot(gameManager.getCourse(), gameManager.getSolver());
+            } //Add all other bots
+        }
+        gameManager.setMultiplayerMode(isMultiplayer, bot);
+    }
+
+    private void triggerBotTurn() {
+        javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(Duration.seconds(1.5));
+        pause.setOnFinished(event -> {
+            double[] botVelocity = gameManager.getBotShot();
+            
+            hudOverlay.setVelocity(botVelocity[0], botVelocity[1]);
+            executeShotAnimation(botVelocity[0], botVelocity[1]);
+        });
+        pause.play();
+    }
+
+    private void showModalAlert(String title, String content) {
+        //create window
+        javafx.stage.Stage popupStage = new javafx.stage.Stage();
+        popupStage.initModality(Modality.WINDOW_MODAL);
+        
+        Window owner = getScene() == null ? null : getScene().getWindow();
+        if (owner != null) {
+            popupStage.initOwner(owner);
+        }
+        
+        //remove default top bar
+        popupStage.initStyle(javafx.stage.StageStyle.TRANSPARENT);
+
+        javafx.scene.layout.VBox rootBox = new javafx.scene.layout.VBox(20);
+        rootBox.setAlignment(javafx.geometry.Pos.CENTER);
+        rootBox.setPadding(new javafx.geometry.Insets(30, 40, 30, 40));
+        
+        rootBox.setStyle(
+            "-fx-background-color: rgba(255, 255, 255, 0.95);" +
+            "-fx-background-radius: 20;" +
+            "-fx-border-radius: 20;" +
+            "-fx-border-color: #f39c12;" +
+            "-fx-border-width: 3;"
+        );
+        
+        // Add shadow around popup
+        rootBox.setEffect(new javafx.scene.effect.DropShadow(15, javafx.scene.paint.Color.rgb(0, 0, 0, 0.4)));
+
+        // add text
+        javafx.scene.control.Label titleLabel = new javafx.scene.control.Label(title);
+        titleLabel.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, 28));
+        titleLabel.setStyle("-fx-text-fill: #333333;");
+
+        javafx.scene.control.Label contentLabel = new javafx.scene.control.Label(content);
+        contentLabel.setFont(javafx.scene.text.Font.font("Arial", 16));
+        contentLabel.setStyle("-fx-text-fill: #555555;");
+        contentLabel.setWrapText(true);
+        contentLabel.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+
+        javafx.scene.control.Button okButton = new javafx.scene.control.Button("Continue");
+        String idleStyle = "-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-padding: 10 30; -fx-background-radius: 10; -fx-cursor: hand;";
+        String hoverStyle = "-fx-background-color: #e67e22; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px; -fx-padding: 10 30; -fx-background-radius: 10; -fx-cursor: hand;";
+        
+        okButton.setStyle(idleStyle);
+        okButton.hoverProperty().addListener((obs, wasHovered, isNowHovered) -> {
+            okButton.setStyle(isNowHovered ? hoverStyle : idleStyle);
+        });
+        
+        okButton.setOnAction(e -> popupStage.close());
+
+        rootBox.getChildren().addAll(titleLabel, contentLabel, okButton);
+
+        javafx.scene.Scene scene = new javafx.scene.Scene(rootBox);
+        scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+        
+        popupStage.setScene(scene);
+        popupStage.showAndWait();
     }
 }
