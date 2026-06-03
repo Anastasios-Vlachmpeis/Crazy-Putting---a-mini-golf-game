@@ -83,6 +83,27 @@ public class CoursePreview extends Canvas {
             }
         }
 
+        // DRAW OBSTACLES
+        for (Sand sand : course.getSandPits()) {
+            double sandScreenX = canvasCenterX + (sand.getCenterX() - gameCenterX) * scale;
+            double sandScreenY = canvasCenterY - (sand.getCenterY() - gameCenterY) * scale;
+            double sandRadius = sand.getRadius() * scale;
+
+            gc.setFill(Color.web("#d8bd73"));
+            gc.fillOval(sandScreenX - sandRadius, sandScreenY - sandRadius, sandRadius * 2, sandRadius * 2);
+        }
+
+        for (Tree tree : course.getTrees()) {
+            double treeScreenX = canvasCenterX + (tree.getCenterX() - gameCenterX) * scale;
+            double treeScreenY = canvasCenterY - (tree.getCenterY() - gameCenterY) * scale;
+            double treeRadius = tree.getRadius() * scale;
+
+            gc.setFill(Color.web("#1f6b3a"));
+            gc.fillOval(treeScreenX - treeRadius, treeScreenY - treeRadius, treeRadius * 2, treeRadius * 2);
+            gc.setFill(Color.web("#7a4c24"));
+            gc.fillOval(treeScreenX - 2, treeScreenY - 2, 4, 4);
+        }
+
         // DRAW THE HOLE / TARGET
         double[] target = course.getTargetXYR(); // [x, y, r]
         double targetScreenX = canvasCenterX + (target[0] - gameCenterX) * scale;
