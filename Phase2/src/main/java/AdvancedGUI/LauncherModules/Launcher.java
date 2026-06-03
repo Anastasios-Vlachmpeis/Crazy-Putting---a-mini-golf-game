@@ -30,6 +30,12 @@ public class Launcher extends Application{
     public void start(Stage LauncherStage){
         //Created stackpane for layering
         StackPane root = new StackPane();
+        root.setStyle(
+            "-fx-background-image: url('file:src/main/java/AdvancedGUI/LauncherModules/Background.png');" +
+            "-fx-background-size: cover;" +
+            "-fx-background-position: center center;" +
+            "-fx-background-repeat: no-repeat;"
+        );
 
         GolfCourse course = new GolfCourse();
         Solver solver = new RungeKuttaSolver();
@@ -41,7 +47,7 @@ public class Launcher extends Application{
 
         //Add Big launcher title
         Label gameName = new Label("Crazy Putting!");
-        gameName.setPadding(new Insets(100, 10, 100, 10));
+        gameName.setPadding(new Insets(80, 10, 100, 10));
         gameName.setFont(Font.font("Arial", FontWeight.BOLD, 150));
         gameName.setStyle("-fx-text-fill: #FFFFFF;");
         gameName.setEffect(new DropShadow(10, Color.BLACK));
@@ -76,14 +82,16 @@ public class Launcher extends Application{
         layout.setAlignment(Pos.CENTER);
 
         //Add background to scene
-        Image backgroundImage = new Image("file:src\\main\\java\\AdvancedGUI\\LauncherModules\\Background.png");
+        /* 
+        Image backgroundImage = new Image("file:src/main/java/AdvancedGUI/LauncherModules/Background.png");
         ImageView backgroundView = new ImageView(backgroundImage);
         backgroundView.setPreserveRatio(false);
         backgroundView.fitWidthProperty().bind(root.widthProperty());
         backgroundView.fitHeightProperty().bind(root.heightProperty());
+        */
 
         root.getChildren().addAll(
-            backgroundView,
+            //backgroundView,
             layout,
             settings.getContainer(),
             builder.getContainer(),
@@ -101,16 +109,15 @@ public class Launcher extends Application{
         //Show stage
         Stage launcher = new Stage();
         launcher.setTitle("Crazy Putting!");
-        launcher.setMinWidth(1850);
-        launcher.setMinHeight(1000);
+        launcher.setMinWidth(1600);
+        launcher.setMinHeight(900);
         launcher.setMaximized(true);
-        launcher.setFullScreen(true);
+        //launcher.setFullScreen(true);
         //launcher.setResizable(false);
         launcher.setScene(scene);
 
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == javafx.scene.input.KeyCode.F11) {
-                // Toggle de fullscreen status: zet hem op het tegenovergestelde van wat het nu is
                 launcher.setFullScreen(!launcher.isFullScreen());
             }
         });

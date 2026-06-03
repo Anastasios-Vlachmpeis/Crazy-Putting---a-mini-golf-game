@@ -53,6 +53,12 @@ public class Settings {
     public Settings(GolfCourse course){
         //StackPane root = new StackPane();
         this.settingsContainer = new StackPane();
+        this.settingsContainer.setStyle(
+            "-fx-background-image: url('file:src/main/java/AdvancedGUI/LauncherModules/Background.png');" +
+            "-fx-background-size: cover;" +
+            "-fx-background-position: center center;" +
+            "-fx-background-repeat: no-repeat;"
+        );
         VBox rootBox = new VBox();
 
         //stepSize setting
@@ -170,11 +176,13 @@ public class Settings {
         rootBox.getChildren().add(grid);
 
         //Add background to scene
-        Image backgroundImage = new Image("file:src\\main\\java\\AdvancedGUI\\LauncherModules\\Background.png");
+        /* 
+        Image backgroundImage = new Image("file:src/main/java/AdvancedGUI/LauncherModules/Background.png");
         ImageView backgroundView = new ImageView(backgroundImage);
         backgroundView.setPreserveRatio(false);
         backgroundView.fitWidthProperty().bind(settingsContainer.widthProperty());
         backgroundView.fitHeightProperty().bind(settingsContainer.heightProperty());
+        */
 
         Button closeButton = new Button("Close Settings");
         closeButton.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 5;");
@@ -182,7 +190,7 @@ public class Settings {
         StackPane.setAlignment(closeButton, Pos.TOP_LEFT);
         StackPane.setMargin(closeButton, new Insets(10, 0, 0, 10));
 
-        settingsContainer.getChildren().addAll(backgroundView, rootBox, closeButton);
+        settingsContainer.getChildren().addAll(/*backgroundView,*/ rootBox, closeButton);
 
         //this.scene = new Scene(settingsContainer, 1000, 800);
         StackPane.setAlignment(rootBox, Pos.TOP_CENTER);
