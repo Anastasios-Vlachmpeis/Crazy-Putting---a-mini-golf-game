@@ -5,6 +5,8 @@ import java.util.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import GolfCourseData.Obstacles.Sand;
+import GolfCourseData.Obstacles.Tree;
 import GolfCourseData.RandomTerrainGeneration.PerlinNoise;
 
 import java.io.Reader;
@@ -18,7 +20,7 @@ public class GolfCourse {
     private String[] friction;
     private double[] frictionValues = {0.15, 0.5, 0.3, 0.75}; //TO DO: ADD DEFAULT SAND FRICTION!!!
     private String[] target;
-    private double[] targetValues = {3, 0, 0.2};
+    private double[] targetValues = {3, 0, 0.35};
     private String[] start;
     private double[] currentBallPosition = {0, 0, 0}; //updates after every shot
     private double[] initialBallPosition = {0.0, 0.0, 0.0};
@@ -26,6 +28,8 @@ public class GolfCourse {
     //Gameborders
     private double[] size = {-25,25,-25,25}; //{minX, maxX, minY, maxY}
     private double borderSteepness = 2;
+    private List<Sand> sandPits = new ArrayList<>();
+    private List<Tree> trees = new ArrayList<>();
 
     public double stepSize = 0.01;
 
@@ -92,6 +96,8 @@ public class GolfCourse {
             this.targetValues = loadedData.targetValues;     
             this.frictionValues = loadedData.frictionValues; 
             this.currentBallPosition = loadedData.currentBallPosition;
+            this.sandPits = loadedData.sandPits != null ? loadedData.sandPits : new ArrayList<>();
+            this.trees = loadedData.trees != null ? loadedData.trees : new ArrayList<>();
 
             if (loadedData.initialBallPosition != null) {
                 this.initialBallPosition = loadedData.initialBallPosition;
@@ -109,6 +115,7 @@ public class GolfCourse {
                     this.addHill(h.centerX, h.centerY, h.peakHeight, h.width); 
                 }
             }
+            removeObstaclesInWater();
         }
         System.out.println("Course properties successfully deserialized from JSON.");
     }
@@ -146,11 +153,115 @@ public class GolfCourse {
 
     public void setTerrainFormula(String formula){
         terrainFormula = formula;
+        removeObstaclesInWater();
     }
 
     public void addHill(double centerX, double centerY, double peakHeight, double width) {
         // Forward the parameters straight down to your existing terrain manager
         this.TerrainManipulator.addHill(centerX, centerY, peakHeight, width);
+        removeObstaclesInWater();
+    }
+
+    public boolean addSandPit(double centerX, double centerY, double radius) {
+        if (!canPlaceSandPit(centerX, centerY, radius)) {
+            return false;
+        }
+        this.sandPits.add(new Sand(centerX, centerY, radius));
+        return true;
+    }
+
+    public boolean addTree(double centerX, double centerY, double radius) {
+        if (!canPlaceTree(centerX, centerY, radius)) {
+            return false;
+        }
+        this.trees.add(new Tree(centerX, centerY, radius));
+        return true;
+    }
+
+    public boolean canPlaceSandPit(double centerX, double centerY, double radius) {
+        return isAreaDry(centerX, centerY, radius);
+    }
+
+    public boolean canPlaceTree(double centerX, double centerY, double radius) {
+        Tree tree = new Tree(centerX, centerY, radius);
+        return isAreaDry(centerX, centerY, tree.getCollisionRadius());
+    }
+
+    public void removeObstaclesInWater() {
+        sandPits.removeIf(sand -> !canPlaceSandPit(sand.getCenterX(), sand.getCenterY(), sand.getRadius()));
+        trees.removeIf(tree -> !canPlaceTree(tree.getCenterX(), tree.getCenterY(), tree.getRadius()));
+    }
+
+    private boolean isAreaDry(double centerX, double centerY, double radius) {
+        if (isWater(centerX, centerY)) {
+            return false;
+        }
+
+        int samples = 16;
+        for (int i = 0; i < samples; i++) {
+            double angle = (2.0 * Math.PI * i) / samples;
+            double cos = Math.cos(angle);
+            double sin = Math.sin(angle);
+
+            if (isWater(centerX + cos * radius, centerY + sin * radius)) {
+                return false;
+            }
+
+            double innerRadius = radius * 0.5;
+            if (isWater(centerX + cos * innerRadius, centerY + sin * innerRadius)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void clearSandPits() {
+        this.sandPits.clear();
+    }
+
+    public void clearTrees() {
+        this.trees.clear();
+    }
+
+    public void clearObstacles() {
+        clearSandPits();
+        clearTrees();
+    }
+
+    public List<Sand> getSandPits() {
+        return Collections.unmodifiableList(sandPits);
+    }
+
+    public List<Tree> getTrees() {
+        return Collections.unmodifiableList(trees);
+    }
+
+    public boolean isSand(double x, double y) {
+        for (Sand sand : sandPits) {
+            if (sand.contains(x, y)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isTree(double x, double y) {
+        for (Tree tree : trees) {
+            if (tree.contains(x, y)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Tree getTreeAt(double x, double y) {
+        for (Tree tree : trees) {
+            if (tree.contains(x, y)) {
+                return tree;
+            }
+        }
+        return null;
     }
 
     public GolfCourse(double miuK, double miuS) {
@@ -174,6 +285,24 @@ public class GolfCourse {
 
     public double getMiuS() {
         return frictionValues[1];
+    }
+
+    public double getMiuK(double x, double y) {
+        for (Sand sand : sandPits) {
+            if (sand.contains(x, y)) {
+                return frictionValues[2];
+            }
+        }
+        return getMiuK();
+    }
+
+    public double getMiuS(double x, double y) {
+        for (Sand sand : sandPits) {
+            if (sand.contains(x, y)) {
+                return frictionValues[3];
+            }
+        }
+        return getMiuS();
     }
 
     public double getMiuKSand() {
@@ -228,7 +357,7 @@ public class GolfCourse {
     }
 
     public boolean isWater(double x, double y) {
-        return TerrainManipulator.calculateHeight(terrainFormula, x, y, targetValues) < 0;
+        return height(x, y) < 0;
     }
 
     public double[] getFrictions(){
@@ -287,6 +416,7 @@ public class GolfCourse {
 
     public void setGlobalElevation(double elevation) {
         this.globalElevation = elevation;
+        removeObstaclesInWater();
     }
     
     public double getGlobalElevation() {

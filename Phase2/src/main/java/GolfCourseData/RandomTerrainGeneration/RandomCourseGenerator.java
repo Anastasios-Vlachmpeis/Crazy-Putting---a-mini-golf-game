@@ -24,5 +24,6 @@ public class RandomCourseGenerator {
         double targetX = 5.0 + (seededRandom.nextDouble() * 5.0);
         double targetY = 5.0 + (seededRandom.nextDouble() * 5.0);
         course.setTargetXYR(targetX, targetY, 0.2); 
+        course.removeObstaclesInWater();
     }
 }

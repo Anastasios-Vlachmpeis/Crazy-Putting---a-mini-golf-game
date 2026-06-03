@@ -2,6 +2,8 @@ package AdvancedGUI.GameModules.Scene;
 
 import GameEngine.GameManager;
 import GolfCourseData.GolfCourse;
+import GolfCourseData.Obstacles.Sand;
+import GolfCourseData.Obstacles.Tree;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.*;
@@ -26,6 +28,7 @@ public class Game3DScene extends SubScene {
     
     // 3D Nodes
     private Group terrainGroup;
+    private Group obstacleGroup;
     private PerspectiveCamera camera;
     private Sphere playerBall;
     private Sphere botBall;
@@ -174,6 +177,7 @@ public class Game3DScene extends SubScene {
 
     public void refreshCourseGeometry() {
         buildSmoothTerrainAndCamera();
+        buildObstacleObjects();
     }
 
     private void updateCameraZoom() {
@@ -190,7 +194,9 @@ public class Game3DScene extends SubScene {
     }
 
     private double getHeightShadeTextureX(double elevation) {
-        return clamp(elevation / 5.0, 0.0, 1.0);
+        double greenIntensity = 0.4 + (elevation * 0.05);
+        greenIntensity = clamp(greenIntensity, 0.1, 0.9);
+        return (greenIntensity - 0.1) / 0.8;
     }
 
     private WritableImage createHeightShadeTexture() {
@@ -199,43 +205,16 @@ public class Game3DScene extends SubScene {
         PixelWriter writer = image.getPixelWriter();
 
         for (int x = 0; x < width; x++) {
-            double elevation = (x / (double)(width - 1)) * 5.0;
-            writer.setColor(x, 0, getColorForHeight(elevation));
+            double greenIntensity = 0.1 + (x / (double)(width - 1)) * 0.8;
+            writer.setColor(x, 0, Color.color(0.2, greenIntensity, 0.2));
         }
 
         return image;
     }
 
-    private Color getColorForHeight(double elevation) {
-        if (elevation >= 3.0) {
-            double t = clamp((elevation - 3.0) / 2.0, 0.0, 1.0);
-            return Color.rgb(
-                (int)(165 + t * 70),
-                (int)(155 + t * 80),
-                (int)(135 + t * 95)
-            );
-        }
-
-        if (elevation >= 1.5) {
-            double t = clamp((elevation - 1.5) / 1.5, 0.0, 1.0);
-            return Color.rgb(
-                (int)(130 + t * 35),
-                (int)(150 + t * 5),
-                (int)(70 + t * 65)
-            );
-        }
-
-        double t = clamp(elevation / 1.5, 0.0, 1.0);
-        return Color.rgb(
-            (int)(35 + t * 95),
-            (int)(110 + t * 105),
-            (int)(45 + t * 25)
-        );
-    }
-
     private void buildGameObjects() {
         //player ball = white
-        playerBall = new Sphere(0.1);
+        playerBall = new Sphere(0.25);
         playerBall.setMaterial(new PhongMaterial(Color.WHITE));
         //ballMat.setSpecularColor(Color.LIGHTGRAY);
         //ballNode.setMaterial(ballMat);
@@ -244,24 +223,167 @@ public class Game3DScene extends SubScene {
         botBall.setMaterial(new PhongMaterial(Color.web("#f39c12")));
         botBall.setVisible(false);//make invisible in case of singleplayer
 
-        flagPoleNode = new Cylinder(0.05, 1.0); 
-        flagPoleNode.setMaterial(new PhongMaterial(Color.DARKRED));
+        flagPoleNode = new Cylinder(0.1, 3.0); 
+        flagPoleNode.setMaterial(new PhongMaterial(Color.BLACK));
 
         flagBannerNode = createFlagBanner();
         PhongMaterial flagBannerMat = createUnlitMaterial(Color.RED);
         flagBannerNode.setMaterial(flagBannerMat);
 
-        worldGroup.getChildren().addAll(ballNode, flagPoleNode, flagBannerNode);
+        worldGroup.getChildren().addAll(playerBall, flagPoleNode, flagBannerNode);
 
         AimingArrow aimingArrow = new AimingArrow(gameManager, playerBall);
         worldGroup.getChildren().add(aimingArrow.getView());
         aimingShotController = new AimingShotController(this, gameManager, angleY, aimingArrow);
+
+        buildObstacleObjects();
+    }
+
+    private void buildObstacleObjects() {
+        if (obstacleGroup != null) {
+            worldGroup.getChildren().remove(obstacleGroup);
+        }
+
+        obstacleGroup = new Group();
+        GolfCourse course = gameManager.getCourse();
+
+        PhongMaterial sandMat = createSandMaterial();
+        PhongMaterial trunkMat = new PhongMaterial(Color.web("#7a4c24"));
+        PhongMaterial leafMat = new PhongMaterial(Color.web("#1f6b3a"));
+
+        for (Sand sand : course.getSandPits()) {
+            MeshView sandPatch = createSandPatch(sand);
+            sandPatch.setMaterial(sandMat);
+            obstacleGroup.getChildren().add(sandPatch);
+        }
+
+        for (Tree tree : course.getTrees()) {
+            double height = gameManager.getTerrainHeight(tree.getCenterX(), tree.getCenterY());
+            double trunkHeight = 2.0;
+            double canopyRadius = Math.max(0.35, tree.getRadius());
+
+            Cylinder trunk = new Cylinder(tree.getTrunkRadius(), trunkHeight);
+            trunk.setTranslateX(tree.getCenterX());
+            trunk.setTranslateZ(tree.getCenterY());
+            trunk.setTranslateY(-height - trunkHeight / 2.0);
+            trunk.setMaterial(trunkMat);
+
+            Sphere canopy = new Sphere(canopyRadius);
+            canopy.setTranslateX(tree.getCenterX());
+            canopy.setTranslateZ(tree.getCenterY());
+            canopy.setTranslateY(-height - trunkHeight - canopyRadius * 0.75);
+            canopy.setMaterial(leafMat);
+
+            obstacleGroup.getChildren().addAll(trunk, canopy);
+        }
+
+        worldGroup.getChildren().add(obstacleGroup);
+    }
+
+    private MeshView createSandPatch(Sand sand) {
+        int rings = 8;
+        int segments = 48;
+        double liftAboveTerrain = 0.12;
+        TriangleMesh mesh = new TriangleMesh();
+
+        double centerHeight = gameManager.getTerrainHeight(sand.getCenterX(), sand.getCenterY());
+        mesh.getPoints().addAll(
+            (float) sand.getCenterX(),
+            (float) (-centerHeight - liftAboveTerrain),
+            (float) sand.getCenterY()
+        );
+        mesh.getTexCoords().addAll(0.5f, 0.5f);
+
+        for (int ring = 1; ring <= rings; ring++) {
+            double ringRadius = sand.getRadius() * ring / rings;
+            for (int segment = 0; segment < segments; segment++) {
+                double angle = (2.0 * Math.PI * segment) / segments;
+                double angleCos = Math.cos(angle);
+                double angleSin = Math.sin(angle);
+                double x = sand.getCenterX() + angleCos * ringRadius;
+                double z = sand.getCenterY() + angleSin * ringRadius;
+                double height = gameManager.getTerrainHeight(x, z);
+
+                mesh.getPoints().addAll(
+                    (float) x,
+                    (float) (-height - liftAboveTerrain),
+                    (float) z
+                );
+                float textureU = (float) (0.5 + angleCos * ring / (2.0 * rings));
+                float textureV = (float) (0.5 + angleSin * ring / (2.0 * rings));
+                mesh.getTexCoords().addAll(textureU, textureV);
+            }
+        }
+
+        for (int segment = 0; segment < segments; segment++) {
+            int nextSegment = (segment + 1) % segments;
+            int current = sandMeshIndex(1, segment, segments);
+            int next = sandMeshIndex(1, nextSegment, segments);
+            mesh.getFaces().addAll(0, 0, current, current, next, next);
+        }
+
+        for (int ring = 2; ring <= rings; ring++) {
+            for (int segment = 0; segment < segments; segment++) {
+                int nextSegment = (segment + 1) % segments;
+
+                int innerCurrent = sandMeshIndex(ring - 1, segment, segments);
+                int innerNext = sandMeshIndex(ring - 1, nextSegment, segments);
+                int outerCurrent = sandMeshIndex(ring, segment, segments);
+                int outerNext = sandMeshIndex(ring, nextSegment, segments);
+
+                mesh.getFaces().addAll(innerCurrent, innerCurrent, outerCurrent, outerCurrent, innerNext, innerNext);
+                mesh.getFaces().addAll(innerNext, innerNext, outerCurrent, outerCurrent, outerNext, outerNext);
+            }
+        }
+
+        MeshView sandPatch = new MeshView(mesh);
+        sandPatch.setCullFace(CullFace.NONE);
+        return sandPatch;
+    }
+
+    private int sandMeshIndex(int ring, int segment, int segments) {
+        return 1 + ((ring - 1) * segments) + segment;
+    }
+
+    private PhongMaterial createSandMaterial() {
+        PhongMaterial material = new PhongMaterial(Color.web("#cfae62"));
+        material.setDiffuseMap(createSandTexture());
+        material.setSpecularColor(Color.web("#5f4f2d"));
+        return material;
+    }
+
+    private WritableImage createSandTexture() {
+        int size = 96;
+        WritableImage image = new WritableImage(size, size);
+        PixelWriter writer = image.getPixelWriter();
+
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                double grain = pseudoNoise(x, y);
+                double ripple = 0.5 + 0.5 * Math.sin((x * 0.22) + (y * 0.08));
+                double shade = clamp((grain * 0.75) + (ripple * 0.25), 0.0, 1.0);
+
+                int red = (int) (180 + shade * 35);
+                int green = (int) (145 + shade * 30);
+                int blue = (int) (70 + shade * 22);
+                writer.setColor(x, y, Color.rgb(red, green, blue));
+            }
+        }
+
+        return image;
+    }
+
+    private double pseudoNoise(int x, int y) {
+        int value = x * 374761393 + y * 668265263;
+        value = (value ^ (value >> 13)) * 1274126177;
+        value = value ^ (value >> 16);
+        return (value & 0xffff) / 65535.0;
     }
 
     public void updatePlayerBall(double x, double y, double h) {
         playerBall.setTranslateX(x);
         playerBall.setTranslateZ(y);
-        playerBall.setTranslateY(-h - 0.1);
+        playerBall.setTranslateY(-h - 0.25);
     }
 
     public void updateBotBall(double x, double y, double h) {

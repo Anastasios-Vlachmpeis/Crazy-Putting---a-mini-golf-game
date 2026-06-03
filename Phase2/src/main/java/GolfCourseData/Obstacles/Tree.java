@@ -1,4 +1,4 @@
-package Obstacles;
+package GolfCourseData.Obstacles;
 
 public class Tree implements ObstacleObjects {
     private double centerX;
@@ -16,7 +16,8 @@ public class Tree implements ObstacleObjects {
     public boolean contains(double x, double y) {
         double dx = x - centerX;
         double dy = y - centerY;
-        return dx * dx + dy * dy <= radius * radius;
+        double collisionRadius = getCollisionRadius();
+        return dx * dx + dy * dy <= collisionRadius * collisionRadius;
     }
 
     @Override
@@ -49,5 +50,13 @@ public class Tree implements ObstacleObjects {
 
     public double getRadius() {
         return radius;
+    }
+
+    public double getTrunkRadius() {
+        return Math.max(0.08, radius * 0.18);
+    }
+
+    public double getCollisionRadius() {
+        return getTrunkRadius() + 0.25;
     }
 }

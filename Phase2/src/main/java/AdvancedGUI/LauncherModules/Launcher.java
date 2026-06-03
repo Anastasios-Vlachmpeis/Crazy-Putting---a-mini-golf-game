@@ -19,6 +19,8 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.effect.DropShadow;
+import javafx.geometry.Rectangle2D;
+import javafx.stage.Screen;
 
 public class Launcher extends Application{
 
@@ -76,7 +78,7 @@ public class Launcher extends Application{
         layout.setAlignment(Pos.CENTER);
 
         //Add background to scene
-        Image backgroundImage = new Image("file:src\\main\\java\\AdvancedGUI\\LauncherModules\\Background.png");
+        Image backgroundImage = new Image("file:src/main/java/AdvancedGUI/LauncherModules/Background.png");
         ImageView backgroundView = new ImageView(backgroundImage);
         backgroundView.setPreserveRatio(false);
         backgroundView.fitWidthProperty().bind(root.widthProperty());
@@ -94,28 +96,26 @@ public class Launcher extends Application{
         builder.hide();
         game.hide();
         
-        Scene scene = new Scene(root, 1000, 800);
-        StackPane.setAlignment(layout, Pos.TOP_CENTER);
-        StackPane.setMargin(layout, new Insets(00, 0, 250, 0));
+        Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
 
-        //Show stage
-        Stage launcher = new Stage();
-        launcher.setTitle("Crazy Putting!");
-        launcher.setMinWidth(1850);
-        launcher.setMinHeight(1000);
-        launcher.setMaximized(true);
-        launcher.setFullScreen(true);
-        //launcher.setResizable(false);
-        launcher.setScene(scene);
+        Scene scene = new Scene(root, bounds.getWidth(), bounds.getHeight());
+        StackPane.setAlignment(layout, Pos.TOP_CENTER);
+        StackPane.setMargin(layout, new Insets(0, 0, 250, 0));
+
+        // Show stage
+        LauncherStage.setTitle("Crazy Putting!");
+        LauncherStage.setMinWidth(900);
+        LauncherStage.setMinHeight(650);
+        LauncherStage.setScene(scene);
+        LauncherStage.setMaximized(true);
 
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == javafx.scene.input.KeyCode.F11) {
-                // Toggle de fullscreen status: zet hem op het tegenovergestelde van wat het nu is
-                launcher.setFullScreen(!launcher.isFullScreen());
+                LauncherStage.setFullScreen(!LauncherStage.isFullScreen());
             }
         });
 
-        launcher.show();
+        LauncherStage.show();
     }
 
 

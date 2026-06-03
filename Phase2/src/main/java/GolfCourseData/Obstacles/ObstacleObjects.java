@@ -1,4 +1,4 @@
-package Obstacles;
+package GolfCourseData.Obstacles;
 
 /**
  * Common interface for all course objects/obstacles.

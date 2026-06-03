@@ -8,31 +8,12 @@ public class ColorTerrain {
     }
 
     public Color isGrassColor(double h, double maxH) {
-        if (h >= 3.0) {
-            double t = clamp((h - 3.0) / 2.0);
-            return Color.rgb(
-                (int)(165 + t * 70),
-                (int)(155 + t * 80),
-                (int)(135 + t * 95),
-                1.0
-            );
-        }
+        double t = Math.min(h / maxH, 1.0); //we want to be between 0 and 1 for the height (we normalize it) -> thats why we also cap it at 1
 
-        if (h >= 1.5) {
-            double t = clamp((h - 1.5) / 1.5);
-            return Color.rgb(
-                (int)(130 + t * 35),
-                (int)(150 + t * 5),
-                (int)(70 + t * 65),
-                1.0
-            );
-        }
-
-        double t = clamp(h / 1.5);
-        return Color.rgb(
-            (int)(35 + t * 95),
-            (int)(110 + t * 105),
-            (int)(45 + t * 25),
+       return Color.rgb(
+            (int)(60  + (1.0 - t) * 20),   
+            (int)(210 - (1.0 - t) * 60),
+            (int)(80  + (1.0 - t) * 20),   
             1.0
         );
     }
@@ -46,10 +27,6 @@ public class ColorTerrain {
                 (int)(180 + depth * 60), //clearly the dominant pigment 
                 1.0
             );
-    }
-
-    private double clamp(double value) {
-        return Math.max(0.0, Math.min(1.0, value));
     }
 
     
