@@ -38,7 +38,7 @@ public class BaseModificationTab extends BorderPane{
         TextField widthYString = new TextField("50");
 
         //TextField terrainFormula = new TextField("(sin(x-y)/7)+0.5");
-        terrainFormula = new TextField("(sin(x-y)/3.0)+0.5");
+        terrainFormula = new TextField("1");
 
         rightMenu.getChildren().addAll(
             title, 

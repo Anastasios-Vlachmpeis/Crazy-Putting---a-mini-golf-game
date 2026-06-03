@@ -4,6 +4,7 @@ import GolfCourseData.GolfCourse;
 import ShotEngine.ShotSimulatorV2;
 import Solvers.Solver;
 import Systems.GolfODE;
+import Bots.GolfBot;
 //For javaFX
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -11,6 +12,8 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
 public class GameManager {
     private final GolfCourse course;
@@ -25,16 +28,68 @@ public class GameManager {
     private double waterRecoveryX;
     private double waterRecoveryY;
 
+    private double playerX, playerY;
+    private double botX, botY;
+
+    public double getPlayerX() { return playerX; }
+    public double getPlayerY() { return playerY; }
+    public double getBotX() { return botX; }
+    public double getBotY() { return botY; }
+
+    //multiplayer
+    private boolean isMultiplayer = false;
+    private GolfBot activeBot = null;
+    private final BooleanProperty isPlayerTurn = new SimpleBooleanProperty(true);
+
+    public boolean isMultiplayerMode() { return isMultiplayer; }
+    public BooleanProperty isPlayerTurnProperty() { return isPlayerTurn; }
+    public boolean getIsPlayerTurn() { return isPlayerTurn.get(); }
+
     //private GameState currentState;
     //private int strokeCount;
     
     // JavaFX Observable Properties for instant GUI text/label bindings
     private final ObjectProperty<GameState> currentState = new SimpleObjectProperty<>(GameState.AIMING);
-    private final IntegerProperty strokeCount = new SimpleIntegerProperty(0);
+    private final IntegerProperty playerStrokes = new SimpleIntegerProperty(0);
+    private final IntegerProperty botStrokes = new SimpleIntegerProperty(0);
     private ShotResult lastShotResult = ShotResult.NORMAL;
     
     private final int MAX_STROKES = 10; //max number of shots until game over
     private double stepSize;
+
+    public void setMultiplayerMode(boolean isMultiplayer, GolfBot bot) {
+        this.isMultiplayer = isMultiplayer;
+        this.activeBot = bot;
+        this.isPlayerTurn.set(true);
+    }
+
+    public double[] getBotShot() {
+        if (activeBot != null) {
+            return activeBot.shoot();
+        }
+        return new double[]{0, 0};
+    }
+
+    private void prepareNextShot() {
+        if (isMultiplayer) {
+            isPlayerTurn.set(!isPlayerTurn.get());
+
+            if (isPlayerTurn.get()) {
+                this.currentBallX = playerX;
+                this.currentBallY = playerY;
+                this.lastSafeX = playerX; //Fall back to previous position if landed in water
+                this.lastSafeY = playerY;
+            } else {
+                this.currentBallX = botX;
+                this.currentBallY = botY;
+                this.lastSafeX = botX; 
+                this.lastSafeY = botY;
+            }
+            course.setBallPosition(currentBallX, currentBallY);
+            updateLivePosition(currentBallX, currentBallY);
+        }
+        currentState.set(GameState.AIMING);
+    }
 
     public GameManager(GolfCourse course, Solver solver) {
         this.course = course;
@@ -59,16 +114,17 @@ public class GameManager {
         currentState.set(GameState.ROLLING);
         lastShotResult = ShotResult.NORMAL;
         //strokeCount++;
-        strokeCount.set(strokeCount.get() + 1);
+        if (isPlayerTurn.get()) {
+            playerStrokes.set(playerStrokes.get() + 1);
+        } else {
+            botStrokes.set(botStrokes.get() + 1);
+        };
 
         // Save previous coordinates in case we need to roll back water/ penalty
         this.lastSafeX = currentBallX;
         this.lastSafeY = currentBallY;
         
         // Gather active coordinates from the data model
-        //double[] ballPos = course.getStartPosition(); 
-        //double[] startState = { ballPos[0], ballPos[1], vx, vy };
-        //FIxed: starts from current location instead of original start position
         double[] startState = { currentBallX, currentBallY, vx, vy };
 
         // Wrap the course map inside your differential physics container
@@ -86,6 +142,13 @@ public class GameManager {
         //update the location
         course.setBallPosition(currentBallX, currentBallY);
 
+        //Save landing position for correct player
+        if (isPlayerTurn.get()) {
+            playerX = currentBallX; playerY = currentBallY;
+        } else {
+            botX = currentBallX; botY = currentBallY;
+        }
+
         return trajectory; // Pass coordinates array straight back to GUI timeline to animate
     }
 
@@ -97,6 +160,11 @@ public class GameManager {
 
     public void resetGame() {
         double[] spawn = course.getOriginalStartPosition(); 
+
+        this.playerX = spawn[0]; this.playerY = spawn[1];
+        this.botX = spawn[0]; this.botY = spawn[1];
+
+        //For a the last shot
         this.currentBallX = spawn[0];
         this.currentBallY = spawn[1];
         this.lastSafeX = spawn[0];
@@ -104,8 +172,12 @@ public class GameManager {
         
         //course.setBallPosition(currentBallX, currentBallY); 
         updateLivePosition(currentBallX, currentBallY);
-        strokeCount.set(0);
+        playerStrokes.set(0);
+        botStrokes.set(0);
         currentState.set(GameState.AIMING);
+
+        isPlayerTurn.set(true);//player starts
+
         System.out.println("Match reset. Ball returned to tee box.");
     }
 
@@ -132,17 +204,23 @@ public class GameManager {
         }
 
         // CHECK FOR VICTORY (Ball is inside the cup target radius)
-        double[] target = course.getTargetXYR(); // {x, y, r]
+        double[] target = course.getTargetXYR(); // {x, y, r}
         double distance = course.distanceToTarget(currentBallX, currentBallY);
+        
         if (distance <= target[2]) {
             lastShotResult = ShotResult.HOLED_OUT;
             currentState.set(GameState.HOLED_OUT);
-            System.out.println("Victory achieved in " + strokeCount.get() + " strokes!");
+            
+            String winnerName = isPlayerTurn.get() ? "Player" : "Bot";
+            int winningStrokes = isPlayerTurn.get() ? playerStrokes.get() : botStrokes.get();
+            
+            System.out.println(winnerName + " achieved victory in " + winningStrokes + " strokes!");
             return;
         }
 
         // 4. CHECK FOR DEFEAT (Max strokes)
-        if (strokeCount.get() >= MAX_STROKES) {
+        int currentStrokes = isPlayerTurn.get() ? playerStrokes.get() : botStrokes.get();
+        if (currentStrokes >= MAX_STROKES) {
             lastShotResult = ShotResult.GAME_OVER;
             currentState.set(GameState.GAME_OVER);
             System.out.println("Defeat: Exceeded maximum stroke limits.");
@@ -151,7 +229,8 @@ public class GameManager {
 
         // If none of the above are met, ball is at rest safely on the green. Allow next shot.
         lastShotResult = ShotResult.NORMAL;
-        currentState.set(GameState.AIMING);
+        //currentState.set(GameState.AIMING);
+        prepareNextShot();
     }
 
     private void processPenalty(String consoleMessage) {
@@ -160,13 +239,25 @@ public class GameManager {
 
     private void processPenalty(String consoleMessage, double recoveryX, double recoveryY) {
         System.out.println(consoleMessage);
-        strokeCount.set(strokeCount.get() + 1); // Extra penalty stroke
+        // Extra penalty stroke
+        if (isPlayerTurn.get()) {
+            playerStrokes.set(playerStrokes.get() + 1);
+        } else {
+            botStrokes.set(botStrokes.get() + 1);
+        } 
         
         // Roll back positions to where the player last shot from safely
         this.currentBallX = recoveryX;
         this.currentBallY = recoveryY;
         course.setBallPosition(currentBallX, currentBallY);
         updateLivePosition(currentBallX, currentBallY);
+
+        //For saving to correct player
+        if (isPlayerTurn.get()) {
+            playerX = currentBallX; playerY = currentBallY;
+        } else {
+            botX = currentBallX; botY = currentBallY;
+        }
         
         // Ready for recovery shot
         currentState.set(GameState.AIMING);
@@ -221,8 +312,12 @@ public class GameManager {
     public ObjectProperty<GameState> currentStateProperty() { return currentState; }
     public GameState getCurrentState() { return currentState.get(); }
 
-    public IntegerProperty strokeCountProperty() { return strokeCount; }
-    public int getStrokeCount() { return strokeCount.get(); }
+    public IntegerProperty playerStrokesProperty() { return playerStrokes; }
+    public int getPlayerStrokes() { return playerStrokes.get(); }
+    
+    public IntegerProperty botStrokesProperty() { return botStrokes; }
+    public int getBotStrokes() { return botStrokes.get(); }
+
     public ShotResult getLastShotResult() { return lastShotResult; }
 
     //For the 3D modeling
@@ -247,5 +342,9 @@ public class GameManager {
         this.liveX.set(x);
         this.liveY.set(y);
         this.liveHeight.set(course.height(x, y));
+    }
+
+    public Solver getSolver() {
+        return this.solver;
     }
 }

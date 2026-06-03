@@ -19,6 +19,7 @@ public class RandomCourseGenerator {
         double startX = -5.0 + (seededRandom.nextDouble() * 5.0);
         double startY = -5.0 + (seededRandom.nextDouble() * 5.0);
         course.setOriginalStartPosition(startX, startY);
+        course.setBallPosition(startX, startY);
 
         double targetX = 5.0 + (seededRandom.nextDouble() * 5.0);
         double targetY = 5.0 + (seededRandom.nextDouble() * 5.0);

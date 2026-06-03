@@ -13,7 +13,7 @@ public class TerrainManipulation {
 
     //Improbe perfomance
     private String lastFormula = "";
-    private Expression compiledExpression;
+    private transient Expression compiledExpression;
 
     public double calculateHeight(String formula, double x, double y, double[] target){
         return functionHeight(formula, x, y, target) + artificialHillsHeight(x, y);

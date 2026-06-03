@@ -11,17 +11,8 @@ import Solvers.Solver;
 public abstract class GolfBot {
 
     protected final GolfCourse course;
-    //protected final ShotSimulator shotSimulator;
-
-    /*
-    protected GolfBot(GolfCourse course, ShotSimulator shotSimulator) {
-        this.course = Objects.requireNonNull(course, "course"); //We explicitly check that a course is not null
-        this.shotSimulator = shotSimulator;
-    }
-    */
-    ////
     protected final Solver solver;
-    ////
+    
     protected GolfBot(GolfCourse course, Solver solver) {
     this.course = Objects.requireNonNull(course, "course");
     this.solver = solver;
@@ -30,6 +21,9 @@ public abstract class GolfBot {
     protected GolfBot(GolfCourse course) {
         this(course, null);
     }
+
+    //For multiplayer gamemode
+    public abstract double[] shoot();
 
     //FOR THE ML BOT ONLY
     /* 
