@@ -1,4 +1,4 @@
-package Obstacles;
+package GolfCourseData.Obstacles;
 
 /**
  * Circular sand pit object.

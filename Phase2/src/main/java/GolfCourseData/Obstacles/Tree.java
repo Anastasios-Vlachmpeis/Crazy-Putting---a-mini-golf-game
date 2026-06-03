@@ -1,4 +1,4 @@
-package Obstacles;
+package GolfCourseData.Obstacles;
 
 public class Tree implements ObstacleObjects {
     private double centerX;
