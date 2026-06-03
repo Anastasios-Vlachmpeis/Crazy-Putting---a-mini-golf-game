@@ -19,6 +19,8 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.effect.DropShadow;
+import javafx.geometry.Rectangle2D;
+import javafx.stage.Screen;
 
 public class Launcher extends Application{
 
@@ -102,27 +104,26 @@ public class Launcher extends Application{
         builder.hide();
         game.hide();
         
-        Scene scene = new Scene(root, 1000, 800);
-        StackPane.setAlignment(layout, Pos.TOP_CENTER);
-        StackPane.setMargin(layout, new Insets(00, 0, 250, 0));
+        Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
 
-        //Show stage
-        Stage launcher = new Stage();
-        launcher.setTitle("Crazy Putting!");
-        launcher.setMinWidth(1600);
-        launcher.setMinHeight(900);
-        launcher.setMaximized(true);
-        //launcher.setFullScreen(true);
-        //launcher.setResizable(false);
-        launcher.setScene(scene);
+        Scene scene = new Scene(root, bounds.getWidth(), bounds.getHeight());
+        StackPane.setAlignment(layout, Pos.TOP_CENTER);
+        StackPane.setMargin(layout, new Insets(0, 0, 250, 0));
+
+        // Show stage
+        LauncherStage.setTitle("Crazy Putting!");
+        LauncherStage.setMinWidth(900);
+        LauncherStage.setMinHeight(650);
+        LauncherStage.setScene(scene);
+        LauncherStage.setMaximized(true);
 
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == javafx.scene.input.KeyCode.F11) {
-                launcher.setFullScreen(!launcher.isFullScreen());
+                LauncherStage.setFullScreen(!LauncherStage.isFullScreen());
             }
         });
 
-        launcher.show();
+        LauncherStage.show();
     }
 
 

@@ -27,8 +27,8 @@ public class GolfODE implements ODE {
         double hx = course.dhdx(x, y); // slope with respect to x (aka downhill force in the direction of x)
         double hy = course.dhdy(x, y); // slope with respect to y
 
-        double miuK = course.getMiuK(); // get the kinetif friction coeficient
-        double miuS = course.getMiuS(); // and also the static one
+        double miuK = course.getMiuK(x, y); // get the kinetic friction coefficient at this position
+        double miuS = course.getMiuS(x, y); // and also the static one
 
         double speed = Math.sqrt((vx * vx) + (vy * vy)); // magnitude of the velocity vector (aka speed)
         double slopeMagnitude = Math.sqrt(hx * hx + hy * hy); // ball stays at rest if miuS is bigger than this

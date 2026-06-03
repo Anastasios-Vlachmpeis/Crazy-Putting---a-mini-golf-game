@@ -3,6 +3,8 @@ package AdvancedGUI.BuilderModules;
 import java.util.Map;
 
 import GolfCourseData.GolfCourse;
+import GolfCourseData.Obstacles.Sand;
+import GolfCourseData.Obstacles.Tree;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;

@@ -6,6 +6,7 @@ import AdvancedGUI.BuilderModules.Tabs.HillModificationTab;
 import AdvancedGUI.BuilderModules.Tabs.SaveLoadPresetsTab;
 import AdvancedGUI.BuilderModules.Tabs.BallTargetTab;
 import AdvancedGUI.BuilderModules.Tabs.PerlinNoiseTab;
+import AdvancedGUI.BuilderModules.Tabs.ObstacleModificationTab;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -61,6 +62,7 @@ public class GUI_courseBuilder {
         SaveLoadPresetsTab saveLoadView = new SaveLoadPresetsTab(course, preViewSize);
         BaseModificationTab baseView = new BaseModificationTab(course, preViewSize);
         HillModificationTab hillView = new HillModificationTab(course, preViewSize);
+        ObstacleModificationTab obstacleView = new ObstacleModificationTab(course, preViewSize);
         BallTargetTab targetView = new BallTargetTab(course, preViewSize);
 
         //Set up the Tabs
@@ -80,11 +82,15 @@ public class GUI_courseBuilder {
         setupCustomTab(hillTab, "Hills & Valleys");
         hillTab.setContent(hillView);
 
+        Tab obstacleTab = new Tab();
+        setupCustomTab(obstacleTab, "Trees & Sand");
+        obstacleTab.setContent(obstacleView);
+
         Tab targetTab = new Tab();
         setupCustomTab(targetTab, "Target & Hole");
         targetTab.setContent(targetView);
 
-        tabPane.getTabs().addAll(perlinTab, saveLoadTab, baseTab, hillTab, targetTab);
+        tabPane.getTabs().addAll(perlinTab, saveLoadTab, baseTab, hillTab, obstacleTab, targetTab);
         tabPane.setStyle(
             "-fx-background-color: transparent; " +
             "-fx-padding: 0; " +
@@ -97,6 +103,7 @@ public class GUI_courseBuilder {
         saveLoadTab.setClosable(false); 
         baseTab.setClosable(false);        
         hillTab.setClosable(false);        
+        obstacleTab.setClosable(false);
         targetTab.setClosable(false);
 
         //Disable certain tabs when perlin is active
@@ -117,6 +124,8 @@ public class GUI_courseBuilder {
                     ((BaseModificationTab) newTab.getContent()).refreshView();
                 } else if (newTab.getContent() instanceof HillModificationTab) {
                     ((HillModificationTab) newTab.getContent()).refreshView();
+                } else if (newTab.getContent() instanceof ObstacleModificationTab) {
+                    ((ObstacleModificationTab) newTab.getContent()).refreshView();
                 } else if (newTab.getContent() instanceof BallTargetTab) {
                     ((BallTargetTab) newTab.getContent()).refreshView();
                 }
