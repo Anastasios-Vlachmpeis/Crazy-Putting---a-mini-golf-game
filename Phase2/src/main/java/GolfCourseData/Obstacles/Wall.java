@@ -1,4 +1,4 @@
-package Obstacles;
+package GolfCourseData.Obstacles;
 
 /**
  * Solid wall obstacle for the 3D course.
@@ -7,7 +7,7 @@ package Obstacles;
  * drawn as a raised object in the 3D view and used as a solid collision object
  * during shot simulation.
  */
-public class Wall implements Objects {
+public class Wall implements ObstacleObjects {
 
     private double startX;
     private double startY;
