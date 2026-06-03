@@ -33,6 +33,11 @@ public class Water implements ObstacleObjects {
     }
 
     @Override
+    public boolean isWall() {
+        return false;
+    }
+
+    @Override
     public double getKineticFriction(double defaultMiuK) {
         return defaultMiuK;
     }

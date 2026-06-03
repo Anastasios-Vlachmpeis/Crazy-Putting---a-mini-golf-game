@@ -18,7 +18,11 @@ public interface ObstacleObjects {
      * @return true for hazards that count as water and cause a penalty.
      */
     boolean isWater();
-
+    /**
+     * @return true for solid obstacles that the ball may not pass through.
+     */
+    boolean isWall();
+    
     /**
      * Returns the kinetic friction at this object.
      * Water normally returns the default because the ball is stopped by collision.

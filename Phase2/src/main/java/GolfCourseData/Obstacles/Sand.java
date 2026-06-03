@@ -36,6 +36,11 @@ public class Sand implements ObstacleObjects {
     }
 
     @Override
+    public boolean isWall() {
+        return false;
+    }
+
+    @Override
     public double getKineticFriction(double defaultMiuK) {
         return miuK > 0.0 ? miuK : defaultMiuK;
     }
