@@ -1,19 +1,17 @@
 package AdvancedGUI.GameModules.Scene;
 
-import GameEngine.*;
+import Bots.GolfBot;
+import Bots.ManhattanBot;
+import GameEngine.GameManager;
+import GameEngine.GameState;
+import GameEngine.ShotResult;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.scene.control.Alert;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Window;
 import javafx.util.Duration;
-
-//import all bots for multiplayer
-import Bots.GolfBot;
-import Bots.SimpleBot;
-import Bots.MLBot;
 
 public class MainGameContainer extends StackPane {
 
@@ -46,6 +44,7 @@ public class MainGameContainer extends StackPane {
 
     private void configureActions() {
         hudOverlay.getShootButton().setOnAction(e -> executeShotAnimation());
+        hudOverlay.getBotButton().setOnAction(e -> playBotStroke());
         game3DScene.setShotHandler(velocity -> executeShotAnimation(velocity[0], velocity[1]));
         game3DScene.setVelocityPreviewHandler(velocity -> hudOverlay.setVelocity(velocity[0], velocity[1]));
         hudOverlay.getResetButton().setOnAction(e -> {
@@ -268,5 +267,12 @@ public class MainGameContainer extends StackPane {
         
         popupStage.setScene(scene);
         popupStage.showAndWait();
+    }
+
+    private void playBotStroke() {
+        ManhattanBot bot = new ManhattanBot(gameManager.getCourse(), gameManager.getSolver());
+        double[] v = bot.shoot();
+        hudOverlay.setVelocity(v[0], v[1]);
+        executeShotAnimation(v[0], v[1]);
     }
 }
