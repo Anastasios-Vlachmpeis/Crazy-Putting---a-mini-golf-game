@@ -25,6 +25,11 @@ public class Tree implements ObstacleObjects {
     }
 
     @Override
+    public boolean isWall() {
+        return true; // is no wall but still balls shouldn't pass through
+    }
+
+    @Override
     public double getKineticFriction(double defaultMiuK) {
         return defaultMiuK;
     }

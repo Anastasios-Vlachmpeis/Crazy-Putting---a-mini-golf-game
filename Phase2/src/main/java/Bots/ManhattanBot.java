@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import Bots.helpers.BotTrialResult;
 import Bots.helpers.VelocitySearchWindow;
+import Bots.helpers.WaypointPlanner;
 import GolfCourseData.GolfCourse;
 import Solvers.Solver;
 
@@ -30,16 +31,24 @@ public class ManhattanBot extends SearchBot {
         searchDepth = 0;
         resetBestRest();
 
-        double[] start = course.getStartPosition();
-        double[] target = course.getTargetXYR();
+        // aim at the next waypoint instead of the hole, then put the real hole back
+        double[] aim = WaypointPlanner.activeAim(course);
+        double[] realTarget = course.getTargetXYR().clone();
+        course.setTargetXYR(aim[0], aim[1], aim[2]);
 
-        VelocitySearchWindow window = new VelocitySearchWindow();
-        window.orientForLayout(start[0], start[1], target[0], target[1]);
+        try {
+            double[] start = course.getStartPosition();
 
-        return runGridSearch(
-                window.getVxStep(), window.getVyStep(),
-                window.getMinVx(), window.getMaxVx(),
-                window.getMinVy(), window.getMaxVy());
+            VelocitySearchWindow window = new VelocitySearchWindow();
+            window.orientForLayout(start[0], start[1], aim[0], aim[1]);
+
+            return runGridSearch(
+                    window.getVxStep(), window.getVyStep(),
+                    window.getMinVx(), window.getMaxVx(),
+                    window.getMinVy(), window.getMaxVy());
+        } finally {
+            course.setTargetXYR(realTarget[0], realTarget[1], realTarget[2]);
+        }
     }
 
     /**

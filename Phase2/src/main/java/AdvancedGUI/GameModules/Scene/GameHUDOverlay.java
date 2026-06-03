@@ -1,11 +1,14 @@
 package AdvancedGUI.GameModules.Scene;
 
+import java.util.Locale;
+
 import GameEngine.GameManager;
 import GameEngine.GameState;
-import java.util.Locale;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 public class GameHUDOverlay extends VBox {
@@ -17,6 +20,7 @@ public class GameHUDOverlay extends VBox {
     private TextField vyField;
     private Button shootButton;
     private Button resetButton;
+    private Button botButton;
 
     public GameHUDOverlay(GameManager gameManager) {
         super(15); // 15px gap space between items
@@ -82,10 +86,13 @@ public class GameHUDOverlay extends VBox {
         resetButton = new Button("Restart Level");
         resetButton.setMaxWidth(Double.MAX_VALUE);
 
+        botButton = new Button("Bot Stroke");
+        botButton.setMaxWidth(Double.MAX_VALUE);
+
         card.getChildren().addAll(
             new Label("Velocity X:"), vxField,
             new Label("Velocity Y:"), vyField,
-            shootButton, resetButton
+            shootButton, resetButton, botButton
         );
         this.getChildren().add(card);
     }
@@ -100,6 +107,7 @@ public class GameHUDOverlay extends VBox {
     // Getters to expose controls to the container
     public Button getShootButton() { return shootButton; }
     public Button getResetButton() { return resetButton; }
+    public Button getBotButton() { return botButton; }
     
     public double getVelocityX() { return Double.parseDouble(vxField.getText().trim()); }
     public double getVelocityY() { return Double.parseDouble(vyField.getText().trim()); }
