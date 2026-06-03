@@ -4,6 +4,7 @@ import GameEngine.GameManager;
 import GolfCourseData.GolfCourse;
 import GolfCourseData.Obstacles.Sand;
 import GolfCourseData.Obstacles.Tree;
+import GolfCourseData.Obstacles.Wall;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.*;
@@ -250,6 +251,7 @@ public class Game3DScene extends SubScene {
         PhongMaterial sandMat = createSandMaterial();
         PhongMaterial trunkMat = new PhongMaterial(Color.web("#7a4c24"));
         PhongMaterial leafMat = new PhongMaterial(Color.web("#1f6b3a"));
+        PhongMaterial wallMat = new PhongMaterial(Color.web("#3f3f3f"));
 
         for (Sand sand : course.getSandPits()) {
             MeshView sandPatch = createSandPatch(sand);
@@ -275,6 +277,21 @@ public class Game3DScene extends SubScene {
             canopy.setMaterial(leafMat);
 
             obstacleGroup.getChildren().addAll(trunk, canopy);
+        }
+
+        for (Wall wall : course.getWalls()) {
+            double centerX = wall.getCenterX();
+            double centerY = wall.getCenterY();
+            double terrainHeight = gameManager.getTerrainHeight(centerX, centerY);
+
+            Box wallNode = new Box(wall.getLength(), wall.getHeight(), wall.getThickness());
+            wallNode.setMaterial(wallMat);
+            wallNode.setTranslateX(centerX);
+            wallNode.setTranslateY(-terrainHeight - wall.getHeight() / 2.0);
+            wallNode.setTranslateZ(centerY);
+            wallNode.setRotationAxis(Rotate.Y_AXIS);
+            wallNode.setRotate(-wall.getAngleDegrees());
+            obstacleGroup.getChildren().add(wallNode);
         }
 
         worldGroup.getChildren().add(obstacleGroup);

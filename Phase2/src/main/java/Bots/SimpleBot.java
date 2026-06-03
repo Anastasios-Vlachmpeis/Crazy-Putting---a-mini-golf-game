@@ -133,7 +133,7 @@ public class SimpleBot extends GolfBot {
 
   
         //we calculate the speed of the shot
-        double miuK = course.getMiuK();
+        double miuK = course.getMiuK(sx, sy);
         double speed = Math.min(MAX_SPEED, SPEED_OVERSHOOT * Math.sqrt(2.0 * miuK * 9.81 * len));
 
         // Rule 2 ~ If we are relatively close to the hole,

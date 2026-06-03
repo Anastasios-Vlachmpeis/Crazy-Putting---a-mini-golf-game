@@ -61,7 +61,7 @@ public final class BotShotTrial {
             double speed = Math.hypot(vx, vy);
             if (speed < SPEED_THRESHOLD) { // ball stopped on a flat enough slope
                 double slopeMagnitude = Math.hypot(course.dhdx(x, y), course.dhdy(x, y));
-                if (course.getMiuS() > slopeMagnitude) break; // static friction holds
+                if (course.getMiuS(x, y) > slopeMagnitude) break; // static friction holds
             }
 
             state = stepOnce(ode, solver, state, t);

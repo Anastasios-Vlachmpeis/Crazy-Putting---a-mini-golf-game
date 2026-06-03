@@ -83,7 +83,7 @@ public class GUI_courseBuilder {
         hillTab.setContent(hillView);
 
         Tab obstacleTab = new Tab();
-        setupCustomTab(obstacleTab, "Trees & Sand");
+        setupCustomTab(obstacleTab, "Obstacles");
         obstacleTab.setContent(obstacleView);
 
         Tab targetTab = new Tab();

@@ -5,6 +5,7 @@ import java.util.Map;
 import GolfCourseData.GolfCourse;
 import GolfCourseData.Obstacles.Sand;
 import GolfCourseData.Obstacles.Tree;
+import GolfCourseData.Obstacles.Wall;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -13,6 +14,7 @@ public class CoursePreview extends Canvas {
 
     private final GolfCourse course;
     private int resolutionSize = 2; //number of pixels per "color tile"
+    private static final double COURSE_PADDING_PIXELS = 12.0;
 
     // Constructor defines the size of the preview canvas
     public CoursePreview(GolfCourse course, double width, double height) {
@@ -33,26 +35,10 @@ public class CoursePreview extends Canvas {
         gc.setFill(Color.web("#1e1e1e")); // dark gray
         gc.fillRect(0, 0, w, h);
 
-        // Pull the actual live game boundaries from the course
-        double[] size = course.getSize(); // {minX, maxX, minY, maxY}
-        double minX = size[0];
-        double maxX = size[1];
-        double minY = size[2];
-        double maxY = size[3];
-
-        double gameWidth = maxX - minX;
-        double gameHeight = maxY - minY;
-
-        //Find the limiting scale direction to avoid stretching
-        double scaleX = w / gameWidth;
-        double scaleY = h / gameHeight;
-        double scale = Math.min(scaleX, scaleY);
-
-        //locate center
-        double canvasCenterX = w / 2.0;
-        double canvasCenterY = h / 2.0;
-        double gameCenterX = (minX + maxX) / 2.0;
-        double gameCenterY = (minY + maxY) / 2.0;
+        PreviewTransform transform = createPreviewTransform();
+        if (transform == null) {
+            return;
+        }
 
         // (For maximum speed during testing, we step by "resolutionSize" pixels)
         //Map the screen pixels dynamically to the actual game boundaries
@@ -60,11 +46,11 @@ public class CoursePreview extends Canvas {
             for (int screenY = 0; screenY < h; screenY += resolutionSize) {
                 
                 // Dynamic translation formula based on live course sizes
-                double gameX = gameCenterX + (screenX - canvasCenterX) / scale;
-                double gameY = gameCenterY - (screenY - canvasCenterY) / scale; // Invert graphic coordinate space
+                double gameX = transform.toCourseX(screenX);
+                double gameY = transform.toCourseY(screenY); // Invert graphic coordinate space
 
                 // Only colotr the canvas if in bounds
-                if (gameX >= minX && gameX <= maxX && gameY >= minY && gameY <= maxY) {
+                if (transform.isInBounds(gameX, gameY)) {
                     double heightVal = course.height(gameX, gameY);
                     Color terrainColor;
                     
@@ -85,18 +71,18 @@ public class CoursePreview extends Canvas {
 
         // DRAW OBSTACLES
         for (Sand sand : course.getSandPits()) {
-            double sandScreenX = canvasCenterX + (sand.getCenterX() - gameCenterX) * scale;
-            double sandScreenY = canvasCenterY - (sand.getCenterY() - gameCenterY) * scale;
-            double sandRadius = sand.getRadius() * scale;
+            double sandScreenX = transform.toScreenX(sand.getCenterX());
+            double sandScreenY = transform.toScreenY(sand.getCenterY());
+            double sandRadius = sand.getRadius() * transform.scale;
 
             gc.setFill(Color.web("#d8bd73"));
             gc.fillOval(sandScreenX - sandRadius, sandScreenY - sandRadius, sandRadius * 2, sandRadius * 2);
         }
 
         for (Tree tree : course.getTrees()) {
-            double treeScreenX = canvasCenterX + (tree.getCenterX() - gameCenterX) * scale;
-            double treeScreenY = canvasCenterY - (tree.getCenterY() - gameCenterY) * scale;
-            double treeRadius = tree.getRadius() * scale;
+            double treeScreenX = transform.toScreenX(tree.getCenterX());
+            double treeScreenY = transform.toScreenY(tree.getCenterY());
+            double treeRadius = tree.getRadius() * transform.scale;
 
             gc.setFill(Color.web("#1f6b3a"));
             gc.fillOval(treeScreenX - treeRadius, treeScreenY - treeRadius, treeRadius * 2, treeRadius * 2);
@@ -104,11 +90,22 @@ public class CoursePreview extends Canvas {
             gc.fillOval(treeScreenX - 2, treeScreenY - 2, 4, 4);
         }
 
+        for (Wall wall : course.getWalls()) {
+            double wallStartX = transform.toScreenX(wall.getStartX());
+            double wallStartY = transform.toScreenY(wall.getStartY());
+            double wallEndX = transform.toScreenX(wall.getEndX());
+            double wallEndY = transform.toScreenY(wall.getEndY());
+
+            gc.setStroke(Color.web("#2d2d2d"));
+            gc.setLineWidth(Math.max(2.0, wall.getThickness() * transform.scale));
+            gc.strokeLine(wallStartX, wallStartY, wallEndX, wallEndY);
+        }
+
         // DRAW THE HOLE / TARGET
         double[] target = course.getTargetXYR(); // [x, y, r]
-        double targetScreenX = canvasCenterX + (target[0] - gameCenterX) * scale;
-        double targetScreenY = canvasCenterY - (target[1] - gameCenterY) * scale;
-        double targetRadius = target[2] * scale;
+        double targetScreenX = transform.toScreenX(target[0]);
+        double targetScreenY = transform.toScreenY(target[1]);
+        double targetRadius = target[2] * transform.scale;
 
         // Draw the outer cup rim
         gc.setStroke(Color.WHITE);
@@ -121,12 +118,123 @@ public class CoursePreview extends Canvas {
 
         // DRAW THE BALL
         double[] ballPos = course.getStartPosition(); // index 0 = x, index 1 = y
-        double ballScreenX = canvasCenterX + (ballPos[0] - gameCenterX) * scale;
-        double ballScreenY = canvasCenterY - (ballPos[1] - gameCenterY) * scale;
+        double ballScreenX = transform.toScreenX(ballPos[0]);
+        double ballScreenY = transform.toScreenY(ballPos[1]);
         double ballRadius = 5.0; // Fixed pixel size so it remains clear on all map sizes
 
         // Draw the primary white golf ball body
         gc.setFill(Color.WHITE);
         gc.fillOval(ballScreenX - ballRadius, ballScreenY - ballRadius, ballRadius * 2, ballRadius * 2);
+    }
+
+    public double[] pixelToCoursePoint(double pixelX, double pixelY) {
+        PreviewTransform transform = createPreviewTransform();
+        if (transform == null) {
+            return null;
+        }
+
+        double courseX = transform.toCourseX(pixelX);
+        double courseY = transform.toCourseY(pixelY);
+
+        if (!transform.isInBounds(courseX, courseY)) {
+            return null;
+        }
+        return new double[]{courseX, courseY};
+    }
+
+    private PreviewTransform createPreviewTransform() {
+        double w = getWidth();
+        double h = getHeight();
+        if (w <= 0 || h <= 0) {
+            return null;
+        }
+
+        double[] size = course.getSize(); // {minX, maxX, minY, maxY}
+        double minX = size[0];
+        double maxX = size[1];
+        double minY = size[2];
+        double maxY = size[3];
+        double gameWidth = maxX - minX;
+        double gameHeight = maxY - minY;
+
+        if (gameWidth <= 0 || gameHeight <= 0) {
+            minX = -20.0;
+            maxX = 20.0;
+            minY = -20.0;
+            maxY = 20.0;
+            gameWidth = maxX - minX;
+            gameHeight = maxY - minY;
+        }
+
+        double padding = Math.min(COURSE_PADDING_PIXELS, Math.max(0.0, Math.min(w, h) / 2.0 - 1.0));
+        double drawableWidth = Math.max(1.0, w - padding * 2.0);
+        double drawableHeight = Math.max(1.0, h - padding * 2.0);
+        double scale = Math.min(drawableWidth / gameWidth, drawableHeight / gameHeight);
+
+        return new PreviewTransform(
+            minX,
+            maxX,
+            minY,
+            maxY,
+            scale,
+            w / 2.0,
+            h / 2.0,
+            (minX + maxX) / 2.0,
+            (minY + maxY) / 2.0
+        );
+    }
+
+    private static class PreviewTransform {
+        private final double minX;
+        private final double maxX;
+        private final double minY;
+        private final double maxY;
+        private final double scale;
+        private final double canvasCenterX;
+        private final double canvasCenterY;
+        private final double gameCenterX;
+        private final double gameCenterY;
+
+        private PreviewTransform(
+            double minX,
+            double maxX,
+            double minY,
+            double maxY,
+            double scale,
+            double canvasCenterX,
+            double canvasCenterY,
+            double gameCenterX,
+            double gameCenterY
+        ) {
+            this.minX = minX;
+            this.maxX = maxX;
+            this.minY = minY;
+            this.maxY = maxY;
+            this.scale = scale;
+            this.canvasCenterX = canvasCenterX;
+            this.canvasCenterY = canvasCenterY;
+            this.gameCenterX = gameCenterX;
+            this.gameCenterY = gameCenterY;
+        }
+
+        private double toScreenX(double courseX) {
+            return canvasCenterX + (courseX - gameCenterX) * scale;
+        }
+
+        private double toScreenY(double courseY) {
+            return canvasCenterY - (courseY - gameCenterY) * scale;
+        }
+
+        private double toCourseX(double screenX) {
+            return gameCenterX + (screenX - canvasCenterX) / scale;
+        }
+
+        private double toCourseY(double screenY) {
+            return gameCenterY - (screenY - canvasCenterY) / scale;
+        }
+
+        private boolean isInBounds(double courseX, double courseY) {
+            return courseX >= minX && courseX <= maxX && courseY >= minY && courseY <= maxY;
+        }
     }
 }

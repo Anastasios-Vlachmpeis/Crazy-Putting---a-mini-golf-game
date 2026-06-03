@@ -13,6 +13,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Separator;
 import javafx.scene.input.MouseButton;
+import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
@@ -22,12 +23,16 @@ public class ObstacleModificationTab extends BorderPane {
     private final GolfCourse course;
     private final ComboBox<String> obstacleTypeBox;
     private final Slider radiusSlider;
+    private final Slider wallLengthSlider;
+    private final Slider wallAngleSlider;
     // private final TextField radiusField;
     // private final TextField xField;
     // private final TextField yField;
     private double radius = 2.0; 
     private final TextField randomCountField;
     private final Random random = new Random();
+    private static final double DEFAULT_WALL_THICKNESS = 0.5;
+    private static final double DEFAULT_WALL_HEIGHT = 1.0;
 
     public ObstacleModificationTab(GolfCourse course, double[] preViewSize) {
         this.course = course;
@@ -39,11 +44,11 @@ public class ObstacleModificationTab extends BorderPane {
         rightMenu.setPrefWidth(250);
         rightMenu.setStyle("-fx-background-color: rgba(244, 244, 244, 0.9); -fx-border-color: #cccccc; -fx-border-width: 0 0 0 1;");
 
-        Label title = new Label("Add Trees & Sandpits");
+        Label title = new Label("Add Obstacles");
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
         obstacleTypeBox = new ComboBox<>();
-        obstacleTypeBox.getItems().addAll("Sandpit", "Tree");
+        obstacleTypeBox.getItems().addAll("Sandpit", "Tree", "Wall");
         obstacleTypeBox.setValue("Sandpit");
         obstacleTypeBox.setMaxWidth(Double.MAX_VALUE);
 
@@ -53,6 +58,18 @@ public class ObstacleModificationTab extends BorderPane {
         radiusSlider.setShowTickMarks(true);
         radiusSlider.setMajorTickUnit(2.0);
 
+        Label wallLengthLabel = new Label("Wall length: 5.0");
+        wallLengthSlider = new Slider(1.0, 15.0, 5.0);
+        wallLengthSlider.setShowTickLabels(true);
+        wallLengthSlider.setShowTickMarks(true);
+        wallLengthSlider.setMajorTickUnit(2.0);
+
+        Label wallAngleLabel = new Label("Wall angle: 0 deg");
+        wallAngleSlider = new Slider(0.0, 360.0, 0.0);
+        wallAngleSlider.setShowTickLabels(true);
+        wallAngleSlider.setShowTickMarks(true);
+        wallAngleSlider.setMajorTickUnit(90.0);
+
         // radiusField = new TextField("2.0");
         // radiusField.setPromptText("Radius");
 
@@ -61,6 +78,13 @@ public class ObstacleModificationTab extends BorderPane {
             /*radiusField.setText(String.format("%.2f", newVal.doubleValue()));*/
             radius = newVal.doubleValue();
         });
+        wallLengthSlider.valueProperty().addListener((obs, oldVal, newVal) ->
+            wallLengthLabel.setText(String.format("Wall length: %.1f", newVal.doubleValue())));
+        wallAngleSlider.valueProperty().addListener((obs, oldVal, newVal) ->
+            wallAngleLabel.setText(String.format("Wall angle: %.0f deg", newVal.doubleValue())));
+        obstacleTypeBox.valueProperty().addListener((obs, oldVal, newVal) ->
+            updateObstacleControls(radiusLabel, wallLengthLabel, wallAngleLabel));
+        updateObstacleControls(radiusLabel, wallLengthLabel, wallAngleLabel);
 
         // xField = new TextField();
         // xField.setPromptText("X coordinate");
@@ -83,8 +107,10 @@ public class ObstacleModificationTab extends BorderPane {
         clearSelectedButton.setOnAction(e -> {
             if (isSandSelected()) {
                 course.clearSandPits();
-            } else {
+            } else if (isTreeSelected()) {
                 course.clearTrees();
+            } else {
+                course.clearWalls();
             }
             coursePreview.updatePreview();
         });
@@ -100,6 +126,8 @@ public class ObstacleModificationTab extends BorderPane {
             title,
             new Label("Obstacle Type"), obstacleTypeBox,
             radiusLabel, radiusSlider, /*radiusField,*/
+            wallLengthLabel, wallLengthSlider,
+            wallAngleLabel, wallAngleSlider,
             new Separator(),
             /*new Label("Specific Point"), xField, yField, addAtPointButton,
             new Separator(),*/
@@ -116,6 +144,21 @@ public class ObstacleModificationTab extends BorderPane {
                 addObstacleAtPixel(e.getX(), e.getY());
             }
         });
+    }
+
+    private void updateObstacleControls(Label radiusLabel, Label wallLengthLabel, Label wallAngleLabel) {
+        boolean wallSelected = isWallSelected();
+        setControlVisible(radiusLabel, !wallSelected);
+        setControlVisible(radiusSlider, !wallSelected);
+        setControlVisible(wallLengthLabel, wallSelected);
+        setControlVisible(wallLengthSlider, wallSelected);
+        setControlVisible(wallAngleLabel, wallSelected);
+        setControlVisible(wallAngleSlider, wallSelected);
+    }
+
+    private void setControlVisible(Node node, boolean visible) {
+        node.setVisible(visible);
+        node.setManaged(visible);
     }
 
     // private void addObstacleFromFields() {
@@ -140,14 +183,29 @@ public class ObstacleModificationTab extends BorderPane {
     private void addRandomObstacles() {
         try {
             int count = Math.max(0, Integer.parseInt(randomCountField.getText().trim()));
-            double radius = getRadius();
             double[] size = course.getSize();
+
+            double radius = getRadius();
             double minX = size[0] + radius;
             double maxX = size[1] - radius;
             double minY = size[2] + radius;
             double maxY = size[3] - radius;
 
+            if (isWallSelected()) {
+                double angle = Math.toRadians(wallAngleSlider.getValue());
+                double wallLength = wallLengthSlider.getValue();
+                double wallDx = Math.cos(angle) * wallLength;
+                double wallDy = Math.sin(angle) * wallLength;
+                double wallMargin = DEFAULT_WALL_THICKNESS / 2.0;
+
+                minX = size[0] + wallMargin - Math.min(0.0, wallDx);
+                maxX = size[1] - wallMargin - Math.max(0.0, wallDx);
+                minY = size[2] + wallMargin - Math.min(0.0, wallDy);
+                maxY = size[3] - wallMargin - Math.max(0.0, wallDy);
+            }
+
             if (minX > maxX || minY > maxY) {
+                System.out.println("Obstacle cannot fit within the course bounds.");
                 return;
             }
 
@@ -183,6 +241,11 @@ public class ObstacleModificationTab extends BorderPane {
             added = course.addSandPit(x, y, radius);
         } else if (isTreeSelected()) {
             added = course.addTree(x, y, radius);
+        } else if (isWallSelected()) {
+            double angle = Math.toRadians(wallAngleSlider.getValue());
+            double endX = x + Math.cos(angle) * wallLengthSlider.getValue();
+            double endY = y + Math.sin(angle) * wallLengthSlider.getValue();
+            added = course.addWall(x, y, endX, endY, DEFAULT_WALL_THICKNESS, DEFAULT_WALL_HEIGHT);
         }
 
         if (!added) {
@@ -197,31 +260,7 @@ public class ObstacleModificationTab extends BorderPane {
     }
 
     private double[] pixelToCoursePoint(double pixelX, double pixelY) {
-        double canvasW = coursePreview.getWidth();
-        double canvasH = coursePreview.getHeight();
-
-        double[] size = course.getSize();
-        double minX = size[0];
-        double maxX = size[1];
-        double minY = size[2];
-        double maxY = size[3];
-
-        double gameWidth = maxX - minX;
-        double gameHeight = maxY - minY;
-        double scale = Math.min(canvasW / gameWidth, canvasH / gameHeight);
-
-        double canvasCenterX = canvasW / 2.0;
-        double canvasCenterY = canvasH / 2.0;
-        double gameCenterX = (minX + maxX) / 2.0;
-        double gameCenterY = (minY + maxY) / 2.0;
-
-        double courseX = gameCenterX + (pixelX - canvasCenterX) / scale;
-        double courseY = gameCenterY - (pixelY - canvasCenterY) / scale;
-
-        if (courseX < minX || courseX > maxX || courseY < minY || courseY > maxY) {
-            return null;
-        }
-        return new double[]{courseX, courseY};
+        return coursePreview.pixelToCoursePoint(pixelX, pixelY);
     }
 
     private boolean isSandSelected() {
@@ -230,6 +269,10 @@ public class ObstacleModificationTab extends BorderPane {
 
     private boolean isTreeSelected() {
         return "Tree".equals(obstacleTypeBox.getValue());
+    }
+
+    private boolean isWallSelected() {
+        return "Wall".equals(obstacleTypeBox.getValue());
     }
 
     private double getRadius() {

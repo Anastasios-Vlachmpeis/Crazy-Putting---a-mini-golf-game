@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import GolfCourseData.GolfCourse;
 import GolfCourseData.Obstacles.Tree;
+import GolfCourseData.Obstacles.Wall;
 import Solvers.Solver;
 import Systems.GolfODE;
 
@@ -33,13 +34,6 @@ public class ShotSimulatorV2 {
             double hy = course.dhdy(state[0],state[1]);
             double slopeMagnitude = Math.sqrt(hx * hx + hy * hy);
 
-            if (course.isSand(state[0], state[1]) && speed < 0.05) {
-                state[2] = 0;
-                state[3] = 0;
-                trajectoryList.add(solver.storeRow(t, state));
-                break;
-            }
-
             if (speed < 0.01 && course.getMiuS(state[0], state[1]) > slopeMagnitude) {//speed threshhold of 0.01m/s
                 state[2] = 0;
                 state[3] = 0;
@@ -61,6 +55,8 @@ public class ShotSimulatorV2 {
             state = solver.iteration(equation, t, state, h);
             if (course.isTree(state[0], state[1])) {
                 state = bounceOffTree(course, previousState, state);
+            } else if (course.isWall(state[0], state[1])) {
+                state = bounceOffWall(course, previousState, state);
             }
             t += h;
             //System.out.println(Arrays.toString(state));
@@ -108,6 +104,42 @@ public class ShotSimulatorV2 {
         double bouncedX = tree.getCenterX() + normalX * (tree.getCollisionRadius() + clearance);
         double bouncedY = tree.getCenterY() + normalY * (tree.getCollisionRadius() + clearance);
 
+        return reflectVelocity(collisionState, normalX, normalY, bouncedX, bouncedY, 0.65);
+    }
+
+    private double[] bounceOffWall(GolfCourse course, double[] previousState, double[] collisionState) {
+        Wall wall = course.getWallAt(collisionState[0], collisionState[1]);
+        if (wall == null) {
+            return collisionState;
+        }
+
+        double wallDx = wall.getEndX() - wall.getStartX();
+        double wallDy = wall.getEndY() - wall.getStartY();
+        double wallLength = Math.sqrt(wallDx * wallDx + wallDy * wallDy);
+        if (wallLength < 0.0001) {
+            return previousState;
+        }
+
+        double normalX = -wallDy / wallLength;
+        double normalY = wallDx / wallLength;
+        double fromWallX = collisionState[0] - wall.getCenterX();
+        double fromWallY = collisionState[1] - wall.getCenterY();
+        if (normalX * fromWallX + normalY * fromWallY < 0) {
+            normalX = -normalX;
+            normalY = -normalY;
+        }
+
+        double clearance = 0.04;
+        double bouncedX = previousState[0] + normalX * (wall.getThickness() / 2.0 + clearance);
+        double bouncedY = previousState[1] + normalY * (wall.getThickness() / 2.0 + clearance);
+
+        return reflectVelocity(collisionState, normalX, normalY, bouncedX, bouncedY, 0.8);
+    }
+
+    private double[] reflectVelocity(
+            double[] collisionState, double normalX, double normalY,
+            double bouncedX, double bouncedY, double damping) {
+
         double velocityX = collisionState[2];
         double velocityY = collisionState[3];
         double dot = velocityX * normalX + velocityY * normalY;
@@ -117,12 +149,11 @@ public class ShotSimulatorV2 {
             velocityY = velocityY - 2.0 * dot * normalY;
         }
 
-        double bounceDamping = 0.65;
         return new double[]{
             bouncedX,
             bouncedY,
-            velocityX * bounceDamping,
-            velocityY * bounceDamping
+            velocityX * damping,
+            velocityY * damping
         };
     }
 }
