@@ -12,13 +12,13 @@
     0.2
   ],
   "currentBallPosition": [
-    2.6244760717560682,
-    -7.103545771188143,
+    -8.190639269406393,
+    -7.876712328767123,
     0.0
   ],
   "initialBallPosition": [
-    -8.418949771689498,
-    -9.218036529680365,
+    -8.190639269406393,
+    -7.876712328767123,
     0.0
   ],
   "terrainFormula": "1",
@@ -94,7 +94,7 @@
   "usePerlinNoise": false,
   "widthScale": 0.2,
   "heightScale": 1.0,
-  "noiseOffset": 5718.162323871481,
+  "noiseOffset": 0.0,
   "TerrainManipulator": {
     "hills": [
       {

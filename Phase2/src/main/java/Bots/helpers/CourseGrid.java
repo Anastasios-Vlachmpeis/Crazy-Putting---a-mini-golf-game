@@ -14,6 +14,9 @@ public final class CourseGrid {
     // slopes above this count as a wall (steep hills). can be tuned
     private static final double STEEPNESS_LIMIT = 1.0;
 
+    // how far paths must stay from walls, trees, water and the course edge
+    private static final double CLEARANCE = 1.0;
+
     private final double minX;
     private final double minY;
     private final double maxX;
@@ -45,6 +48,8 @@ public final class CourseGrid {
                 passable[col][row] = isWalkable(course, center[0], center[1]);
             }
         }
+
+        inflateBlockedRegions();
     }
 
     public int getCols() { return cols; }
@@ -97,5 +102,40 @@ public final class CourseGrid {
         if (v < lo) return lo;
         if (v > hi) return hi;
         return v;
+    }
+
+    // The whole idea is to stop the bot from routing into tight pockets
+    private void inflateBlockedRegions() {
+        int rings = Math.max(1, (int) Math.ceil(CLEARANCE / cellSize));
+
+        for (int pass = 0; pass < rings; pass++) {
+            boolean[][] next = new boolean[cols][rows];
+
+            for (int col = 0; col < cols; col++) {
+                
+                for (int row = 0; row < rows; row++) {
+                    next[col][row] = passable[col][row] && !touchesBlocked(col, row);
+                }
+            }
+
+            for (int col = 0; col < cols; col++) {
+                System.arraycopy(next[col], 0, passable[col], 0, rows);
+            }
+        }
+    }
+
+    // true iff the cell sits next to blocked cell/grid edge
+    private boolean touchesBlocked(int col, int row) {
+        for (int dc = -1; dc <= 1; dc++) {
+
+            for (int dr = -1; dr <= 1; dr++) {
+                if (dc == 0 && dr == 0) continue;
+                int c = col + dc;
+                int r = row + dr;
+                if (c < 0 || c >= cols || r < 0 || r >= rows) return true; // edge counts as a wall
+                if (!passable[c][r]) return true;
+            }
+        }
+        return false;
     }
 }
