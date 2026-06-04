@@ -9,13 +9,16 @@ import GolfCourseData.Obstacles.ObstacleObjects;
  */
 public final class CourseGrid {
 
-    public static final double DEFAULT_CELL_SIZE = 1.0;
+    // smaller cells to make pathfinding more accurate 
+    public static final double DEFAULT_CELL_SIZE = 0.5;
 
     // slopes above this count as a wall (steep hills). can be tuned
-    private static final double STEEPNESS_LIMIT = 1.0;
+    // Basically off now.
+    private static final double STEEPNESS_LIMIT = 100.0;
 
     // how far paths must stay from walls, trees, water and the course edge
-    private static final double CLEARANCE = 1.0;
+    // Dillation was sealing the corridors the ball needed to reacvh the hole, so it'soff too for now
+    private static final double CLEARANCE = 0.0;
 
     private final double minX;
     private final double minY;
@@ -44,12 +47,11 @@ public final class CourseGrid {
 
         for (int col = 0; col < cols; col++) {
             for (int row = 0; row < rows; row++) {
-                double[] center = cellToWorld(col, row);
-                passable[col][row] = isWalkable(course, center[0], center[1]);
+                passable[col][row] = isCellWalkable(course, col, row);
             }
         }
 
-        inflateBlockedRegions();
+        //inflateBlockedRegions();
     }
 
     public int getCols() { return cols; }
@@ -106,13 +108,14 @@ public final class CourseGrid {
 
     // The whole idea is to stop the bot from routing into tight pockets
     private void inflateBlockedRegions() {
-        int rings = Math.max(1, (int) Math.ceil(CLEARANCE / cellSize));
+        int rings = (int) Math.round(CLEARANCE / cellSize);
+        if (rings <= 0) return;
 
         for (int pass = 0; pass < rings; pass++) {
             boolean[][] next = new boolean[cols][rows];
 
             for (int col = 0; col < cols; col++) {
-                
+
                 for (int row = 0; row < rows; row++) {
                     next[col][row] = passable[col][row] && !touchesBlocked(col, row);
                 }
@@ -137,5 +140,20 @@ public final class CourseGrid {
             }
         }
         return false;
+    }
+
+    // a cell is blocked if a wall crosses any part of it, not just its center
+    private boolean isCellWalkable(GolfCourse course, int col, int row) {
+        double[] c = cellToWorld(col, row);
+        double h = cellSize * 0.5;
+        double[][] pts = {
+            {c[0],c[1]},{c[0] - h,c[1]-h},{c[0] + h,c[1] - h},
+            {c[0] - h,c[1] + h},{ c[0] + h,c[1] + h}
+        };
+        
+        for (double[] p : pts) {
+            if (!isWalkable(course, p[0], p[1])) return false;
+        }
+        return true;
     }
 }
