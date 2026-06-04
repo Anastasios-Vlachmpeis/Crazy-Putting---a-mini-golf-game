@@ -1,12 +1,13 @@
 package Bots.helpers;
 
 import GolfCourseData.GolfCourse;
+import ShotEngine.ShotSimulatorV2;
 import Solvers.Solver;
 import Systems.GolfODE;
 
 /**
- * This runs one simulated putt for the search bots and tracks
- * the closest the ball got to the hole
+ * This runs one simulated putt for the search bots (using ShotSimulatorV2 this time)
+ * and tracks the closest the ball got to the hole 
  */
 public final class BotShotTrial {
 
@@ -26,67 +27,38 @@ public final class BotShotTrial {
         double targetY = target[1];
 
         double[] state = { start[0], start[1], v0x, v0y };
-        double t = 0.0;
+        
+        double[][] trajectory = new ShotSimulatorV2().schoot(ode, solver, state, STEP_SIZE);
 
         double closestDistance = Double.MAX_VALUE;
         double missXAtClosest = 0.0;
         double missYAtClosest = 0.0;
-        boolean inWater = false;
-        boolean outOfBounds = false;
-        double finalX = state[0];
-        double finalY = state[1];
 
-        for (int step = 0; step < MAX_STEPS; step++) {
+        for (double[] r : trajectory) {
 
-            double x = state[0];
-            double y = state[1];
-            double vx = state[2];
-            double vy = state[3];
+            double x = r[1];
+            double y = r[2];
+            double distance = Math.hypot(targetX-x, targetY-y);
 
-            finalX = x;
-            finalY = y;
-
-            double distance = course.distanceToTarget(x, y);
             if (distance < closestDistance) {
                 closestDistance = distance;
                 missXAtClosest = targetX - x;
                 missYAtClosest = targetY - y;
             }
 
-            if (course.isWater(x, y)) { inWater = true; break; }
-
-            if (Math.abs(x) > COURSE_BOUND || Math.abs(y) > COURSE_BOUND) {
-                outOfBounds = true; break;}
-
-            double speed = Math.hypot(vx, vy);
-            if (speed < SPEED_THRESHOLD) { // ball stopped on a flat enough slope
-                double slopeMagnitude = Math.hypot(course.dhdx(x, y), course.dhdy(x, y));
-                if (course.getMiuS(x, y) > slopeMagnitude) break; // static friction holds
-            }
-
-            state = stepOnce(ode, solver, state, t);
-            t += STEP_SIZE;
         }
 
-        if (closestDistance == Double.MAX_VALUE) {
-            closestDistance = course.distanceToTarget(finalX, finalY);
-            missXAtClosest  = targetX - finalX;
-            missYAtClosest  = targetY - finalY;
-        }
-
+        double[] last = trajectory[trajectory.length-1];
+        double finalX = last[1];
+        double finalY = last[2];
+    
+        boolean inWater = course.isWater(finalX, finalY);
+        double[] size = course.getSize();
+        boolean outOfBounds = finalX<size[0] || finalX>size[1]|| finalY<size[2] || finalY>size[3];
+    
         return new BotTrialResult(
                 finalX, finalY, inWater, outOfBounds,
                 closestDistance, missXAtClosest, missYAtClosest);
     }
 
-    private static double[] stepOnce(GolfODE ode, Solver solver, double[] state, double t) {
-
-        double[][] solution = solver.solve(ode, state, t, t + STEP_SIZE, STEP_SIZE);
-        double[] lastRow = solution[solution.length - 1];
-        double[] next = new double[state.length];
-        
-        for (int i = 0; i < state.length; i++) next[i] = lastRow[i + 1];
-
-        return next;
-    }
 }
