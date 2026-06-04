@@ -34,7 +34,11 @@ public class ManhattanBot extends SearchBot {
         // aim at the next waypoint instead of the hole, then put the real hole back
         double[] aim = WaypointPlanner.activeAim(course);
         double[] realTarget = course.getTargetXYR().clone();
-        course.setTargetXYR(aim[0], aim[1], aim[2]);
+
+        // Make the ball roll to its true resting point instead of overshooting
+        boolean atHole = aim[0] == realTarget[0] && aim[1] == realTarget[1];
+        double simRadius = atHole ? realTarget[2] : 0.0;
+        course.setTargetXYR(aim[0], aim[1], simRadius);
 
         try {
             double[] start = course.getStartPosition();
@@ -62,28 +66,36 @@ public class ManhattanBot extends SearchBot {
 
         searchDepth++;
 
+        double[] aim = course.getTargetXYR(); // temporarily set to the active waypoint in shoot()
+
         ArrayList<double[]> candidates = VelocitySearchWindow.buildCandidates(
             vxStep, vyStep, minVx, maxVx, minVy, maxVy, MAX_SPEED);
 
-        double bestPathVx = 0.0;
-        double bestPathVy = 0.0;
-        double closestPathDist = Double.MAX_VALUE;
+        double bestVx = 0.0;
+        double bestVy = 0.0;
+        double bestRestDist = Double.MAX_VALUE;
 
         for (double[] candidate : candidates) {
             BotTrialResult shot = tryShot(candidate[0], candidate[1]);
 
             noteRestingCandidate(shot, candidate[0], candidate[1]);
 
-            double pathDistance = shot.closestDistance;
-            if (pathDistance< closestPathDist) {
-                closestPathDist = pathDistance;
-                bestPathVx = candidate[0];
-                bestPathVy = candidate[1];
-            }
+            // a shot that drowns or flies out is a big no no, skip it
+            if (shot.inWater || shot.outOfBounds) continue;
 
-            if (isInTarget(shot.finalX, shot.finalY)) {
-                return new double[]{ candidate[0], candidate[1] };
+            // rank by where the ball comes to REST, so that ya don't overshoot
+            double restDistance = shot.stopDistance(aim[0], aim[1]);
+            if (restDistance < bestRestDist) {
+                bestRestDist = restDistance;
+                bestVx = candidate[0];
+                bestVy = candidate[1];
             }
+        }
+
+        // the best shot already parks in the aim radius, we are done
+        if (bestRestDist <= aim[2]) {
+            searchDepth = 0;
+            return new double[]{ bestVx, bestVy };
         }
 
         if (searchDepth == MAX_SEARCH_DEPTH) {
@@ -93,8 +105,8 @@ public class ManhattanBot extends SearchBot {
 
         return runGridSearch(
                 vxStep / 4.0, vyStep / 4.0,
-                bestPathVx - vxStep, bestPathVx + vxStep,
-                bestPathVy - vyStep, bestPathVy + vyStep);
+                bestVx - vxStep, bestVx + vxStep,
+                bestVy - vyStep, bestVy + vyStep);
     }
 
     private BotTrialResult tryShot(double vx, double vy) {

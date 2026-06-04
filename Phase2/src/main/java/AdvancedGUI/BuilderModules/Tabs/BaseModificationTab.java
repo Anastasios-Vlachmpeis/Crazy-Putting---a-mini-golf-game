@@ -1,19 +1,14 @@
 package AdvancedGUI.BuilderModules.Tabs;
 
-import GolfCourseData.GolfCourse;
-import javafx.scene.layout.BorderPane;
-import GolfCourseData.GolfCourse;
 import AdvancedGUI.BuilderModules.CoursePreview;
+import GolfCourseData.GolfCourse;
+import javafx.beans.value.ChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.beans.value.ChangeListener;
 
 public class BaseModificationTab extends BorderPane{
 
@@ -34,8 +29,8 @@ public class BaseModificationTab extends BorderPane{
         Label title = new Label("Course Dimensions");
         title.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
-        TextField widthXString = new TextField("50");
-        TextField widthYString = new TextField("50");
+        TextField widthXString = new TextField("25");
+        TextField widthYString = new TextField("25");
 
         //TextField terrainFormula = new TextField("(sin(x-y)/7)+0.5");
         terrainFormula = new TextField("1");
