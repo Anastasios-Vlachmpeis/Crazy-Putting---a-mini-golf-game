@@ -5,6 +5,10 @@ import GolfCourseData.GolfCourse;
 import GolfCourseData.Obstacles.Sand;
 import GolfCourseData.Obstacles.Tree;
 import GolfCourseData.Obstacles.Wall;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.*;
@@ -19,6 +23,7 @@ import javafx.scene.shape.Sphere;
 import javafx.scene.shape.TriangleMesh;
 import javafx.scene.transform.Rotate;
 import javafx.scene.shape.CullFace;
+import javafx.util.Duration;
 import java.util.function.Consumer;
 
 public class Game3DScene extends SubScene {
@@ -33,6 +38,7 @@ public class Game3DScene extends SubScene {
     private PerspectiveCamera camera;
     private Sphere playerBall;
     private Sphere botBall;
+    private Cylinder targetHoleNode;
     private Cylinder flagPoleNode;
     private MeshView flagBannerNode;
     private AimingShotController aimingShotController;
@@ -224,6 +230,9 @@ public class Game3DScene extends SubScene {
         botBall.setMaterial(new PhongMaterial(Color.web("#f39c12")));
         botBall.setVisible(false);//make invisible in case of singleplayer
 
+        targetHoleNode = new Cylinder(GolfCourse.FIXED_TARGET_RADIUS, 0.03);
+        targetHoleNode.setMaterial(createUnlitMaterial(Color.BLACK));
+
         flagPoleNode = new Cylinder(0.1, 3.0); 
         flagPoleNode.setMaterial(new PhongMaterial(Color.BLACK));
 
@@ -231,7 +240,7 @@ public class Game3DScene extends SubScene {
         PhongMaterial flagBannerMat = createUnlitMaterial(Color.RED);
         flagBannerNode.setMaterial(flagBannerMat);
 
-        worldGroup.getChildren().addAll(playerBall, flagPoleNode, flagBannerNode);
+        worldGroup.getChildren().addAll(playerBall, targetHoleNode, flagPoleNode, flagBannerNode);
 
         AimingArrow aimingArrow = new AimingArrow(gameManager, playerBall);
         worldGroup.getChildren().add(aimingArrow.getView());
@@ -247,6 +256,7 @@ public class Game3DScene extends SubScene {
 
         obstacleGroup = new Group();
         GolfCourse course = gameManager.getCourse();
+        double[] courseSize = course.getSize();
 
         PhongMaterial sandMat = createSandMaterial();
         PhongMaterial trunkMat = new PhongMaterial(Color.web("#7a4c24"));
@@ -261,8 +271,8 @@ public class Game3DScene extends SubScene {
 
         for (Tree tree : course.getTrees()) {
             double height = gameManager.getTerrainHeight(tree.getCenterX(), tree.getCenterY());
-            double trunkHeight = 2.0;
             double canopyRadius = Math.max(0.35, tree.getRadius());
+            double trunkHeight = Math.max(2.0, canopyRadius * 0.75);
 
             Cylinder trunk = new Cylinder(tree.getTrunkRadius(), trunkHeight);
             trunk.setTranslateX(tree.getCenterX());
@@ -273,28 +283,99 @@ public class Game3DScene extends SubScene {
             Sphere canopy = new Sphere(canopyRadius);
             canopy.setTranslateX(tree.getCenterX());
             canopy.setTranslateZ(tree.getCenterY());
-            canopy.setTranslateY(-height - trunkHeight - canopyRadius * 0.75);
+            canopy.setTranslateY(-height - trunkHeight - canopyRadius);
             canopy.setMaterial(leafMat);
 
             obstacleGroup.getChildren().addAll(trunk, canopy);
         }
 
         for (Wall wall : course.getWalls()) {
-            double centerX = wall.getCenterX();
-            double centerY = wall.getCenterY();
-            double terrainHeight = gameManager.getTerrainHeight(centerX, centerY);
-
-            Box wallNode = new Box(wall.getLength(), wall.getHeight(), wall.getThickness());
-            wallNode.setMaterial(wallMat);
-            wallNode.setTranslateX(centerX);
-            wallNode.setTranslateY(-terrainHeight - wall.getHeight() / 2.0);
-            wallNode.setTranslateZ(centerY);
-            wallNode.setRotationAxis(Rotate.Y_AXIS);
-            wallNode.setRotate(-wall.getAngleDegrees());
-            obstacleGroup.getChildren().add(wallNode);
+            Box wallNode = createClippedWall(wall, courseSize);
+            if (wallNode != null) {
+                wallNode.setMaterial(wallMat);
+                obstacleGroup.getChildren().add(wallNode);
+            }
         }
 
         worldGroup.getChildren().add(obstacleGroup);
+    }
+
+    private Box createClippedWall(Wall wall, double[] courseSize) {
+        double[] clippedLine = clipLineToCourseBounds(
+            wall.getStartX(),
+            wall.getStartY(),
+            wall.getEndX(),
+            wall.getEndY(),
+            courseSize
+        );
+        if (clippedLine == null) {
+            return null;
+        }
+
+        double startX = clippedLine[0];
+        double startY = clippedLine[1];
+        double endX = clippedLine[2];
+        double endY = clippedLine[3];
+        double dx = endX - startX;
+        double dy = endY - startY;
+        double length = Math.sqrt(dx * dx + dy * dy);
+        if (length <= 0.001) {
+            return null;
+        }
+
+        double centerX = (startX + endX) / 2.0;
+        double centerY = (startY + endY) / 2.0;
+        double terrainHeight = gameManager.getTerrainHeight(centerX, centerY);
+
+        Box wallNode = new Box(length, wall.getHeight(), wall.getThickness());
+        wallNode.setTranslateX(centerX);
+        wallNode.setTranslateY(-terrainHeight - wall.getHeight() / 2.0);
+        wallNode.setTranslateZ(centerY);
+        wallNode.setRotationAxis(Rotate.Y_AXIS);
+        wallNode.setRotate(-Math.toDegrees(Math.atan2(dy, dx)));
+        return wallNode;
+    }
+
+    private double[] clipLineToCourseBounds(double startX, double startY, double endX, double endY, double[] courseSize) {
+        double dx = endX - startX;
+        double dy = endY - startY;
+        double minT = 0.0;
+        double maxT = 1.0;
+
+        double[] p = {-dx, dx, -dy, dy};
+        double[] q = {
+            startX - courseSize[0],
+            courseSize[1] - startX,
+            startY - courseSize[2],
+            courseSize[3] - startY
+        };
+
+        for (int i = 0; i < p.length; i++) {
+            if (p[i] == 0.0) {
+                if (q[i] < 0.0) {
+                    return null;
+                }
+                continue;
+            }
+
+            double t = q[i] / p[i];
+            if (p[i] < 0.0) {
+                minT = Math.max(minT, t);
+            } else {
+                maxT = Math.min(maxT, t);
+            }
+
+            if (minT > maxT) {
+                return null;
+            }
+        }
+
+        return new double[]{
+            startX + minT * dx,
+            startY + minT * dy,
+            startX + maxT * dx,
+            startY + maxT * dy
+        };
     }
 
     private MeshView createSandPatch(Sand sand) {
@@ -302,6 +383,7 @@ public class Game3DScene extends SubScene {
         int segments = 48;
         double liftAboveTerrain = 0.12;
         TriangleMesh mesh = new TriangleMesh();
+        double[] courseSize = gameManager.getCourse().getSize();
 
         double centerHeight = gameManager.getTerrainHeight(sand.getCenterX(), sand.getCenterY());
         mesh.getPoints().addAll(
@@ -317,8 +399,8 @@ public class Game3DScene extends SubScene {
                 double angle = (2.0 * Math.PI * segment) / segments;
                 double angleCos = Math.cos(angle);
                 double angleSin = Math.sin(angle);
-                double x = sand.getCenterX() + angleCos * ringRadius;
-                double z = sand.getCenterY() + angleSin * ringRadius;
+                double x = clamp(sand.getCenterX() + angleCos * ringRadius, courseSize[0], courseSize[1]);
+                double z = clamp(sand.getCenterY() + angleSin * ringRadius, courseSize[2], courseSize[3]);
                 double height = gameManager.getTerrainHeight(x, z);
 
                 mesh.getPoints().addAll(
@@ -398,15 +480,128 @@ public class Game3DScene extends SubScene {
     }
 
     public void updatePlayerBall(double x, double y, double h) {
+        playerBall.setVisible(true);
+        resetBallScale(playerBall);
         playerBall.setTranslateX(x);
         playerBall.setTranslateZ(y);
         playerBall.setTranslateY(-h - 0.25);
     }
 
     public void updateBotBall(double x, double y, double h) {
+        resetBallScale(botBall);
         botBall.setTranslateX(x);
         botBall.setTranslateZ(y);
         botBall.setTranslateY(-h - 0.1);
+    }
+
+    public Timeline createDropInAnimation(
+        boolean playerBallActive,
+        double holeX,
+        double holeY,
+        double holeHeight,
+        Runnable onFinished
+    ) {
+        Sphere ball = playerBallActive ? playerBall : botBall;
+        ball.setVisible(true);
+
+        Timeline dropTimeline = new Timeline(
+            new KeyFrame(
+                Duration.ZERO,
+                new KeyValue(ball.translateXProperty(), ball.getTranslateX()),
+                new KeyValue(ball.translateZProperty(), ball.getTranslateZ()),
+                new KeyValue(ball.translateYProperty(), ball.getTranslateY()),
+                new KeyValue(ball.scaleXProperty(), 1.0),
+                new KeyValue(ball.scaleYProperty(), 1.0),
+                new KeyValue(ball.scaleZProperty(), 1.0)
+            ),
+            new KeyFrame(
+                Duration.millis(220),
+                new KeyValue(ball.translateXProperty(), holeX, Interpolator.EASE_BOTH),
+                new KeyValue(ball.translateZProperty(), holeY, Interpolator.EASE_BOTH),
+                new KeyValue(ball.translateYProperty(), -holeHeight - 0.22, Interpolator.EASE_BOTH)
+            ),
+            new KeyFrame(
+                Duration.millis(520),
+                new KeyValue(ball.translateYProperty(), -holeHeight + 0.16, Interpolator.EASE_IN),
+                new KeyValue(ball.scaleXProperty(), 0.25, Interpolator.EASE_IN),
+                new KeyValue(ball.scaleYProperty(), 0.25, Interpolator.EASE_IN),
+                new KeyValue(ball.scaleZProperty(), 0.25, Interpolator.EASE_IN)
+            )
+        );
+        dropTimeline.setOnFinished(e -> {
+            ball.setVisible(false);
+            if (onFinished != null) {
+                onFinished.run();
+            }
+        });
+        return dropTimeline;
+    }
+
+    public Timeline createOutOfBoundsFallAnimation(
+        boolean playerBallActive,
+        double edgeX,
+        double edgeY,
+        double edgeHeight,
+        double directionX,
+        double directionY,
+        Runnable onFinished
+    ) {
+        Sphere ball = playerBallActive ? playerBall : botBall;
+        ball.setVisible(true);
+
+        double directionLength = Math.sqrt(directionX * directionX + directionY * directionY);
+        if (directionLength < 0.0001) {
+            double[] size = gameManager.getCourse().getSize();
+            double centerX = (size[0] + size[1]) / 2.0;
+            double centerY = (size[2] + size[3]) / 2.0;
+            directionX = edgeX - centerX;
+            directionY = edgeY - centerY;
+            directionLength = Math.sqrt(directionX * directionX + directionY * directionY);
+        }
+        if (directionLength < 0.0001) {
+            directionX = 1.0;
+            directionY = 0.0;
+            directionLength = 1.0;
+        }
+
+        double fallDistance = 1.25;
+        double endX = edgeX + (directionX / directionLength) * fallDistance;
+        double endY = edgeY + (directionY / directionLength) * fallDistance;
+
+        Timeline fallTimeline = new Timeline(
+            new KeyFrame(
+                Duration.ZERO,
+                new KeyValue(ball.translateXProperty(), edgeX),
+                new KeyValue(ball.translateZProperty(), edgeY),
+                new KeyValue(ball.translateYProperty(), -edgeHeight - 0.25),
+                new KeyValue(ball.scaleXProperty(), 1.0),
+                new KeyValue(ball.scaleYProperty(), 1.0),
+                new KeyValue(ball.scaleZProperty(), 1.0)
+            ),
+            new KeyFrame(
+                Duration.millis(650),
+                new KeyValue(ball.translateXProperty(), endX, Interpolator.EASE_IN),
+                new KeyValue(ball.translateZProperty(), endY, Interpolator.EASE_IN),
+                new KeyValue(ball.translateYProperty(), -edgeHeight + 2.0, Interpolator.EASE_IN),
+                new KeyValue(ball.scaleXProperty(), 0.25, Interpolator.EASE_IN),
+                new KeyValue(ball.scaleYProperty(), 0.25, Interpolator.EASE_IN),
+                new KeyValue(ball.scaleZProperty(), 0.25, Interpolator.EASE_IN)
+            )
+        );
+
+        fallTimeline.setOnFinished(e -> {
+            resetBallScale(ball);
+            if (onFinished != null) {
+                onFinished.run();
+            }
+        });
+        return fallTimeline;
+    }
+
+    private void resetBallScale(Sphere ball) {
+        ball.setScaleX(1.0);
+        ball.setScaleY(1.0);
+        ball.setScaleZ(1.0);
     }
 
     public void setMultiplayerVisibility(boolean isMultiplayer) {
@@ -414,6 +609,12 @@ public class Game3DScene extends SubScene {
     }
 
     public void renderFlagPosition(double physX, double physY, double physHeight) {
+        double[] target = gameManager.getCourse().getTargetXYR();
+        targetHoleNode.setRadius(target[2]);
+        targetHoleNode.setTranslateX(physX);
+        targetHoleNode.setTranslateZ(physY);
+        targetHoleNode.setTranslateY(-physHeight - 0.015);
+
         flagPoleNode.setTranslateX(physX);
         flagPoleNode.setTranslateZ(physY); 
         flagPoleNode.setTranslateY(-physHeight - 1.25);

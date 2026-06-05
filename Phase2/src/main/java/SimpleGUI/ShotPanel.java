@@ -204,13 +204,7 @@ public class ShotPanel {
 
     // resets ball to start position and clears shot count and result label
     private void onReset() {
-        GolfCourse course = gui.getCourseRelated();
-        double[] startPos = course.getOriginalStartPosition();
-        course.setBallPosition(startPos[0], startPos[1]);
-        double[] resetState = new double[] { startPos[0], startPos[1], 0.0, 0.0 };
-        System.out.println("OnReset triggerd");
-        gui.getBall().setPos(resetState);
-        gameCanvas.drawObjects(resetState, null, 0.0, 0.0);
+        double[] resetState = resetBallToStartPosition();
 
         shotResultLabel.setText("");
         
@@ -219,9 +213,20 @@ public class ShotPanel {
         update(resetState, shotCount, gui.distanceToTarget(resetState));
     }
 
+    private double[] resetBallToStartPosition() {
+        GolfCourse course = gui.getCourseRelated();
+        double[] startPos = course.getOriginalStartPosition();
+        course.setBallPosition(startPos[0], startPos[1]);
+        double[] resetState = new double[] { startPos[0], startPos[1], 0.0, 0.0 };
+        System.out.println("OnReset triggerd");
+        gui.getBall().setPos(resetState);
+        gameCanvas.drawObjects(resetState, null, 0.0, 0.0);
+        return resetState;
+    }
+
     // called by GameCanvas after every shot completes to update the shot count,
     // ball position, distance to target, and shot result message
-    public void onShotLanded(double[] finalState, double dist, boolean inWater, boolean won) {
+    public void onShotLanded(double[] finalState, double dist, boolean inWater, boolean outOfBounds, boolean won) {
         update(finalState, shotCount, dist);
 
         if (won) {
@@ -230,14 +235,17 @@ public class ShotPanel {
             System.out.println("game Won");
         } 
         else if (inWater) {
-            //penalty: count an extra shot and reset position
-            recordShot(); 
-            onReset();
-            shotResultLabel.setText("In the water! +1 penalty. \nReplaying from build.");
+            double[] resetState = resetBallToStartPosition();
+            update(resetState, shotCount, gui.distanceToTarget(resetState));
+            shotResultLabel.setText("In the water!\nReplaying from start.");
             shotResultLabel.setTextFill(Color.CORNFLOWERBLUE);
             System.out.println("in Water");
             System.out.println(inWater);
         } 
+        else if (outOfBounds) {
+            shotResultLabel.setText("Out of bounds!\nReplaying from the edge.");
+            shotResultLabel.setTextFill(Color.SALMON);
+        }
         else {
             shotResultLabel.setText(String.format("Resting %.2f m from target.", dist));
             shotResultLabel.setTextFill(Color.BLACK);

@@ -53,6 +53,11 @@ public class ShotSimulatorV2 {
             //continue if ball did not stop
             double[] previousState = Arrays.copyOf(state, state.length);
             state = solver.iteration(equation, t, state, h);
+            if (isOutOfBounds(course, state[0], state[1])) {
+                t += h;
+                trajectoryList.add(solver.storeRow(t, state));
+                break;
+            }
             if (course.isTree(state[0], state[1])) {
                 state = bounceOffTree(course, previousState, state);
             } else if (course.isWall(state[0], state[1])) {
@@ -156,4 +161,11 @@ public class ShotSimulatorV2 {
             velocityY * damping
         };
     }
+
+    //If the ball hits the edge of the terrain 
+    private boolean isOutOfBounds(GolfCourse course, double x, double y) {
+        double[] size = course.getSize(); // {minX, maxX, minY, maxY}
+        return x < size[0] || x > size[1] || y < size[2] || y > size[3];
+    }
+
 }

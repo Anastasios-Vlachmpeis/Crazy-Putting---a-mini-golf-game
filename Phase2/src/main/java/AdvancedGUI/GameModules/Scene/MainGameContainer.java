@@ -21,6 +21,7 @@ public class MainGameContainer extends StackPane {
     private final Game3DScene game3DScene;
     private final GameHUDOverlay hudOverlay;
     private Timeline currentShotTimeline;
+    private Timeline currentDropTimeline;
 
     //multiplayer
     private boolean isMultiplayer = false;
@@ -59,13 +60,7 @@ public class MainGameContainer extends StackPane {
         gameManager.currentStateProperty().addListener((obs, oldState, newState) -> {
             javafx.application.Platform.runLater(() -> {
                 if (newState == GameState.HOLED_OUT) {
-                    
-                    // ---> [NIEUW] Controleer wie de winnende bal sloeg
-                    String winnerName = gameManager.getIsPlayerTurn() ? "Player (White)" : "Bot (Orange)";
-                    int finalScore = gameManager.getIsPlayerTurn() ? gameManager.getPlayerStrokes() : gameManager.getBotStrokes();
-                    
-                    showModalAlert("We have a Winner!", winnerName + " completed the course in " + finalScore + " strokes.");
-                    
+                    playDropInThenShowWinModal();
                 } else if (newState == GameState.GAME_OVER) {
                     
                     // ---> [NIEUW] Controleer wie de limiet bereikte
@@ -164,9 +159,14 @@ public class MainGameContainer extends StackPane {
                 gameManager.finishShot();
                 if (gameManager.getLastShotResult() == ShotResult.WATER) {
                     javafx.application.Platform.runLater(() -> {
-                        showModalAlert("Hit the water", "Your ball landed in the water. Penalty stroke applied.");
+                        showModalAlert("Hit the water", "Your ball landed in the water.");
                     });
                 }
+                if (gameManager.getLastShotResult() == ShotResult.OUT_OF_BOUNDS) {
+                    playOutOfBoundsFall(trajectory);
+                    return;
+                }
+
                 currentShotTimeline = null;
                 syncVisualPositions();
 
@@ -187,6 +187,54 @@ public class MainGameContainer extends StackPane {
         }
     }
 
+    private void playOutOfBoundsFall(double[][] trajectory) {
+        double edgeX = gameManager.getEdgeRecoveryX();
+        double edgeY = gameManager.getEdgeRecoveryY();
+        double edgeHeight = gameManager.getTerrainHeight(edgeX, edgeY);
+        double[] direction = outOfBoundsDirection(trajectory, edgeX, edgeY);
+
+        currentDropTimeline = game3DScene.createOutOfBoundsFallAnimation(
+            gameManager.getIsPlayerTurn(),
+            edgeX,
+            edgeY,
+            edgeHeight,
+            direction[0],
+            direction[1],
+            () -> {
+                javafx.application.Platform.runLater(() ->
+                    showModalAlert("Out of bounds", "Your ball fell off the edge.")
+                );
+                currentShotTimeline = null;
+                currentDropTimeline = null;
+                syncVisualPositions();
+
+                if (isMultiplayer && gameManager.getCurrentState() == GameState.AIMING) {
+                    isPlayerTurn = !isPlayerTurn;
+                    if (!isPlayerTurn && activeBot != null) {
+                        triggerBotTurn();
+                    }
+                }
+            }
+        );
+        currentDropTimeline.play();
+    }
+
+    private double[] outOfBoundsDirection(double[][] trajectory, double edgeX, double edgeY) {
+        if (trajectory != null && trajectory.length > 0) {
+            double[] finalRow = trajectory[trajectory.length - 1];
+            double dx = finalRow[1] - edgeX;
+            double dy = finalRow[2] - edgeY;
+            if (Math.sqrt(dx * dx + dy * dy) > 0.0001) {
+                return new double[] { dx, dy };
+            }
+        }
+
+        double[] size = gameManager.getCourse().getSize();
+        double centerX = (size[0] + size[1]) / 2.0;
+        double centerY = (size[2] + size[3]) / 2.0;
+        return new double[] { edgeX - centerX, edgeY - centerY };
+    }
+
     private double[] capShotVelocity(double vx, double vy) {
         double speed = Math.sqrt(vx * vx + vy * vy);
 
@@ -203,6 +251,30 @@ public class MainGameContainer extends StackPane {
             currentShotTimeline.stop();
             currentShotTimeline = null;
         }
+        if (currentDropTimeline != null) {
+            currentDropTimeline.stop();
+            currentDropTimeline = null;
+        }
+    }
+
+    private void playDropInThenShowWinModal() {
+        boolean playerWon = gameManager.getIsPlayerTurn();
+        String winnerName = playerWon ? "Player (White)" : "Bot (Orange)";
+        int finalScore = playerWon ? gameManager.getPlayerStrokes() : gameManager.getBotStrokes();
+
+        double[] target = gameManager.getCourse().getTargetXYR();
+        double targetHeight = gameManager.getTerrainHeight(target[0], target[1]);
+        currentDropTimeline = game3DScene.createDropInAnimation(
+            playerWon,
+            target[0],
+            target[1],
+            targetHeight,
+            () -> {
+                currentDropTimeline = null;
+                showModalAlert("We have a Winner!", winnerName + " completed the course in " + finalScore + " strokes.");
+            }
+        );
+        currentDropTimeline.play();
     }
 
     public void setMultiplayerMode(boolean isMultiplayer, String botName) {
