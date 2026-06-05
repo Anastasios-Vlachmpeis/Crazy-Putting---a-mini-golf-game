@@ -13,7 +13,8 @@ import GolfCourseData.GolfCourse;
 public final class WaypointPlanner {
 
     // how close the ball needs to get before a corner counts as reached
-    public static final double WAYPOINT_REACH_RADIUS = 2.0;
+    // Tightened up to make the bot more accurate
+    public static final double WAYPOINT_REACH_RADIUS = 1.0;
 
     private WaypointPlanner() {}
 
@@ -29,13 +30,17 @@ public final class WaypointPlanner {
             return new double[] { hole[0], hole[1], hole[2] };
         }
 
-        int[] startCell = grid.worldToCell(ball[0], ball[1]);
-        int[] goalCell = grid.worldToCell(hole[0], hole[1]);
 
-        // if an end is blocked there is nothing to plan, we let the bot aim at the hole anyway
-        if (!grid.isPassable(startCell[0], startCell[1]) || !grid.isPassable(goalCell[0], goalCell[1])) {
+        int[] startCell = snapToNearestPassableCell(grid, grid.worldToCell(ball[0], ball[1]));
+        int[] goalCell  = snapToNearestPassableCell(grid, grid.worldToCell(hole[0], hole[1]));
+
+        // NEVER give up (unless the course has no passable cell at all)
+        if (startCell == null || goalCell == null) {
             return new double[] { hole[0], hole[1], hole[2] };
         }
+
+        //TODO: grid printer, remove later NOT YET
+        printGrid(grid, startCell, goalCell);
 
         List<int[]> path = BFSPathfinder.find(grid, startCell[0], startCell[1], goalCell[0], goalCell[1]);
         if (path.size() < 2) {
@@ -49,7 +54,6 @@ public final class WaypointPlanner {
                 return new double[] { cell[0], cell[1], WAYPOINT_REACH_RADIUS };
             }
         }
-
         // the next cell along is always reachable, use it so we still make progress
         double[] next = grid.cellToWorld(path.get(1)[0], path.get(1)[1]);
         return new double[] { next[0], next[1], WAYPOINT_REACH_RADIUS };
@@ -68,5 +72,46 @@ public final class WaypointPlanner {
             if (!grid.isPassableWorld(x, y)) return false;
         }
         return true;
+    }
+
+        // name is self explanatory (RING SEARCHH O)
+        private static int[] snapToNearestPassableCell(CourseGrid grid, int[] cell) {
+            int col = cell[0];
+            int row = cell[1];
+            if (grid.isPassable(col, row)) return new int[] { col, row };
+            int maxRadius = Math.max(grid.getCols(), grid.getRows());
+
+            for (int r = 1; r <= maxRadius; r++) {
+
+                for (int dc = -r; dc <= r; dc++) {
+
+                    for (int dr = -r; dr <= r; dr++) {
+                        if (Math.abs(dc) != r && Math.abs(dr) != r) continue; 
+                        if (grid.isPassable(col + dc, row + dr)) {
+                            return new int[] { col + dc, row + dr };
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+
+    //TODO: Remove this later
+    // An ASCII grid of the course showing the passable cells, start and goal ~ for debugging
+    private static boolean gridPrinted = false;
+
+    private static void printGrid(CourseGrid grid, int[] start, int[] goal) {
+        if (gridPrinted) return;
+        gridPrinted = true;
+        for (int row = grid.getRows() - 1; row >= 0; row--) {   // top row first, matches the screen
+            StringBuilder sb = new StringBuilder("[GRID] ");
+            for (int col = 0; col < grid.getCols(); col++) {
+                if (start != null && col == start[0] && row == start[1])      sb.append('S');
+                else if (goal != null && col == goal[0] && row == goal[1])    sb.append('G');
+                else sb.append(grid.isPassable(col, row) ? '.' : '#');
+            }
+            System.out.println(sb);
+        }
     }
 }

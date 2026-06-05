@@ -39,7 +39,11 @@ public class NewtonBot extends SearchBot {
         // aim at the next waypoint instead of the hole, then put the real hole back
         double[] aim = WaypointPlanner.activeAim(course);
         double[] realTarget = course.getTargetXYR().clone();
-        course.setTargetXYR(aim[0], aim[1], aim[2]);
+
+        // Make the ball roll to its true resting point instead of overshooting
+        boolean atHole = aim[0] == realTarget[0] && aim[1] == realTarget[1];
+        double simRadius = atHole ? realTarget[2] : 0.0;
+        course.setTargetXYR(aim[0], aim[1], simRadius);
 
         try {
             findSeedVelocity();
@@ -52,27 +56,20 @@ public class NewtonBot extends SearchBot {
         }
     }
 
-    // Scan the grid of speeds and keep the one that gets closest to the hole
+    // Scan the grid of speeds, the best resting shot becomes the Newton starting point
     private void findSeedVelocity() {
         double[] start = course.getStartPosition();
-        double[] target = course.getTargetXYR();
+        double[] aim = course.getTargetXYR();
 
         VelocitySearchWindow window = new VelocitySearchWindow();
-        window.orientForLayout(start[0], start[1], target[0], target[1]);
-
-        seedVx = 0.0;
-        seedVy = 0.0;
-        double bestDistance = Double.MAX_VALUE;
+        window.orientForLayout(start[0], start[1], aim[0], aim[1]);
 
         for (double[] candidate : window.buildCandidates(MAX_SPEED)) {
-            double[] miss = measureShotMiss(candidate[0], candidate[1]);
-
-            if (miss[2] < bestDistance) {
-                bestDistance = miss[2];
-                seedVx = candidate[0];
-                seedVy = candidate[1];
-            }
+            measureShotMiss(candidate[0], candidate[1]); // update bestRest w/ noteRestingCandidate
         }
+        // bestRest is the resting shot closest to the aim, w/ water and bounds filtered out
+        seedVx = bestRestVx;
+        seedVy = bestRestVy;
     }
 
     //Adjust vx/vy until the shot reaches the hole, or give up and use the best resting shot
@@ -108,13 +105,17 @@ public class NewtonBot extends SearchBot {
         return runNewtonSteps(vx - miss[0] / dvx, vy - miss[1] / dvy);
     }
 
-    // returns an array with missX, missY and closestDistance for a simulated shot
+    // returns the resting miss in x and y, + the resting distance to the aim,
+    // to keep the bot from overshooting
     private double[] measureShotMiss(double vx, double vy) {
         simulationCount++;
         BotTrialResult shot = runTrial(vx, vy);
         noteRestingCandidate(shot, vx, vy);
 
-        return new double[]{ shot.missXAtClosest, shot.missYAtClosest, shot.closestDistance };
+        double[] aim = course.getTargetXYR();
+        double missX = aim[0] - shot.finalX;
+        double missY = aim[1] - shot.finalY;
+        return new double[]{missX, missY, Math.hypot(missX, missY)};
     }
 
     // estimates how much the miss changes when vx or vy changes a little

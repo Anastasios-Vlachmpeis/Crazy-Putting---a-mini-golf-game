@@ -89,9 +89,10 @@ public class Settings {
         Label MiuSSand = new Label("Enter static friction sand: ");
         styleSettingsLabel(MiuSSand);
 
-        TextField MiuKString = new TextField("0.15");
+        // Changed so that we meet the requirements of the project
+        TextField MiuKString = new TextField("0.1");
         styleTextBox(MiuKString);
-        TextField MiuSString = new TextField("0.5");
+        TextField MiuSString = new TextField("0.2");
         styleTextBox(MiuSString);
         TextField MiuKSandString = new TextField("0.3");
         styleTextBox(MiuKSandString);
