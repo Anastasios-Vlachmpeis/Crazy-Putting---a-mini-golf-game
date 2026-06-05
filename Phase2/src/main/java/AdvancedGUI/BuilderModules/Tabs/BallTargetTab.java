@@ -1,22 +1,21 @@
 package AdvancedGUI.BuilderModules.Tabs;
 
-import java.util.Locale;
+import java.util.concurrent.ThreadLocalRandom;
 
 import AdvancedGUI.BuilderModules.CoursePreview;
 import GolfCourseData.GolfCourse;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 
 public class BallTargetTab extends BorderPane {
 
     private CoursePreview coursePreview;
+    private static final int RANDOM_POINT_ATTEMPTS = 100;
+    private static final double RANDOM_EDGE_MARGIN_FRACTION = 0.05;
 
     public BallTargetTab(GolfCourse course, double[] preViewSize) {
         
@@ -47,29 +46,14 @@ public class BallTargetTab extends BorderPane {
         moveBtn.setMaxWidth(Double.MAX_VALUE);
         */
 
-        //TextField rTarget = new TextField();
-        //rTarget.setPromptText("Set target radius");
-
-        Slider rTarget = new Slider(0.1, 0.5, 0.2);
-        rTarget.setShowTickLabels(true);
-        rTarget.setShowTickMarks(true);
-        rTarget.setMajorTickUnit(0.1);
-
-        rTarget.valueProperty().addListener((obs, oldVal, newVal) -> {
-            // Get the current target location so we don't accidentally move it
-            double[] currentTarget = course.getTargetXYR(); 
-            
-            // Update the course with the same X and Y, but the new Radius
-            course.setTargetXYR(currentTarget[0], currentTarget[1], newVal.doubleValue());
-            
-            // Instantly redraw the canvas!
-            coursePreview.updatePreview();
-        });
+        Button randomizeButton = new Button("Random Placement");
+        randomizeButton.setMaxWidth(Double.MAX_VALUE);
+        randomizeButton.setOnAction(e -> randomizeBallAndTarget(course));
         
         rightMenu.getChildren().addAll(
             title, 
             instructionLabel,
-            rTarget
+            randomizeButton
         );
 
         this.coursePreview.setOnMouseClicked(e -> {
@@ -87,7 +71,7 @@ public class BallTargetTab extends BorderPane {
             } 
             else if (e.getButton() == MouseButton.SECONDARY) {
                 // RIGHT CLICK: Relocate target array indices directly
-                course.setTargetXYR(point[0], point[1], rTarget.getValue());
+                course.setTargetPosition(point[0], point[1]);
                 
                 System.out.printf("Target relocated to: (%.2f, %.2f)%n", point[0], point[1]);
             }
@@ -99,6 +83,74 @@ public class BallTargetTab extends BorderPane {
         //ASSEMBLE
         this.setCenter(coursePreview);
         this.setRight(rightMenu);
+    }
+
+    private void randomizeBallAndTarget(GolfCourse course) {
+        double targetRadius = GolfCourse.FIXED_TARGET_RADIUS;
+        double[] targetPoint = randomCoursePoint(course, targetRadius);
+        double[] ballPoint = randomCoursePoint(course, targetRadius);
+        double minimumDistance = Math.max(targetRadius * 4.0, shortestCourseSide(course) * 0.2);
+
+        for (int i = 0; i < RANDOM_POINT_ATTEMPTS && distance(ballPoint, targetPoint) < minimumDistance; i++) {
+            ballPoint = randomCoursePoint(course, targetRadius);
+        }
+
+        course.setTargetPosition(targetPoint[0], targetPoint[1]);
+        course.setBallPosition(ballPoint[0], ballPoint[1]);
+        course.setOriginalStartPosition(ballPoint[0], ballPoint[1]);
+
+        System.out.printf(
+            "Randomized ball to: (%.2f, %.2f), target to: (%.2f, %.2f)%n",
+            ballPoint[0],
+            ballPoint[1],
+            targetPoint[0],
+            targetPoint[1]
+        );
+        coursePreview.updatePreview();
+    }
+
+    private double[] randomCoursePoint(GolfCourse course, double targetRadius) {
+        for (int i = 0; i < RANDOM_POINT_ATTEMPTS; i++) {
+            double[] point = randomPointInsideBounds(course, targetRadius);
+            if (!course.isWater(point[0], point[1])) {
+                return point;
+            }
+        }
+        return randomPointInsideBounds(course, targetRadius);
+    }
+
+    private double[] randomPointInsideBounds(GolfCourse course, double targetRadius) {
+        double[] size = course.getSize(); // {minX, maxX, minY, maxY}
+        double width = size[1] - size[0];
+        double height = size[3] - size[2];
+        double edgeMargin = Math.max(targetRadius, Math.min(width, height) * RANDOM_EDGE_MARGIN_FRACTION);
+
+        double minX = size[0] + edgeMargin;
+        double maxX = size[1] - edgeMargin;
+        double minY = size[2] + edgeMargin;
+        double maxY = size[3] - edgeMargin;
+
+        if (minX > maxX) {
+            minX = maxX = (size[0] + size[1]) / 2.0;
+        }
+        if (minY > maxY) {
+            minY = maxY = (size[2] + size[3]) / 2.0;
+        }
+
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+        return new double[] {
+            minX == maxX ? minX : random.nextDouble(minX, maxX),
+            minY == maxY ? minY : random.nextDouble(minY, maxY)
+        };
+    }
+
+    private double shortestCourseSide(GolfCourse course) {
+        double[] size = course.getSize();
+        return Math.min(size[1] - size[0], size[3] - size[2]);
+    }
+
+    private double distance(double[] first, double[] second) {
+        return Math.hypot(first[0] - second[0], first[1] - second[1]);
     }
 
     //refresh preview

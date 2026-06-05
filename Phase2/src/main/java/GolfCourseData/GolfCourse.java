@@ -21,15 +21,16 @@ import java.io.Writer;
 
 public class GolfCourse {
     public final double epsilon = 1e-7;
+    public static final double FIXED_TARGET_RADIUS = 0.35;
 
     //these values are just test/default values
     private String[] friction;
     private double[] frictionValues = {0.15, 0.5, 0.3, 0.75}; //TO DO: ADD DEFAULT SAND FRICTION!!!
     private String[] target;
-    private double[] targetValues = {3, 0, 0.35};
+    private double[] targetValues = {20.0, 20.0, FIXED_TARGET_RADIUS};
     private String[] start;
-    private double[] currentBallPosition = {0, 0, 0}; //updates after every shot
-    private double[] initialBallPosition = {0.0, 0.0, 0.0};
+    private double[] currentBallPosition = {-20.0, -20.0, 0.0}; //updates after every shot
+    private double[] initialBallPosition = {-20.0, -20.0, 0.0};
     private String terrainFormula = "1"; //Default terrain (sin(x-y)/7)+0.5"
     //Gameborders
     private double[] size = {-25,25,-25,25}; //{minX, maxX, minY, maxY}
@@ -101,7 +102,8 @@ public class GolfCourse {
             // Safely extract properties back into this active, running UI memory instance
             this.terrainFormula = loadedData.terrainFormula; 
             this.size = loadedData.size;                     
-            this.targetValues = loadedData.targetValues;     
+            this.targetValues = loadedData.targetValues;
+            normalizeTargetRadius();
             this.frictionValues = loadedData.frictionValues; 
             this.currentBallPosition = loadedData.currentBallPosition;
             this.sandPits = loadedData.sandPits != null ? loadedData.sandPits : new ArrayList<>();
@@ -176,6 +178,7 @@ public class GolfCourse {
         targetValues = Arrays.stream(target)
             .mapToDouble(Double::parseDouble)
             .toArray();
+        normalizeTargetRadius();
 
         currentBallPosition = Arrays.stream(start)
             .mapToDouble(Double::parseDouble)
@@ -236,7 +239,8 @@ public class GolfCourse {
 
     public boolean canPlaceTree(double centerX, double centerY, double radius) {
         Tree tree = new Tree(centerX, centerY, radius);
-        return isAreaDry(centerX, centerY, tree.getCollisionRadius())
+        return isCircleWithinBounds(centerX, centerY, tree.getTrunkRadius())
+            && isAreaDry(centerX, centerY, tree.getCollisionRadius())
             && isTreeTrunkClearOfWalls(tree);
     }
 
@@ -276,6 +280,13 @@ public class GolfCourse {
             }
         }
         return true;
+    }
+
+    private boolean isCircleWithinBounds(double centerX, double centerY, double radius) {
+        return centerX - radius >= size[0]
+            && centerX + radius <= size[1]
+            && centerY - radius >= size[2]
+            && centerY + radius <= size[3];
     }
 
     public void removeObstaclesInWater() {
@@ -500,6 +511,18 @@ public class GolfCourse {
         targetValues[0] = x;
         targetValues[1] = y;
         targetValues[2] = r;
+    }
+
+    public void setTargetPosition(double x, double y) {
+        setTargetXYR(x, y, FIXED_TARGET_RADIUS);
+    }
+
+    private void normalizeTargetRadius() {
+        if (targetValues == null || targetValues.length < 3) {
+            targetValues = new double[] {20.0, 20.0, FIXED_TARGET_RADIUS};
+            return;
+        }
+        targetValues[2] = FIXED_TARGET_RADIUS;
     }
 
     public double[] getStartPosition(){
