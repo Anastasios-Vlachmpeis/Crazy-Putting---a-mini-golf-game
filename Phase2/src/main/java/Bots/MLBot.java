@@ -42,7 +42,7 @@ public class MLBot extends GolfBot {
         // usually takes between 1-10k shots to get result but sometimes more than 40k
 
         int i = 0;
-        while (distanceToTarget > tRadius && i < 100000) {
+        while (distanceToTarget > tRadius && i < 20000) {
             // System.out.println("shot nr " + (i + 1));
 
             double vx;

@@ -2,14 +2,19 @@ package Experiment;
 
 import Bots.*;
 import GolfCourseData.*;
+import GolfCourseData.RandomTerrainGeneration.*;
 import ShotEngine.ShotSimulatorV2;
 import Solvers.RungeKuttaSolver;
 import Systems.GolfODE;
 
 public class MLBotExperiment {
     public static void main(String[] args) {
+        long seed = "Groningen".hashCode();
+
         // create course
         GolfCourse course = new GolfCourse(0, 0);
+        course.usePerlinNoise = true;
+        RandomCourseGenerator.generateSeededCourse(course, seed);
         GolfODE golfODE = new GolfODE(course);
 
         // create simulator and solver

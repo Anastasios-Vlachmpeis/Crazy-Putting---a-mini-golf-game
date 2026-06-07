@@ -1,0 +1,117 @@
+{
+  "epsilon": 1.0E-7,
+  "frictionValues": [
+    0.15,
+    0.5,
+    0.3,
+    0.75
+  ],
+  "targetValues": [
+    -0.22831050228310504,
+    3.436073059360731,
+    0.2
+  ],
+  "currentBallPosition": [
+    2.802144115036008,
+    -5.826903083596685,
+    0.0
+  ],
+  "initialBallPosition": [
+    0.09132420091324202,
+    -2.5228310502283104,
+    0.0
+  ],
+  "terrainFormula": "1",
+  "size": [
+    -10.0,
+    10.0,
+    -10.0,
+    10.0
+  ],
+  "borderSteepness": 2.0,
+  "sandPits": [
+    {
+      "centerX": 2.8767123287671237,
+      "centerY": -6.061643835616438,
+      "radius": 2.0,
+      "miuK": 0.35,
+      "miuS": 0.65
+    }
+  ],
+  "trees": [
+    {
+      "centerX": -8.310502283105023,
+      "centerY": 7.340182648401827,
+      "radius": 2.0
+    },
+    {
+      "centerX": 5.159817351598174,
+      "centerY": 7.203196347031964,
+      "radius": 2.0
+    },
+    {
+      "centerX": -4.634703196347032,
+      "centerY": 4.73744292237443,
+      "radius": 2.0
+    },
+    {
+      "centerX": -4.885844748858448,
+      "centerY": -4.600456621004566,
+      "radius": 2.0
+    }
+  ],
+  "walls": [],
+  "stepSize": 0.01,
+  "usePerlinNoise": false,
+  "widthScale": 0.2,
+  "heightScale": 1.0,
+  "noiseOffset": 0.0,
+  "TerrainManipulator": {
+    "hills": [
+      {
+        "centerX": -4.9771689497716896,
+        "centerY": 0.14840182648401828,
+        "peakHeight": 1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -4.840182648401827,
+        "centerY": 0.12557077625570778,
+        "peakHeight": 1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -2.5114155251141552,
+        "centerY": 0.1940639269406393,
+        "peakHeight": 1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": 0.8219178082191781,
+        "centerY": 0.5821917808219178,
+        "peakHeight": 1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": 2.3744292237442925,
+        "centerY": 0.8333333333333334,
+        "peakHeight": 1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": 4.726027397260275,
+        "centerY": 1.1529680365296804,
+        "peakHeight": 1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -0.6392694063926941,
+        "centerY": 0.3995433789954338,
+        "peakHeight": 1.0,
+        "width": 2.0
+      }
+    ],
+    "lastFormula": "1"
+  },
+  "globalElevation": 0.0
+}
