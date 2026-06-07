@@ -8,13 +8,16 @@ import Solvers.RungeKuttaSolver;
 import Systems.GolfODE;
 
 public class HillBotExperiment {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         long seed = "Groningen".hashCode();
 
         // create course
-        GolfCourse course = new GolfCourse(0, 0);
-        course.usePerlinNoise = true;
-        RandomCourseGenerator.generateSeededCourse(course, seed);
+        // GolfCourse course = new GolfCourse(0, 0);
+        // course.usePerlinNoise = true;
+        // RandomCourseGenerator.generateSeededCourse(course, seed);
+
+        GolfCourse course = new GolfCourse();
+        course.loadFromJson("src/main/java/Presets/Phase3Format/ExperimentCourse5.json");
         GolfODE golfODE = new GolfODE(course);
 
         // create simulator and solver

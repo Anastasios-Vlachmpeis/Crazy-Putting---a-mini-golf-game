@@ -20,7 +20,7 @@ public class SimpleBotExperiment {
 
         // for custom courses
         GolfCourse course = new GolfCourse();
-        course.loadFromJson("src/main/java/Presets/Phase3Format/ExperimentCourse1.json");
+        course.loadFromJson("src/main/java/Presets/Phase3Format/ExperimentCourse5.json");
 
         GolfODE golfODE = new GolfODE(course);
 
@@ -34,7 +34,7 @@ public class SimpleBotExperiment {
 
         int finishedGames = 0; // nr of times the bot got the ball in the hole
         double nrShots = 0;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 1000; i++) {
             // reset ball for each new game
             double[] originalStart = course.getOriginalStartPosition();
             course.setBallPosition(originalStart[0], originalStart[1]);

@@ -8,13 +8,16 @@ import Solvers.RungeKuttaSolver;
 import Systems.GolfODE;
 
 public class NewtonBotExperiment {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         long seed = "Amsterdam".hashCode();
 
         // create course
-        GolfCourse course = new GolfCourse(0, 0);
-        course.usePerlinNoise = true;
-        RandomCourseGenerator.generateSeededCourse(course, seed);
+        // GolfCourse course = new GolfCourse(0, 0);
+        // course.usePerlinNoise = true;
+        // RandomCourseGenerator.generateSeededCourse(course, seed);
+
+        GolfCourse course = new GolfCourse();
+        course.loadFromJson("src/main/java/Presets/Phase3Format/ExperimentCourse5.json");
 
         GolfODE golfODE = new GolfODE(course);
 
