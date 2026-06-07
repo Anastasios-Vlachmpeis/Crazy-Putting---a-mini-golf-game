@@ -4,6 +4,7 @@ import java.util.Random;
 
 import AdvancedGUI.BuilderModules.CoursePreview;
 import GolfCourseData.GolfCourse;
+import GolfCourseData.Obstacles.Tree;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -191,7 +192,13 @@ public class ObstacleModificationTab extends BorderPane {
             double minY = size[2] + radius;
             double maxY = size[3] - radius;
 
-            if (isWallSelected()) {
+            if (isTreeSelected()) {
+                double trunkRadius = new Tree(0.0, 0.0, radius).getTrunkRadius();
+                minX = size[0] + trunkRadius;
+                maxX = size[1] - trunkRadius;
+                minY = size[2] + trunkRadius;
+                maxY = size[3] - trunkRadius;
+            } else if (isWallSelected()) {
                 double angle = Math.toRadians(wallAngleSlider.getValue());
                 double wallLength = wallLengthSlider.getValue();
                 double wallDx = Math.cos(angle) * wallLength;

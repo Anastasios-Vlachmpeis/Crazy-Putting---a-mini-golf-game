@@ -70,6 +70,20 @@ public class CoursePreview extends Canvas {
         }
 
         // DRAW OBSTACLES
+        double boundsScreenX1 = transform.toScreenX(transform.minX);
+        double boundsScreenX2 = transform.toScreenX(transform.maxX);
+        double boundsScreenY1 = transform.toScreenY(transform.maxY);
+        double boundsScreenY2 = transform.toScreenY(transform.minY);
+        gc.save();
+        gc.beginPath();
+        gc.rect(
+            Math.min(boundsScreenX1, boundsScreenX2),
+            Math.min(boundsScreenY1, boundsScreenY2),
+            Math.abs(boundsScreenX2 - boundsScreenX1),
+            Math.abs(boundsScreenY2 - boundsScreenY1)
+        );
+        gc.clip();
+
         for (Sand sand : course.getSandPits()) {
             double sandScreenX = transform.toScreenX(sand.getCenterX());
             double sandScreenY = transform.toScreenY(sand.getCenterY());
@@ -79,16 +93,29 @@ public class CoursePreview extends Canvas {
             gc.fillOval(sandScreenX - sandRadius, sandScreenY - sandRadius, sandRadius * 2, sandRadius * 2);
         }
 
+        gc.restore();
+
         for (Tree tree : course.getTrees()) {
             double treeScreenX = transform.toScreenX(tree.getCenterX());
             double treeScreenY = transform.toScreenY(tree.getCenterY());
             double treeRadius = tree.getRadius() * transform.scale;
+            double trunkRadius = Math.max(2.0, tree.getTrunkRadius() * transform.scale);
 
             gc.setFill(Color.web("#1f6b3a"));
             gc.fillOval(treeScreenX - treeRadius, treeScreenY - treeRadius, treeRadius * 2, treeRadius * 2);
             gc.setFill(Color.web("#7a4c24"));
-            gc.fillOval(treeScreenX - 2, treeScreenY - 2, 4, 4);
+            gc.fillOval(treeScreenX - trunkRadius, treeScreenY - trunkRadius, trunkRadius * 2, trunkRadius * 2);
         }
+
+        gc.save();
+        gc.beginPath();
+        gc.rect(
+            Math.min(boundsScreenX1, boundsScreenX2),
+            Math.min(boundsScreenY1, boundsScreenY2),
+            Math.abs(boundsScreenX2 - boundsScreenX1),
+            Math.abs(boundsScreenY2 - boundsScreenY1)
+        );
+        gc.clip();
 
         for (Wall wall : course.getWalls()) {
             double wallStartX = transform.toScreenX(wall.getStartX());
@@ -101,20 +128,26 @@ public class CoursePreview extends Canvas {
             gc.strokeLine(wallStartX, wallStartY, wallEndX, wallEndY);
         }
 
+        gc.restore();
+
         // DRAW THE HOLE / TARGET
         double[] target = course.getTargetXYR(); // [x, y, r]
         double targetScreenX = transform.toScreenX(target[0]);
         double targetScreenY = transform.toScreenY(target[1]);
         double targetRadius = target[2] * transform.scale;
 
+        // Draw the dark cup first so the target reads as an actual hole.
+        gc.setFill(Color.web("#050505"));
+        gc.fillOval(targetScreenX - targetRadius, targetScreenY - targetRadius, targetRadius * 2, targetRadius * 2);
+
+        gc.setFill(Color.web("#202020"));
+        double innerRadius = targetRadius * 0.55;
+        gc.fillOval(targetScreenX - innerRadius, targetScreenY - innerRadius, innerRadius * 2, innerRadius * 2);
+
         // Draw the outer cup rim
         gc.setStroke(Color.WHITE);
         gc.setLineWidth(2);
         gc.strokeOval(targetScreenX - targetRadius, targetScreenY - targetRadius, targetRadius * 2, targetRadius * 2);
-        
-        // Draw the center flag cup
-        gc.setFill(Color.BLACK);
-        gc.fillOval(targetScreenX - 3, targetScreenY - 3, 6, 6);
 
         // DRAW THE BALL
         double[] ballPos = course.getStartPosition(); // index 0 = x, index 1 = y

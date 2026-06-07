@@ -27,6 +27,8 @@ public class GameManager {
     private double lastSafeY;
     private double waterRecoveryX;
     private double waterRecoveryY;
+    private double edgeRecoveryX;
+    private double edgeRecoveryY;
 
     private double playerX, playerY;
     private double botX, botY;
@@ -132,6 +134,7 @@ public class GameManager {
         // Process full resolution trajectory array path output matrices
         double[][] trajectory = simulator.schoot(physicsEngine, solver, startState, stepSize); 
         updateWaterRecoveryPosition(trajectory);
+        updateEdgeRecoveryPosition(trajectory);
 
         // Update the resting coordinate models using the final row element index
         double[] finalState = trajectory[trajectory.length - 1]; 
@@ -188,7 +191,7 @@ public class GameManager {
                                currentBallY < boundaries[2] || currentBallY > boundaries[3]);
         if (outOfBounds) {
             lastShotResult = ShotResult.OUT_OF_BOUNDS;
-            processPenalty("OUT OF BOUNDS! +1 Penalty Stroke. Resetting to last position.");
+            processPenalty("OUT OF BOUNDS! Resetting to the edge.", edgeRecoveryX, edgeRecoveryY);
             return;
         }
 
@@ -196,7 +199,7 @@ public class GameManager {
         if (course.isWater(currentBallX, currentBallY)) { //
             lastShotResult = ShotResult.WATER;
             processPenalty(
-                "SPLASH! Ball landed in water. +1 Penalty Stroke. Resetting near water edge.",
+                "SPLASH! Ball landed in water. Resetting near water edge.",
                 waterRecoveryX,
                 waterRecoveryY
             );
@@ -239,12 +242,6 @@ public class GameManager {
 
     private void processPenalty(String consoleMessage, double recoveryX, double recoveryY) {
         System.out.println(consoleMessage);
-        // Extra penalty stroke
-        if (isPlayerTurn.get()) {
-            playerStrokes.set(playerStrokes.get() + 1);
-        } else {
-            botStrokes.set(botStrokes.get() + 1);
-        } 
         
         // Roll back positions to where the player last shot from safely
         this.currentBallX = recoveryX;
@@ -308,6 +305,55 @@ public class GameManager {
         }
     }
 
+    private void updateEdgeRecoveryPosition(double[][] trajectory) {
+        edgeRecoveryX = lastSafeX;
+        edgeRecoveryY = lastSafeY;
+
+        if (trajectory == null || trajectory.length < 2) {
+            return;
+        }
+
+        for (int i = 1; i < trajectory.length; i++) {
+            double previousX = trajectory[i - 1][1];
+            double previousY = trajectory[i - 1][2];
+            double currentX = trajectory[i][1];
+            double currentY = trajectory[i][2];
+
+            if (!isOutOfBounds(previousX, previousY) && isOutOfBounds(currentX, currentY)) {
+                setEdgeRecoveryFromBoundary(previousX, previousY, currentX, currentY);
+                return;
+            }
+        }
+    }
+
+    private boolean isOutOfBounds(double x, double y) {
+        double[] boundaries = course.getSize();
+        return x < boundaries[0] || x > boundaries[1] || y < boundaries[2] || y > boundaries[3];
+    }
+
+    private void setEdgeRecoveryFromBoundary(double previousX, double previousY, double currentX, double currentY) {
+        double dx = currentX - previousX;
+        double dy = currentY - previousY;
+        double[] size = course.getSize();
+        double contactFraction = 1.0;
+
+        if (dx < 0.0) {
+            contactFraction = Math.min(contactFraction, (size[0] - previousX) / dx);
+        } else if (dx > 0.0) {
+            contactFraction = Math.min(contactFraction, (size[1] - previousX) / dx);
+        }
+
+        if (dy < 0.0) {
+            contactFraction = Math.min(contactFraction, (size[2] - previousY) / dy);
+        } else if (dy > 0.0) {
+            contactFraction = Math.min(contactFraction, (size[3] - previousY) / dy);
+        }
+
+        contactFraction = Math.max(0.0, Math.min(1.0, contactFraction));
+        edgeRecoveryX = previousX + dx * contactFraction;
+        edgeRecoveryY = previousY + dy * contactFraction;
+    }
+
     // Getters for the GUI view layer properties
     public ObjectProperty<GameState> currentStateProperty() { return currentState; }
     public GameState getCurrentState() { return currentState.get(); }
@@ -319,6 +365,8 @@ public class GameManager {
     public int getBotStrokes() { return botStrokes.get(); }
 
     public ShotResult getLastShotResult() { return lastShotResult; }
+    public double getEdgeRecoveryX() { return edgeRecoveryX; }
+    public double getEdgeRecoveryY() { return edgeRecoveryY; }
 
     //For the 3D modeling
     private final DoubleProperty liveX = new SimpleDoubleProperty(0);

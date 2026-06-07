@@ -39,6 +39,8 @@ public class GameCanvas {
     private static final double BALL_RADIUS_PIXELS = 5.0;
     private static final double V_MAX = 5.0; // max velocity for shot
     private static final double ARROW_SCALE = 40.0; // pixels per meters/second for aiming arrow
+    private static final int FALL_ANIMATION_FRAMES = 40;
+    private static final double FALL_DRIFT_PIXELS = 48.0;
 
     private static final double SIMULATION_STEP = 0.01; // seconds per simulation step -> step size for RK4 in seconds
 
@@ -46,10 +48,8 @@ public class GameCanvas {
                                                  // takes forever
 
     private final Canvas terrain = new Canvas(CANVAS_W, CANVAS_H); // will only be drawn once at the start of the game
-    private final Canvas objects = new Canvas(CANVAS_W, CANVAS_H); // holds ball and target, will be cleared and redrawn
-                                                                   // every frame
-    private final StackPane view = new StackPane(terrain, objects); // stacked so terrain is in the background and
-                                                                    // objects are in the foreground
+    private final Canvas objects = new Canvas(CANVAS_W, CANVAS_H); // holds ball and target, will be cleared and redrawn every frame
+    private final StackPane view = new StackPane(terrain, objects); // stacked so terrain is in the background and objects are in the foreground
 
     // shared states (getter methods in GUI_phase2)
     private GolfCourse golfCourse;
@@ -183,6 +183,11 @@ public class GameCanvas {
 
     // Objects layer (ball and target)
     public void drawObjects(double[] ballState, double[][] trajectory, double arrowVx, double arrowVy) {
+        drawObjects(ballState, trajectory, arrowVx, arrowVy, BALL_RADIUS_PIXELS, 1.0);
+    }
+
+    private void drawObjects(double[] ballState, double[][] trajectory, double arrowVx, double arrowVy,
+            double ballRadiusPixels, double ballOpacity) {
         GraphicsContext gc = objects.getGraphicsContext2D();
         gc.clearRect(0, 0, CANVAS_W, CANVAS_H);
 
@@ -217,12 +222,12 @@ public class GameCanvas {
         double bpx = worldToCanvasX(ballState[0]);
         double bpy = worldToCanvasY(ballState[1]);
 
-        gc.setFill(Color.WHITE);
-        gc.fillOval(bpx - BALL_RADIUS_PIXELS, bpy - BALL_RADIUS_PIXELS, BALL_RADIUS_PIXELS * 2, BALL_RADIUS_PIXELS * 2);
-        gc.setStroke(Color.DARKGRAY);
+        gc.setFill(Color.rgb(255, 255, 255, ballOpacity));
+        gc.fillOval(bpx - ballRadiusPixels, bpy - ballRadiusPixels, ballRadiusPixels * 2, ballRadiusPixels * 2);
+        gc.setStroke(Color.rgb(64, 64, 64, ballOpacity));
         gc.setLineWidth(1.0);
-        gc.strokeOval(bpx - BALL_RADIUS_PIXELS, bpy - BALL_RADIUS_PIXELS, BALL_RADIUS_PIXELS * 2,
-                BALL_RADIUS_PIXELS * 2);
+        gc.strokeOval(bpx - ballRadiusPixels, bpy - ballRadiusPixels, ballRadiusPixels * 2,
+                ballRadiusPixels * 2);
 
         // aiming arrow
         if (dragging && (arrowVx != 0.0 || arrowVy != 0.0)) {
@@ -351,10 +356,10 @@ public class GameCanvas {
         //double[][] trajectory = new RungeKuttaSolver().solveBall(golfODE, startState, SIMULATION_STEP);
         double[][] trajectory = simulator.schoot(golfODE, new RungeKuttaSolver(), startState, SIMULATION_STEP);
 
-        animateBall(trajectory);
+        animateBall(trajectory, startState);
     }
 
-    public void animateBall(double[][] trajectory) {
+    public void animateBall(double[][] trajectory, double[] shotStartState) {
         objects.setMouseTransparent(true);
 
         final int[] frameIndex = { 0 }; // use array to allow modification inside lambda
@@ -364,13 +369,17 @@ public class GameCanvas {
         timeline.getKeyFrames().add(new KeyFrame(Duration.millis(16), event -> {
             if (frameIndex[0] >= trajectory.length) {
                 timeline.stop();
-                objects.setMouseTransparent(false);
 
                 double[] finalRow = trajectory[trajectory.length - 1];
                 double[] finalState = new double[] { finalRow[1], finalRow[2], finalRow[3], finalRow[4] };
                 System.out.println("Ball State: " + Arrays.toString(finalState)); // ~Stan
-                ball.setPos(finalState);
-                onShotComplete(finalState, trajectory);
+                if (isOutOfBounds(finalState[0], finalState[1])) {
+                    animateOutOfBoundsFall(finalState, trajectory, shotStartState);
+                } else {
+                    objects.setMouseTransparent(false);
+                    ball.setPos(finalState);
+                    onShotComplete(finalState, trajectory, shotStartState);
+                }
                 return;
             }
 
@@ -383,16 +392,131 @@ public class GameCanvas {
         timeline.play();
     }
 
-    private void onShotComplete(double[] finalState, double[][] trajectory) {
-        double dist = golfCourse.distanceToTarget(finalState);
+    private void animateOutOfBoundsFall(double[] finalState, double[][] trajectory, double[] shotStartState) {
+        double[] fallStartState = edgeContactState(trajectory);
+        double[] direction = fallDirection(finalState, trajectory);
+        double driftWorld = FALL_DRIFT_PIXELS * metersPerPixel;
+
+        final int[] frameIndex = { 0 };
+        Timeline fallTimeline = new Timeline();
+        fallTimeline.setCycleCount(Timeline.INDEFINITE);
+
+        fallTimeline.getKeyFrames().add(new KeyFrame(Duration.millis(16), event -> {
+            double progress = (double) frameIndex[0] / FALL_ANIMATION_FRAMES;
+            double[] fallState = Arrays.copyOf(fallStartState, fallStartState.length);
+            fallState[0] = fallStartState[0] + direction[0] * driftWorld * progress;
+            fallState[1] = fallStartState[1] + direction[1] * driftWorld * progress;
+
+            double radius = BALL_RADIUS_PIXELS * (1.0 - 0.65 * progress);
+            double opacity = 1.0 - 0.75 * progress;
+            drawObjects(fallState, trajectory, 0.0, 0.0, radius, opacity);
+
+            frameIndex[0]++;
+            if (frameIndex[0] > FALL_ANIMATION_FRAMES) {
+                fallTimeline.stop();
+                objects.setMouseTransparent(false);
+                onShotComplete(finalState, trajectory, shotStartState);
+            }
+        }));
+
+        fallTimeline.play();
+    }
+
+    private double[] edgeContactState(double[][] trajectory) {
+        for (int i = 1; i < trajectory.length; i++) {
+            double[] previousRow = trajectory[i - 1];
+            double[] currentRow = trajectory[i];
+
+            if (!isOutOfBounds(previousRow[1], previousRow[2]) && isOutOfBounds(currentRow[1], currentRow[2])) {
+                return interpolateBoundaryContact(previousRow, currentRow);
+            }
+        }
+
+        double[] row = trajectory[trajectory.length - 1];
+        return new double[] { row[1], row[2], row[3], row[4] };
+    }
+
+    private double[] interpolateBoundaryContact(double[] previousRow, double[] currentRow) {
+        double previousX = previousRow[1];
+        double previousY = previousRow[2];
+        double currentX = currentRow[1];
+        double currentY = currentRow[2];
+        double dx = currentX - previousX;
+        double dy = currentY - previousY;
+        double[] size = golfCourse.getSize();
+
+        double contactFraction = 1.0;
+        if (dx < 0.0) {
+            contactFraction = Math.min(contactFraction, (size[0] - previousX) / dx);
+        } else if (dx > 0.0) {
+            contactFraction = Math.min(contactFraction, (size[1] - previousX) / dx);
+        }
+
+        if (dy < 0.0) {
+            contactFraction = Math.min(contactFraction, (size[2] - previousY) / dy);
+        } else if (dy > 0.0) {
+            contactFraction = Math.min(contactFraction, (size[3] - previousY) / dy);
+        }
+
+        contactFraction = Math.max(0.0, Math.min(1.0, contactFraction));
+        double contactX = previousX + dx * contactFraction;
+        double contactY = previousY + dy * contactFraction;
+
+        return new double[] {
+            contactX,
+            contactY,
+            currentRow[3],
+            currentRow[4]
+        };
+    }
+
+    private double[] fallDirection(double[] finalState, double[][] trajectory) {
+        double vx = finalState[2];
+        double vy = finalState[3];
+        double speed = Math.sqrt(vx * vx + vy * vy);
+
+        if (speed < 1e-6 && trajectory.length >= 2) {
+            double[] previousRow = trajectory[trajectory.length - 2];
+            double[] finalRow = trajectory[trajectory.length - 1];
+            vx = finalRow[1] - previousRow[1];
+            vy = finalRow[2] - previousRow[2];
+            speed = Math.sqrt(vx * vx + vy * vy);
+        }
+
+        if (speed < 1e-6) {
+            double[] size = golfCourse.getSize();
+            double centerX = (size[0] + size[1]) / 2.0;
+            double centerY = (size[2] + size[3]) / 2.0;
+            vx = finalState[0] - centerX;
+            vy = finalState[1] - centerY;
+            speed = Math.sqrt(vx * vx + vy * vy);
+        }
+
+        if (speed < 1e-6) {
+            return new double[] { 1.0, 0.0 };
+        }
+        return new double[] { vx / speed, vy / speed };
+    }
+
+    private void onShotComplete(double[] finalState, double[][] trajectory, double[] shotStartState) {
+        boolean outOfBounds = isOutOfBounds(finalState[0], finalState[1]);
+        double[] resultState = finalState;
+
+        if (outOfBounds) {
+            resultState = edgeContactState(trajectory);
+            resultState[2] = 0.0;
+            resultState[3] = 0.0;
+            ball.setPos(resultState);
+        }
+        
+        double dist = golfCourse.distanceToTarget(resultState);
         boolean inWater = golfCourse.isWater(finalState[0], finalState[1]);
-        boolean won = dist <= golfCourse.getTargetXYR()[2]; // check if ball is within target radius -> if yes player
-                                                            // wins
+        boolean won = !outOfBounds && dist <= golfCourse.getTargetXYR()[2]; // check if ball is within target radius -> if yes player wins
 
         if (shotPanel != null)
-            shotPanel.onShotLanded(finalState, dist, inWater, won);
+            shotPanel.onShotLanded(resultState, dist, inWater, outOfBounds, won);
 
-        drawObjects(finalState, trajectory, 0.0, 0.0);
+        drawObjects(resultState, trajectory, 0.0, 0.0);
     }
 
     private void attachMouseHandlers() {
@@ -458,5 +582,10 @@ public class GameCanvas {
         double wx = worldX0 + px * metersPerPixel;
         double wy = worldY0 + (CANVAS_H - py) * metersPerPixel;
         return new double[] { wx, wy };
+    }
+
+    private boolean isOutOfBounds(double x, double y) {
+        double[] size = golfCourse.getSize();
+        return x < size[0] || x > size[1] || y < size[2] || y > size[3];
     }
 }
