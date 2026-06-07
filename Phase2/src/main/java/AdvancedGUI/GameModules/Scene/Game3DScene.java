@@ -240,7 +240,7 @@ public class Game3DScene extends SubScene {
         PhongMaterial flagBannerMat = createUnlitMaterial(Color.RED);
         flagBannerNode.setMaterial(flagBannerMat);
 
-        worldGroup.getChildren().addAll(playerBall, targetHoleNode, flagPoleNode, flagBannerNode);
+        worldGroup.getChildren().addAll(playerBall, botBall, targetHoleNode, flagPoleNode, flagBannerNode);
 
         AimingArrow aimingArrow = new AimingArrow(gameManager, playerBall);
         worldGroup.getChildren().add(aimingArrow.getView());
