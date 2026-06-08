@@ -16,8 +16,16 @@ public class ManhattanBotExperiment {
         // course.usePerlinNoise = true;
         // RandomCourseGenerator.generateSeededCourse(course, seed);
 
+        // GolfCourse course = new GolfCourse();
+        // course.loadFromJson("src/main/java/Presets/Phase3Format/ExperimentCourse1.json");
+
+        // for the manual course
         GolfCourse course = new GolfCourse();
-        course.loadFromJson("src/main/java/Presets/Phase3Format/ExperimentCourse1.json");
+        course.setTerrainFormula("0.25 * sin((x+y)/10) + 1");
+        course.setFrictions(0.08, 0.2, 0.08, 0.2);
+        course.setOriginalStartPosition(7, 8);
+        course.setBallPosition(7, 8);
+        course.setTargetXYR(14, 1, 0.1);
 
         GolfODE golfODE = new GolfODE(course);
 
