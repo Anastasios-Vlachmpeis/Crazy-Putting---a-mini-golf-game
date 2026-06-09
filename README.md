@@ -78,9 +78,9 @@ Team 17:
 - Stan Wouters
 - Laurenz Warkentin
 - Anastasios Vlachmpeis
-- Angel Antonio Perez Gomez
 - Damian Volovei
 - Lilly Schulze
+- Angel Antonio Perez Gomez (dropped out)
 
 ## License
 
