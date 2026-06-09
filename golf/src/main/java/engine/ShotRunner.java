@@ -6,14 +6,14 @@ package engine;
  */
 
 import domain.course.GolfCourse;
-import physics.ShotSimulatorV2;
+import physics.ShotSimulator;
 import solvers.Solver;
 import physics.GolfODE;
 
 final class ShotRunner {
     private final GolfCourse course;
     private final Solver solver;
-    private final ShotSimulatorV2 simulator = new ShotSimulatorV2();
+    private final ShotSimulator simulator = new ShotSimulator();
 
     ShotRunner(GolfCourse course, Solver solver) {
         this.course = course;

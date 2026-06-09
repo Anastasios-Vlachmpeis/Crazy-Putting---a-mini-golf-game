@@ -3,7 +3,7 @@ package bots;
 import java.util.Random;
 
 import domain.course.GolfCourse;
-import physics.ShotSimulatorV2;
+import physics.ShotSimulator;
 //import physics.ShotSimulation;
 //import physics.ShotSimulator;
 import physics.GolfODE;
@@ -35,7 +35,7 @@ public class MLBot extends GolfBot {
         double bestDistance = Double.MAX_VALUE;
 
         GolfODE golfODE = new GolfODE(course);
-        ShotSimulatorV2 simulator = new ShotSimulatorV2();
+        ShotSimulator simulator = new ShotSimulator();
 
         double exploreChance = 0.2; // chance to explore the map randomly to hpefully get a better shot
 

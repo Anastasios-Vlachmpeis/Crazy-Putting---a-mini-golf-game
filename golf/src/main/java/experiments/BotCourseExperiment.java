@@ -3,7 +3,7 @@ package experiments;
 
 import bots.*;
 import domain.course.*;
-import physics.ShotSimulatorV2;
+import physics.ShotSimulator;
 import solvers.RungeKuttaSolver;
 import physics.GolfODE;
 
@@ -16,7 +16,7 @@ public class BotCourseExperiment {
     public static void main(String[] args) {
         GolfCourse course = new GolfCourse(0, 0);
         GolfODE golfODE = new GolfODE(course);
-        ShotSimulatorV2 simulator = new ShotSimulatorV2();
+        ShotSimulator simulator = new ShotSimulator();
 
         RungeKuttaSolver solver = new RungeKuttaSolver();
         //PhysicsShotSimulator shotSim = new PhysicsShotSimulator(course, solver);

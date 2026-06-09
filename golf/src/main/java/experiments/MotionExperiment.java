@@ -1,7 +1,7 @@
 package experiments;
 
 import domain.course.*;
-import physics.ShotSimulatorV2;
+import physics.ShotSimulator;
 import solvers.RungeKuttaSolver;
 import physics.GolfODE;
 
@@ -13,7 +13,7 @@ public class MotionExperiment {
 
         //double[][] results = solver.solveBall(course, ball.getState(), 1);
         GolfODE golfODE = new GolfODE(course);
-        ShotSimulatorV2 simulator = new ShotSimulatorV2();
+        ShotSimulator simulator = new ShotSimulator();
         double[][] solution = simulator.schoot(golfODE, new RungeKuttaSolver(), ball.getState(), 1);
 
         //for (double[] row : results) {

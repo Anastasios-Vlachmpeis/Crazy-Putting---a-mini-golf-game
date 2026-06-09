@@ -2,7 +2,7 @@ package ui.simple;
 
 import java.util.Arrays;
 import domain.course.*;
-import physics.ShotSimulatorV2;
+import physics.ShotSimulator;
 import solvers.RungeKuttaSolver;
 import physics.GolfODE;
 
@@ -16,7 +16,7 @@ import javafx.animation.Timeline;
 
 public class GameCanvas {
 
-    ShotSimulatorV2 simulator = new ShotSimulatorV2();
+    ShotSimulator simulator = new ShotSimulator();
 
     // fixed canvas pixel size
     private static final double CANVAS_W = 800.0;

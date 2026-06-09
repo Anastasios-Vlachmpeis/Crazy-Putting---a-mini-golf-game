@@ -1,12 +1,12 @@
 package bots.helpers;
 
 import domain.course.GolfCourse;
-import physics.ShotSimulatorV2;
+import physics.ShotSimulator;
 import solvers.Solver;
 import physics.GolfODE;
 
 /**
- * This runs one simulated putt for the search bots (using ShotSimulatorV2 this time)
+ * This runs one simulated putt for the search bots (using ShotSimulator this time)
  * and tracks the closest the ball got to the hole 
  */
 public final class BotShotTrial {
@@ -28,7 +28,7 @@ public final class BotShotTrial {
 
         double[] state = { start[0], start[1], v0x, v0y };
         
-        double[][] trajectory = new ShotSimulatorV2().schoot(ode, solver, state, STEP_SIZE);
+        double[][] trajectory = new ShotSimulator().schoot(ode, solver, state, STEP_SIZE);
 
         double closestDistance = Double.MAX_VALUE;
         double missXAtClosest = 0.0;

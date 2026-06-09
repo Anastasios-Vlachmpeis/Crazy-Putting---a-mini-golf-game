@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 import domain.course.GolfCourse;
-import physics.ShotSimulatorV2;
+import physics.ShotSimulator;
 import physics.GolfODE;
 import solvers.RungeKuttaSolver;
 import solvers.Solver;
@@ -43,7 +43,7 @@ public class HillBot extends GolfBot {
         double bestDistance = Double.MAX_VALUE;
 
         GolfODE golfODE = new GolfODE(course);
-        ShotSimulatorV2 simulator = new ShotSimulatorV2();
+        ShotSimulator simulator = new ShotSimulator();
 
         double impact = 1;
         double minImpact = 0.001; // had to add this otherwise it would take forever

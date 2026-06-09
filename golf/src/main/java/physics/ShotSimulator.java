@@ -9,7 +9,7 @@ import domain.obstacles.Wall;
 import solvers.Solver;
 import physics.GolfODE;
 
-public class ShotSimulatorV2 {
+public class ShotSimulator {
     
     //state {x, y, vx, vy}
     //h stepsize

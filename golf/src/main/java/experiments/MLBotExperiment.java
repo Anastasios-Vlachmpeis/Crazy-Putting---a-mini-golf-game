@@ -3,7 +3,7 @@ package experiments;
 import bots.*;
 import domain.course.*;
 import domain.terrain.*;
-import physics.ShotSimulatorV2;
+import physics.ShotSimulator;
 import solvers.RungeKuttaSolver;
 import physics.GolfODE;
 
@@ -31,7 +31,7 @@ public class MLBotExperiment {
         GolfODE golfODE = new GolfODE(course);
 
         // create simulator and solver
-        ShotSimulatorV2 simulator = new ShotSimulatorV2();
+        ShotSimulator simulator = new ShotSimulator();
         RungeKuttaSolver solver = new RungeKuttaSolver();
 
         // get targer
