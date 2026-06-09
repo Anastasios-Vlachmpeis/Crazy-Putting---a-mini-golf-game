@@ -132,7 +132,7 @@ public class GameManager {
         // Wrap the course map inside your differential physics container
         GolfODE physicsEngine = new GolfODE(course); 
         // Process full resolution trajectory array path output matrices
-        double[][] trajectory = simulator.schoot(physicsEngine, solver, startState, stepSize); 
+        double[][] trajectory = simulator.schoot(physicsEngine, solver, startState, course.getStepSize()); 
         updateWaterRecoveryPosition(trajectory);
         updateEdgeRecoveryPosition(trajectory);
 
