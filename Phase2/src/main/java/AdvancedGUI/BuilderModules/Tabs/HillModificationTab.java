@@ -10,6 +10,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
@@ -77,12 +78,21 @@ public class HillModificationTab extends BorderPane{
         widthSlider.valueProperty().addListener((obs, oldVal, newVal) -> 
             widthLabel.setText(String.format("Width: %.1f", newVal))
         );
+
+        Button resetHeightButton = new Button("Reset Height");
+        resetHeightButton.setMaxWidth(Double.MAX_VALUE);
+        resetHeightButton.setOnAction(e -> {
+            course.clearAllHills();
+            coursePreview.updatePreview();
+        });
     
         rightMenu.getChildren().addAll(
             title, 
             instructions,
             strengthLabel, strengthSlider, 
-            widthLabel, widthSlider
+            widthLabel, widthSlider,
+            new Separator(),
+            resetHeightButton
         );
 
         //combine BorderPane
