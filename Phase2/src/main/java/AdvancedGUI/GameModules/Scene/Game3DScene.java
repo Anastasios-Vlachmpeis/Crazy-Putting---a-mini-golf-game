@@ -321,9 +321,8 @@ public class Game3DScene extends SubScene {
         }
 
         for (Wall wall : course.getWalls()) {
-            Box wallNode = createClippedWall(wall, courseSize);
+            Group wallNode = createClippedWall(wall, courseSize, wallMat);
             if (wallNode != null) {
-                wallNode.setMaterial(wallMat);
                 obstacleGroup.getChildren().add(wallNode);
             }
         }
@@ -331,7 +330,7 @@ public class Game3DScene extends SubScene {
         worldGroup.getChildren().add(obstacleGroup);
     }
 
-    private Box createClippedWall(Wall wall, double[] courseSize) {
+    private Group createClippedWall(Wall wall, double[] courseSize, PhongMaterial wallMat) {
         double[] clippedLine = clipLineToCourseBounds(
             wall.getStartX(),
             wall.getStartY(),
@@ -354,17 +353,30 @@ public class Game3DScene extends SubScene {
             return null;
         }
 
+        int samples = Math.max(2, (int) Math.ceil(length / 0.5));
+        double groundHeight = Double.POSITIVE_INFINITY;
+        double angleDegrees = -Math.toDegrees(Math.atan2(dy, dx));
+
+        for (int i = 0; i <= samples; i++) {
+            double t = i / (double) samples;
+            double sampleX = startX + dx * t;
+            double sampleY = startY + dy * t;
+            groundHeight = Math.min(groundHeight, gameManager.getTerrainHeight(sampleX, sampleY));
+        }
+
         double centerX = (startX + endX) / 2.0;
         double centerY = (startY + endY) / 2.0;
-        double terrainHeight = gameManager.getTerrainHeight(centerX, centerY);
-
         Box wallNode = new Box(length, wall.getHeight(), wall.getThickness());
+        wallNode.setMaterial(wallMat);
         wallNode.setTranslateX(centerX);
-        wallNode.setTranslateY(-terrainHeight - wall.getHeight() / 2.0);
+        wallNode.setTranslateY(-groundHeight - wall.getHeight() / 2.0);
         wallNode.setTranslateZ(centerY);
         wallNode.setRotationAxis(Rotate.Y_AXIS);
-        wallNode.setRotate(-Math.toDegrees(Math.atan2(dy, dx)));
-        return wallNode;
+        wallNode.setRotate(angleDegrees);
+
+        Group wallGroup = new Group();
+        wallGroup.getChildren().add(wallNode);
+        return wallGroup;
     }
 
     private double[] clipLineToCourseBounds(double startX, double startY, double endX, double endY, double[] courseSize) {
