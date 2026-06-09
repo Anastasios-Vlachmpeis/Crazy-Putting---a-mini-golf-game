@@ -1,8 +1,7 @@
 package Experiment;
 
-import Bots.*;
-import GolfCourseData.*;
-import GolfCourseData.RandomTerrainGeneration.*;
+import Bots.NewtonBot;
+import GolfCourseData.GolfCourse;
 import ShotEngine.ShotSimulatorV2;
 import Solvers.RungeKuttaSolver;
 import Systems.GolfODE;
@@ -21,11 +20,14 @@ public class NewtonBotExperiment {
 
         // for the manual course
         GolfCourse course = new GolfCourse();
-        course.setTerrainFormula("0.25 * sin((x+y)/10) + 1");
-        course.setFrictions(0.08, 0.2, 0.08, 0.2);
-        course.setOriginalStartPosition(7, 8);
-        course.setBallPosition(7, 8);
-        course.setTargetXYR(14, 1, 0.1);
+
+        course.loadFromJson("src/main/java/Presets/Phase3Format/WaterExperiment.json");
+        
+        // course.setTerrainFormula("0.25 * sin((x+y)/10) + 1");
+        // course.setFrictions(0.08, 0.2, 0.08, 0.2);
+        // course.setOriginalStartPosition(7, 8);
+        // course.setBallPosition(7, 8);
+        // course.setTargetXYR(14, 1, 0.1);
 
         GolfODE golfODE = new GolfODE(course);
 
@@ -40,6 +42,7 @@ public class NewtonBotExperiment {
         int finishedGames = 0; // nr of times the bot got the ball in the hole
         double nrShots = 0;
         double nrIterations = 0;
+        int waterHits = 0;
 
         for (int i = 0; i < 1000; i++) {
             // reset ball for each new game
@@ -69,7 +72,13 @@ public class NewtonBotExperiment {
                     finishedGames++;
                     break;
                 }
-                course.setBallPosition(fx, fy);
+                if (course.isWater(fx, fy)) {
+                    waterHits++;
+                    nrShots++;
+                    course.setBallPosition(ballPosition[0], ballPosition[1]);
+                } else {
+                    course.setBallPosition(fx, fy);
+                }
             }
         }
         double avg = nrShots / finishedGames;
@@ -77,5 +86,6 @@ public class NewtonBotExperiment {
         System.out.println("Finished games: " + finishedGames);
         System.out.println("Avg Shots: " + avg);
         System.out.println("Avg iterations: " + avgIterations);
+        System.out.println("Avg water penalties per game: " + ((double) waterHits / 1000));
     }
 }
