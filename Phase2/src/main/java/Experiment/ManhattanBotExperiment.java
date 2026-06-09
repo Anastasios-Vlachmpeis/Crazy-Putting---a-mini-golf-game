@@ -1,8 +1,7 @@
 package Experiment;
 
-import Bots.*;
-import GolfCourseData.*;
-import GolfCourseData.RandomTerrainGeneration.*;
+import Bots.ManhattanBot;
+import GolfCourseData.GolfCourse;
 import ShotEngine.ShotSimulatorV2;
 import Solvers.RungeKuttaSolver;
 import Systems.GolfODE;
@@ -17,7 +16,7 @@ public class ManhattanBotExperiment {
         // RandomCourseGenerator.generateSeededCourse(course, seed);
 
         GolfCourse course = new GolfCourse();
-        course.loadFromJson("src/main/java/Presets/Phase3Format/ExperimentCourse1.json");
+        course.loadFromJson("src/main/java/Presets/Phase3Format/WaterExperiment.json");
 
         GolfODE golfODE = new GolfODE(course);
 
@@ -32,6 +31,7 @@ public class ManhattanBotExperiment {
         int finishedGames = 0; // nr of times the bot got the ball in the hole
         double nrShots = 0;
         double nrIterations = 0;
+        int waterHits = 0;
 
         for (int i = 0; i < 1000; i++) {
             // reset ball for each new game
@@ -61,7 +61,13 @@ public class ManhattanBotExperiment {
                     finishedGames++;
                     break;
                 }
-                course.setBallPosition(fx, fy);
+                if (course.isWater(fx, fy)) {
+                    waterHits++;
+                    nrShots++;
+                    course.setBallPosition(ballPosition[0], ballPosition[1]);
+                } else {
+                    course.setBallPosition(fx, fy);
+                }
             }
         }
         double avg = nrShots / finishedGames;
@@ -69,5 +75,6 @@ public class ManhattanBotExperiment {
         System.out.println("Finished games: " + finishedGames);
         System.out.println("Avg Shots: " + avg);
         System.out.println("Avg iterations: " + avgIterations);
+        System.out.println("Avg water penalties per game: " + ((double) waterHits / 1000));
     }
 }
