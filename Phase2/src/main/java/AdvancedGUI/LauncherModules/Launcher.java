@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import AdvancedGUI.BuilderModules.GUI_courseBuilder;
 import AdvancedGUI.GameModules.GUI_Game;
+import Bots.*;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -62,8 +63,10 @@ public class Launcher extends Application{
         Button multiPlayerButton = new Button("Multiplayer");
         styleGameButton(multiPlayerButton);
         multiPlayerButton.setOnAction(e -> {
-            String chosenBot = settings.getSelectedBot();
-            game.show(true, chosenBot);
+            String chosenBotName = settings.getSelectedBot();
+            GolfBot bot = createBot(chosenBotName, course, solver);
+            gameManager.setMultiplayerMode(true, bot);
+            game.show(true, bot); 
         });
 
         Button builderButton = new Button("Open Builder");
@@ -163,4 +166,16 @@ public class Launcher extends Application{
             }
         });
     }
+
+    private GolfBot createBot(String botName, GolfCourse course, Solver solver) {
+    return switch (botName) {
+        case "ML Bot" -> new MLBot(course, solver);
+        case "Hill Bot" -> new HillBot(course, solver);
+        case "ManHattan Bot" -> new ManhattanBot(course, solver);
+        case "Newton Bot" -> new NewtonBot(course, solver);
+        case "Simple Bot" -> new SimpleBot(course, solver);
+        default -> new SimpleBot(course, solver);
+    };
 }
+}
+

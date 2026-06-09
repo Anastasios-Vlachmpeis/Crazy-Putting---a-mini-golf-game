@@ -67,6 +67,7 @@ public class GameManager {
 
     public double[] getBotShot() {
         if (activeBot != null) {
+            System.out.println("Active bot: " + activeBot.getClass().getSimpleName());
             return activeBot.shoot();
         }
         return new double[]{0, 0};
@@ -132,7 +133,7 @@ public class GameManager {
         // Wrap the course map inside your differential physics container
         GolfODE physicsEngine = new GolfODE(course); 
         // Process full resolution trajectory array path output matrices
-        double[][] trajectory = simulator.schoot(physicsEngine, solver, startState, stepSize); 
+        double[][] trajectory = simulator.schoot(physicsEngine, solver, startState, course.getStepSize()); 
         updateWaterRecoveryPosition(trajectory);
         updateEdgeRecoveryPosition(trajectory);
 
