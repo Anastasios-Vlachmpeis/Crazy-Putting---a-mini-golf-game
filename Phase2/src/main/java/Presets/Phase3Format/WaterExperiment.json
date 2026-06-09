@@ -1,0 +1,178 @@
+{
+  "epsilon": 1.0E-7,
+  "frictionValues": [
+    0.15,
+    0.5,
+    0.3,
+    0.75
+  ],
+  "targetValues": [
+    7.74353120243531,
+    8.904109589041097,
+    0.35
+  ],
+  "currentBallPosition": [
+    -7.857686453576866,
+    -7.477168949771686,
+    0.0
+  ],
+  "initialBallPosition": [
+    -7.857686453576866,
+    -7.477168949771686,
+    0.0
+  ],
+  "terrainFormula": "1",
+  "size": [
+    -12.5,
+    12.5,
+    -12.5,
+    12.5
+  ],
+  "borderSteepness": 2.0,
+  "sandPits": [],
+  "trees": [],
+  "walls": [],
+  "stepSize": 0.01,
+  "usePerlinNoise": false,
+  "widthScale": 0.2,
+  "heightScale": 1.0,
+  "noiseOffset": 0.0,
+  "TerrainManipulator": {
+    "hills": [
+      {
+        "centerX": -12.233637747336378,
+        "centerY": 12.214611872146119,
+        "peakHeight": 1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -11.834094368340944,
+        "centerY": 11.796042617960426,
+        "peakHeight": 1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -8.99923896499239,
+        "centerY": 10.159817351598173,
+        "peakHeight": 1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -7.933789954337899,
+        "centerY": 9.15144596651446,
+        "peakHeight": 1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -7.191780821917808,
+        "centerY": 7.4961948249619486,
+        "peakHeight": -1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -9.379756468797565,
+        "centerY": 8.732876712328768,
+        "peakHeight": -1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -10.920852359208524,
+        "centerY": 10.540334855403346,
+        "peakHeight": -1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -11.967275494672757,
+        "centerY": 11.986301369863014,
+        "peakHeight": -1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -11.681887366818875,
+        "centerY": 11.872146118721462,
+        "peakHeight": -1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -11.092085235920853,
+        "centerY": 10.768645357686452,
+        "peakHeight": -1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -8.618721461187215,
+        "centerY": 8.69482496194825,
+        "peakHeight": -1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -7.762557077625571,
+        "centerY": 7.686453576864537,
+        "peakHeight": -1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -5.593607305936075,
+        "centerY": 6.659056316590564,
+        "peakHeight": -1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -5.593607305936075,
+        "centerY": 6.659056316590564,
+        "peakHeight": -1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -4.4330289193302885,
+        "centerY": 5.194063926940638,
+        "peakHeight": -1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -2.092846270928462,
+        "centerY": 3.177321156773211,
+        "peakHeight": -1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -0.6088280060882796,
+        "centerY": 1.8645357686453572,
+        "peakHeight": -1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": 2.1118721461187215,
+        "centerY": -0.6468797564687997,
+        "peakHeight": -1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -12.195585996955861,
+        "centerY": 12.290715372907155,
+        "peakHeight": -1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -12.195585996955861,
+        "centerY": 12.290715372907155,
+        "peakHeight": -1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -8.143074581430747,
+        "centerY": 12.252663622526637,
+        "peakHeight": -1.0,
+        "width": 2.0
+      },
+      {
+        "centerX": -8.143074581430747,
+        "centerY": 12.252663622526637,
+        "peakHeight": -1.0,
+        "width": 2.0
+      }
+    ],
+    "lastFormula": "1"
+  },
+  "globalElevation": 0.0
+}
