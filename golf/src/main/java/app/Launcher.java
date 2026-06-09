@@ -41,6 +41,7 @@ public class Launcher extends Application{
         );
 
         GolfCourse course = new GolfCourse();
+        loadDefaultCourse(course);
         Solver solver = new RungeKuttaSolver();
         GameManager gameManager = new GameManager(course, solver);
 
@@ -177,4 +178,12 @@ public class Launcher extends Application{
         default -> new SimpleBot(course, solver);
     };
 }
+
+    private void loadDefaultCourse(GolfCourse course) {
+        try {
+            course.loadFromJsonResource("/Presets/Phase3Format/StartingCourse25x25.json");
+        } catch (Exception exception) {
+            System.err.println("Could not load default course preset. Falling back to built-in course: " + exception.getMessage());
+        }
+    }
 }

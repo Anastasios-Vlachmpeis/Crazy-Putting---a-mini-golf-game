@@ -1,0 +1,108 @@
+{
+  "epsilon": 1.0E-7,
+  "frictionValues": [
+    0.15,
+    0.5,
+    0.3,
+    0.75
+  ],
+  "targetValues": [
+    8.75,
+    8.5,
+    0.35
+  ],
+  "currentBallPosition": [
+    -8.75,
+    -8.5,
+    0.0
+  ],
+  "initialBallPosition": [
+    -8.75,
+    -8.5,
+    0.0
+  ],
+  "terrainFormula": "0.25 * sin(x / 2.5) + 0.18 * cos(y / 3.0) + 0.15",
+  "size": [
+    -12.5,
+    12.5,
+    -12.5,
+    12.5
+  ],
+  "borderSteepness": 2.0,
+  "sandPits": [
+    {
+      "centerX": -2.8,
+      "centerY": 3.0,
+      "radius": 1.8,
+      "miuK": 0.35,
+      "miuS": 0.65
+    },
+    {
+      "centerX": 5.25,
+      "centerY": -2.75,
+      "radius": 1.5,
+      "miuK": 0.35,
+      "miuS": 0.65
+    }
+  ],
+  "trees": [
+    {
+      "centerX": -5.0,
+      "centerY": 1.0,
+      "radius": 0.85
+    },
+    {
+      "centerX": 2.0,
+      "centerY": -5.25,
+      "radius": 0.85
+    },
+    {
+      "centerX": 6.75,
+      "centerY": 4.0,
+      "radius": 0.85
+    }
+  ],
+  "walls": [
+    {
+      "startX": -1.0,
+      "startY": -1.5,
+      "endX": 2.75,
+      "endY": 1.25,
+      "thickness": 0.35,
+      "height": 1.0
+    }
+  ],
+  "stepSize": 0.01,
+  "usePerlinNoise": false,
+  "widthScale": 0.2,
+  "heightScale": 1.0,
+  "noiseOffset": 0.0,
+  "TerrainManipulator": {
+    "hills": [
+      {
+        "centerX": -4.5,
+        "centerY": -2.5,
+        "peakHeight": 0.9,
+        "width": 2.6
+      },
+      {
+        "centerX": 2.5,
+        "centerY": 3.5,
+        "peakHeight": -0.75,
+        "width": 2.4
+      },
+      {
+        "centerX": 7.0,
+        "centerY": 7.0,
+        "peakHeight": 0.55,
+        "width": 2.0
+      },
+      {
+        "centerX": -7.0,
+        "centerY": 6.5,
+        "peakHeight": -0.45,
+        "width": 2.2
+      }
+    ]
+  }
+}

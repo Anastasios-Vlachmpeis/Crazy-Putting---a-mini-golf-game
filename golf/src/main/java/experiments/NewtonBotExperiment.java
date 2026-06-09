@@ -21,7 +21,7 @@ public class NewtonBotExperiment {
         // for the manual course
         GolfCourse course = new GolfCourse();
 
-        course.loadFromJson("src/main/java/Presets/Phase3Format/WaterExperiment.json");
+        course.loadFromJson("src/main/resources/Presets/Phase3Format/WaterExperiment.json");
         
         // course.setTerrainFormula("0.25 * sin((x+y)/10) + 1");
         // course.setFrictions(0.08, 0.2, 0.08, 0.2);

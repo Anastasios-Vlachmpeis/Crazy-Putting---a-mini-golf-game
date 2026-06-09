@@ -77,6 +77,12 @@ public class GolfCourse {
         System.out.println("Course properties successfully deserialized from JSON.");
     }
 
+    public void loadFromJsonResource(String resourcePath) throws Exception {
+        GolfCourseJsonPersistence.LoadedCourse loadedCourse = GolfCourseJsonPersistence.loadResource(resourcePath);
+        applyLoadedCourse(loadedCourse);
+        System.out.println("Default course preset successfully loaded.");
+    }
+
     private void applyLoadedCourse(GolfCourseJsonPersistence.LoadedCourse loadedCourse) {
         GolfCourse loadedData = loadedCourse.course();
 

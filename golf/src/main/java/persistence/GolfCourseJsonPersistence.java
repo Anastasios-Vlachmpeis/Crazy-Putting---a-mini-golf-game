@@ -7,6 +7,8 @@ package persistence;
 
 import java.io.Reader;
 import java.io.Writer;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -30,15 +32,33 @@ public final class GolfCourseJsonPersistence {
 
     public static void save(GolfCourse course, String filePath) throws Exception {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Path path = Path.of(filePath);
+        Path parent = path.getParent();
+        if (parent != null) {
+            Files.createDirectories(parent);
+        }
 
-        try (Writer writer = Files.newBufferedWriter(Path.of(filePath))) {
+        try (Writer writer = Files.newBufferedWriter(path)) {
             gson.toJson(course, writer);
         }
     }
 
     public static LoadedCourse load(String filePath) throws Exception {
+        return loadJson(Files.readString(Path.of(filePath)));
+    }
+
+    public static LoadedCourse loadResource(String resourcePath) throws Exception {
+        try (InputStream inputStream = GolfCourseJsonPersistence.class.getResourceAsStream(resourcePath)) {
+            if (inputStream == null) {
+                throw new IllegalArgumentException("Course preset resource not found: " + resourcePath);
+            }
+            String json = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            return loadJson(json);
+        }
+    }
+
+    private static LoadedCourse loadJson(String json) throws Exception {
         Gson gson = new Gson();
-        String json = Files.readString(Path.of(filePath));
 
         try (Reader reader = new java.io.StringReader(json)) {
             GolfCourse course = gson.fromJson(reader, GolfCourse.class);

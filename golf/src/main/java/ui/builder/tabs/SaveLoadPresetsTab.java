@@ -12,9 +12,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
+import java.nio.file.Path;
 import javafx.scene.control.Separator;
 
 public class SaveLoadPresetsTab extends BorderPane{
+
+    private static final Path PRESET_DIRECTORY = Path.of("src", "main", "resources", "Presets", "Phase3Format");
 
     private CoursePreview coursePreview;
 
@@ -47,9 +50,8 @@ public class SaveLoadPresetsTab extends BorderPane{
                 if (!fileName.toLowerCase().endsWith(".json")) {
                     fileName += ".json";
                 }
-                // Add an actual filename to the destination path
-                String fullPath = "src/main/java/Presets/Phase3Format/" + fileName;
-                course.saveToJson(fullPath);
+                Path fullPath = PRESET_DIRECTORY.resolve(fileName);
+                course.saveToJson(fullPath.toString());
                 System.out.println("Successfully saved as: " + fileName);
 
             } catch (Exception ex) {
@@ -69,7 +71,7 @@ public class SaveLoadPresetsTab extends BorderPane{
             fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("Golf Course Presets (*.json)", "*.json")
             );
-            File presetsDirectory = new File("src/main/java/Presets/Phase3Format");
+            File presetsDirectory = PRESET_DIRECTORY.toFile();
             if (presetsDirectory.exists() && presetsDirectory.isDirectory()) {
                 fileChooser.setInitialDirectory(presetsDirectory);
             }
