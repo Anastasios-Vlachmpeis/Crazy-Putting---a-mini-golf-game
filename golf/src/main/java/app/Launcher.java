@@ -1,27 +1,32 @@
 package app;
 
+import bots.GolfBot;
+import bots.HillBot;
+import bots.MLBot;
+import bots.ManhattanBot;
+import bots.NewtonBot;
+import bots.SimpleBot;
 import domain.course.GolfCourse;
+import engine.GameManager;
 import javafx.application.Application;
-import javafx.stage.Stage;
-import ui.builder.GUI_courseBuilder;
-import ui.game.GUI_Game;
-import bots.*;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import engine.GameManager;
-import solvers.Solver;
-import solvers.RungeKuttaSolver;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.effect.DropShadow;
-import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
+import javafx.stage.Stage;
+import solvers.RungeKuttaSolver;
+import solvers.Solver;
+import ui.builder.GUI_courseBuilder;
+import ui.game.GUI_Game;
 
 public class Launcher extends Application{
 
@@ -48,7 +53,9 @@ public class Launcher extends Application{
         this.builder = new GUI_courseBuilder(course);
         this.settings = new Settings(course);
         this.game = new GUI_Game(course, gameManager);
-
+        this.game.getMainGameContainer().setBotSupplier(() -> 
+        createBot(settings.getSelectedBot(), course, solver));
+        
         //Add Big launcher title
         Label gameName = new Label("Crazy Putting!");
         gameName.setPadding(new Insets(80, 10, 100, 10));
