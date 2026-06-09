@@ -34,7 +34,6 @@ public class HillBot extends GolfBot {
     }
 
     public double[] shoot() {
-        System.out.println("start HillBot");
         iterations = 0;
         double[] target = course.getTargetXYR();
         double tRadius = target[2];

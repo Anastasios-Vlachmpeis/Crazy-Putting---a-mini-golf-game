@@ -67,6 +67,7 @@ public class GameManager {
 
     public double[] getBotShot() {
         if (activeBot != null) {
+            System.out.println("Active bot: " + activeBot.getClass().getSimpleName());
             return activeBot.shoot();
         }
         return new double[]{0, 0};

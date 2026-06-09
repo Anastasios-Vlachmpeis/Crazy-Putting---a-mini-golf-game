@@ -2,6 +2,7 @@ package AdvancedGUI.GameModules;
 
 import GolfCourseData.GolfCourse;
 import AdvancedGUI.GameModules.Scene.MainGameContainer;
+import Bots.GolfBot;
 import GameEngine.GameManager;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -20,7 +21,7 @@ public class GUI_Game{
         return gameContainer;
     }
 
-    public void show(boolean isMultiplayer, String botName) {
+    public void show(boolean isMultiplayer, GolfBot botName) {
         gameContainer.setVisible(true);
         mainGameContainer.setMultiplayerMode(isMultiplayer, botName);
         mainGameContainer.refreshCourseFromBuilder();

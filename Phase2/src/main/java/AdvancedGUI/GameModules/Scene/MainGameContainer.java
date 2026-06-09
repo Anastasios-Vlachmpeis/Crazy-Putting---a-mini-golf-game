@@ -277,16 +277,8 @@ public class MainGameContainer extends StackPane {
         currentDropTimeline.play();
     }
 
-    public void setMultiplayerMode(boolean isMultiplayer, String botName) {
-        Bots.GolfBot bot = null;
-        if (isMultiplayer && botName != null) {
-            if (botName.equals("Simple Bot")) {
-                bot = new Bots.SimpleBot(gameManager.getCourse(), gameManager.getSolver());
-            } else if (botName.equals("ML Bot")) {
-                bot = new Bots.MLBot(gameManager.getCourse(), gameManager.getSolver());
-            } //Add all other bots
-        }
-        gameManager.setMultiplayerMode(isMultiplayer, bot);
+    public void setMultiplayerMode(boolean isMultiplayer, GolfBot bot) {
+        this.gameManager.setMultiplayerMode(isMultiplayer, bot);
     }
 
     private void triggerBotTurn() {
