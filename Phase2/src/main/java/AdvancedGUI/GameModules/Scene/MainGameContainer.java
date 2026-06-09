@@ -8,6 +8,7 @@ import GameEngine.ShotResult;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Window;
@@ -271,7 +272,9 @@ public class MainGameContainer extends StackPane {
             targetHeight,
             () -> {
                 currentDropTimeline = null;
-                showModalAlert("We have a Winner!", winnerName + " completed the course in " + finalScore + " strokes.");
+                Platform.runLater(() ->
+                    showModalAlert("We have a Winner!", winnerName + " completed the course in " + finalScore + " strokes.")
+                );
             }
         );
         currentDropTimeline.play();

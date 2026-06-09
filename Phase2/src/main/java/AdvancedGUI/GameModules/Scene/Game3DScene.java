@@ -11,9 +11,11 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.geometry.Point3D;
 import javafx.scene.*;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.PickResult;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial; //how material looks 
 import javafx.scene.shape.Box;
@@ -27,6 +29,9 @@ import javafx.util.Duration;
 import java.util.function.Consumer;
 
 public class Game3DScene extends SubScene {
+
+    private static final double TERRAIN_SHADOW_FLOOR = 0.22;
+    private static final double OBJECT_SHADOW_FLOOR = 0.18;
 
     private final GameManager gameManager;
     private final Group rootGroup;
@@ -48,6 +53,8 @@ public class Game3DScene extends SubScene {
     private double zoomMultiplier = 1.0;
     private double cameraCenterX;
     private double cameraCenterZ;
+    private double cameraFocusX;
+    private double cameraFocusZ;
     private double cameraMaxDim;
 
     public Game3DScene(GameManager gameManager, double width, double height) {
@@ -135,7 +142,10 @@ public class Game3DScene extends SubScene {
         // Apply a green material to the terrain
         MeshView meshView = new MeshView(mesh);
         PhongMaterial grassMat = new PhongMaterial();
-        grassMat.setDiffuseMap(createHeightShadeTexture());
+        WritableImage heightShadeTexture = createHeightShadeTexture(1.0);
+        grassMat.setDiffuseMap(heightShadeTexture);
+        grassMat.setSelfIlluminationMap(createHeightShadeTexture(TERRAIN_SHADOW_FLOOR));
+        grassMat.setSpecularColor(Color.TRANSPARENT);
         meshView.setMaterial(grassMat);
         //Proper culling
         meshView.setCullFace(CullFace.NONE);
@@ -157,6 +167,8 @@ public class Game3DScene extends SubScene {
 
         cameraCenterX = (minX + maxX) / 2.0;
         cameraCenterZ = (minY + maxY) / 2.0;
+        cameraFocusX = cameraCenterX;
+        cameraFocusZ = cameraCenterZ;
         cameraMaxDim = maxDim;
 
         camera = new PerspectiveCamera(true);
@@ -175,8 +187,17 @@ public class Game3DScene extends SubScene {
         yRotate.angleProperty().bind(angleY);
 
         this.setOnScroll(event -> {
+            Point3D zoomAnchor = getWorldPointUnderCursor(event);
+            double oldZoomMultiplier = zoomMultiplier;
             double zoomStep = event.getDeltaY() > 0 ? 0.9 : 1.1;
             zoomMultiplier = clamp(zoomMultiplier * zoomStep, 0.35, 2.5);
+
+            if (zoomAnchor != null && zoomMultiplier != oldZoomMultiplier) {
+                double zoomRatio = zoomMultiplier / oldZoomMultiplier;
+                cameraFocusX = zoomAnchor.getX() - ((zoomAnchor.getX() - cameraFocusX) * zoomRatio);
+                cameraFocusZ = zoomAnchor.getZ() - ((zoomAnchor.getZ() - cameraFocusZ) * zoomRatio);
+            }
+
             updateCameraZoom();
             event.consume();
         });
@@ -190,10 +211,20 @@ public class Game3DScene extends SubScene {
     private void updateCameraZoom() {
         if (camera == null) return;
 
-        camera.setTranslateX(cameraCenterX);
-        camera.setTranslateZ(cameraCenterZ - (cameraMaxDim * 1.2 * zoomMultiplier));
+        camera.setTranslateX(cameraFocusX);
+        camera.setTranslateZ(cameraFocusZ - (cameraMaxDim * 1.2 * zoomMultiplier));
         // GODS view
         camera.setTranslateY(-(cameraMaxDim * 0.8 * zoomMultiplier));
+    }
+
+    private Point3D getWorldPointUnderCursor(javafx.scene.input.ScrollEvent event) {
+        PickResult pickResult = event.getPickResult();
+        if (pickResult == null || pickResult.getIntersectedNode() == null || pickResult.getIntersectedPoint() == null) {
+            return null;
+        }
+
+        Point3D scenePoint = pickResult.getIntersectedNode().localToScene(pickResult.getIntersectedPoint());
+        return worldGroup.sceneToLocal(scenePoint);
     }
 
     private double clamp(double value, double min, double max) {
@@ -206,14 +237,14 @@ public class Game3DScene extends SubScene {
         return (greenIntensity - 0.1) / 0.8;
     }
 
-    private WritableImage createHeightShadeTexture() {
+    private WritableImage createHeightShadeTexture(double brightness) {
         int width = 256;
         WritableImage image = new WritableImage(width, 1);
         PixelWriter writer = image.getPixelWriter();
 
         for (int x = 0; x < width; x++) {
             double greenIntensity = 0.1 + (x / (double)(width - 1)) * 0.8;
-            writer.setColor(x, 0, Color.color(0.2, greenIntensity, 0.2));
+            writer.setColor(x, 0, Color.color(0.2 * brightness, greenIntensity * brightness, 0.2 * brightness));
         }
 
         return image;
@@ -226,7 +257,7 @@ public class Game3DScene extends SubScene {
         //ballMat.setSpecularColor(Color.LIGHTGRAY);
         //ballNode.setMaterial(ballMat);
 
-        botBall = new Sphere(0.095);//little bit smaller to prevent clipping
+        botBall = new Sphere(0.25);
         botBall.setMaterial(new PhongMaterial(Color.web("#f39c12")));
         botBall.setVisible(false);//make invisible in case of singleplayer
 
@@ -259,8 +290,8 @@ public class Game3DScene extends SubScene {
         double[] courseSize = course.getSize();
 
         PhongMaterial sandMat = createSandMaterial();
-        PhongMaterial trunkMat = new PhongMaterial(Color.web("#7a4c24"));
-        PhongMaterial leafMat = new PhongMaterial(Color.web("#1f6b3a"));
+        PhongMaterial trunkMat = createLitMaterial(Color.web("#7a4c24"));
+        PhongMaterial leafMat = createLitMaterial(Color.web("#1f6b3a"));
         PhongMaterial wallMat = new PhongMaterial(Color.web("#3f3f3f"));
 
         for (Sand sand : course.getSandPits()) {
@@ -446,12 +477,14 @@ public class Game3DScene extends SubScene {
 
     private PhongMaterial createSandMaterial() {
         PhongMaterial material = new PhongMaterial(Color.web("#cfae62"));
-        material.setDiffuseMap(createSandTexture());
-        material.setSpecularColor(Color.web("#5f4f2d"));
+        WritableImage sandTexture = createSandTexture(1.0);
+        material.setDiffuseMap(sandTexture);
+        material.setSelfIlluminationMap(createSandTexture(OBJECT_SHADOW_FLOOR));
+        material.setSpecularColor(Color.TRANSPARENT);
         return material;
     }
 
-    private WritableImage createSandTexture() {
+    private WritableImage createSandTexture(double brightness) {
         int size = 96;
         WritableImage image = new WritableImage(size, size);
         PixelWriter writer = image.getPixelWriter();
@@ -462,9 +495,9 @@ public class Game3DScene extends SubScene {
                 double ripple = 0.5 + 0.5 * Math.sin((x * 0.22) + (y * 0.08));
                 double shade = clamp((grain * 0.75) + (ripple * 0.25), 0.0, 1.0);
 
-                int red = (int) (180 + shade * 35);
-                int green = (int) (145 + shade * 30);
-                int blue = (int) (70 + shade * 22);
+                int red = (int) ((180 + shade * 35) * brightness);
+                int green = (int) ((145 + shade * 30) * brightness);
+                int blue = (int) ((70 + shade * 22) * brightness);
                 writer.setColor(x, y, Color.rgb(red, green, blue));
             }
         }
@@ -491,7 +524,7 @@ public class Game3DScene extends SubScene {
         resetBallScale(botBall);
         botBall.setTranslateX(x);
         botBall.setTranslateZ(y);
-        botBall.setTranslateY(-h - 0.1);
+        botBall.setTranslateY(-h - 0.25);
     }
 
     public Timeline createDropInAnimation(
@@ -642,16 +675,32 @@ public class Game3DScene extends SubScene {
         return flagBanner;
     }
 
-    private PhongMaterial createUnlitMaterial(Color color) {
+    private PhongMaterial createLitMaterial(Color color) {
         PhongMaterial material = new PhongMaterial(color);
-        material.setSpecularColor(color);
-        material.setSelfIlluminationMap(createSolidColorTexture(color));
+        material.setSelfIlluminationMap(createSolidColorTexture(color, OBJECT_SHADOW_FLOOR));
+        material.setSpecularColor(Color.TRANSPARENT);
         return material;
     }
 
-    private WritableImage createSolidColorTexture(Color color) {
+    private PhongMaterial createUnlitMaterial(Color color) {
+        PhongMaterial material = new PhongMaterial(color);
+        material.setSpecularColor(color);
+        material.setSelfIlluminationMap(createSolidColorTexture(color, 1.0));
+        return material;
+    }
+
+    private WritableImage createSolidColorTexture(Color color, double brightness) {
         WritableImage image = new WritableImage(1, 1);
-        image.getPixelWriter().setColor(0, 0, color);
+        image.getPixelWriter().setColor(
+            0,
+            0,
+            Color.color(
+                color.getRed() * brightness,
+                color.getGreen() * brightness,
+                color.getBlue() * brightness,
+                color.getOpacity()
+            )
+        );
         return image;
     }
 
