@@ -1,69 +1,87 @@
-# Team 17 ~ Crazy Putting
+# Team 17 - Crazy Putting
 
-Course project split across Maven modules: **Phase 1** is an interactive **ODE solver explorer** (JavaFX charts). **Phase 2** is **Crazy Putting**, a **JavaFX** mini-golf simulation with terrain height, friction, numerical integration, and bots. **Phase 3** is reserved for future work.
+This repository contains the code for Project 1-2, **Crazy Putting**.
 
-## Prerequisites
-
-- **JDK 17**
-- **Apache Maven** 3.8+
-- JavaFX is pulled in as Maven dependencies (OpenJFX 21)
-
-Each phase uses the **javafx-maven-plugin** to launch the desktop app.
-
-## Repository layout
+The project is split into two main parts:
 
 | Directory | Contents |
 |-----------|----------|
-| `Phase1/` | Generic ODE models (Euler / Runge–Kutta), time-series and phase-space plots |
-| `Phase2/` | Golf course model, physics (`GolfODE`), shot simulation, GUI, bots |
-| `Phase3/` | Placeholder module (`pom.xml` only for the moment) |
+| `Phase1/` | ODE solver explorer with Euler and Runge-Kutta solvers, built-in ODE systems, and JavaFX plots |
+| `golf/` | Crazy Putting game, including the Phase 2 base game and Phase 3 advanced extensions |
 
+There is no separate `Phase3/` folder. Phase 3 features are integrated into the `golf/` project because they reuse the same course model, physics engine, solvers, GUI, and bots.
 
-## Phase 1 ~ ODE explorer
+## Requirements
 
-Phase 1 builds a JavaFX UI to pick an **ODE system** (factory-driven models under `Systems/`), **solver**, step size, and integration horizon, and to view **time series** and **phase space**.
+- JDK 17
+- Apache Maven 3.8+
+- JavaFX dependencies are loaded through Maven
 
-**Entry class in source:** `Main.GUI_phase1`
+## Running Phase 1
 
-To run Phase 1 via Maven :
-
-- Run `Main.GUI_phase1` from your IDE after importing the Maven project.
-
-If compilation fails on Windows set the compiler encoding to UTF-8 in `pom.xml` or ensure source files are saved as UTF-8.
-
-## Phase 2 ~ main application
-
-From `Phase2/`:
+Phase 1 is the ODE solver and visualisation project.
 
 ```bash
+cd Phase1
 mvn javafx:run
 ```
 
-Default **main class**: `Main.GUI_phase2`
+More details are in:
 
-### What Phase 2 includes
+```text
+Phase1/README.md
+```
 
-- **Terrain**: height as a function of \((x,y)\); friction parameters; start and target (hole).
-- **Numerical integration**: ODE system for the ball on the surface (`Systems.GolfODE`), with solvers under `Solvers/` (e.g. Euler, Runge–Kutta).
-- **GUI** (`GUI/`): course controls, shot controls (`ShotPanel`), dual canvas rendering (`GameCanvas`), terrain coloring (`ColorTerrain`).
-- **Shot engine** (`ShotEngine/`): physics-based shot simulation.
-- **Bots** (`Bots/`): abstract `GolfBot`, rule-based `SimpleBot`, and `MLBot` scaffolding.
-- **Course data** (`GolfCourseData/`): `GolfCourse`, generated-course support, example text format in `Course1.txt`.
+## Running The Golf Game
 
-Example course file keys (`Course1.txt`): `height`, `friction`, `target`, `start` ~ used to describe the surface and game layout.
+The golf project is the playable Crazy Putting game.
 
-## Phase 3
+```bash
+cd golf
+mvn javafx:run
+```
 
-- **In Progress**
+Default entry class:
 
-## Package map (Phase 2)
+```text
+app.Launcher
+```
 
-- `Main/` - application entry (`GUI_phase2`)
-- `GUI/` - layout and interaction with the simulation view
-- `GolfCourseData/` - course definitions and related data
-- `Physics/` - ball and course profile types
-- `Systems/` - `GolfODE` and integration with solvers
-- `Solvers/` - numerical methods
-- `ShotEngine/` - shot simulation pipeline
-- `Bots/` - automated players
-- `Experiment/` - commented / experimental harnesses
+More details are in:
+
+```text
+golf/README.md
+```
+
+## Quick Build Check
+
+Compile Phase 1:
+
+```bash
+cd Phase1
+mvn compile
+```
+
+Compile the golf project:
+
+```bash
+cd golf
+mvn compile
+```
+
+At the time of writing, both projects compile successfully. There are no automated test sources configured.
+
+## Authors
+
+Team 17:
+
+- Stan Wouters
+- Laurenz Warkentin
+- Anastasios Vlachmpeis
+- Angel Antonio Perez Gomez
+- Damian Volovei
+- Lilly Schulze
+
+## License
+
+This project was developed for academic purposes at Maastricht University and is not intended for public distribution.

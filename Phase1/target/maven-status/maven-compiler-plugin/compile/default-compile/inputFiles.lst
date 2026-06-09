@@ -1,18 +1,18 @@
-C:\Users\stanw\Documenten\Visual Studio Code\Project 1-2\team_17\Phase1\src\main\java\Examples\ExampleModelPopulation.java
-C:\Users\stanw\Documenten\Visual Studio Code\Project 1-2\team_17\Phase1\src\main\java\Examples\ExampleLotkaVolterra.java
-C:\Users\stanw\Documenten\Visual Studio Code\Project 1-2\team_17\Phase1\src\main\java\Systems\FitzHughNagumo.java
-C:\Users\stanw\Documenten\Visual Studio Code\Project 1-2\team_17\Phase1\src\main\java\Examples\QuizMain.java
-C:\Users\stanw\Documenten\Visual Studio Code\Project 1-2\team_17\Phase1\src\main\java\Solvers\EulerSolver.java
-C:\Users\stanw\Documenten\Visual Studio Code\Project 1-2\team_17\Phase1\src\main\java\Solvers\RungeKuttaSolver.java
-C:\Users\stanw\Documenten\Visual Studio Code\Project 1-2\team_17\Phase1\src\main\java\Solvers\Solver.java
-C:\Users\stanw\Documenten\Visual Studio Code\Project 1-2\team_17\Phase1\src\main\java\Systems\LotkaVolterra.java
-C:\Users\stanw\Documenten\Visual Studio Code\Project 1-2\team_17\Phase1\src\main\java\Experiment\EulerExperiment.java
-C:\Users\stanw\Documenten\Visual Studio Code\Project 1-2\team_17\Phase1\src\main\java\Main\InputData.java
-C:\Users\stanw\Documenten\Visual Studio Code\Project 1-2\team_17\Phase1\src\main\java\Systems\SIR.java
-C:\Users\stanw\Documenten\Visual Studio Code\Project 1-2\team_17\Phase1\src\main\java\Experiment\RungeKuttaExperiment.java
-C:\Users\stanw\Documenten\Visual Studio Code\Project 1-2\team_17\Phase1\src\main\java\Systems\ODE.java
-C:\Users\stanw\Documenten\Visual Studio Code\Project 1-2\team_17\Phase1\src\main\java\Systems\ODEFactory.java
-C:\Users\stanw\Documenten\Visual Studio Code\Project 1-2\team_17\Phase1\src\main\java\Experiment\ExponentialODE.java
-C:\Users\stanw\Documenten\Visual Studio Code\Project 1-2\team_17\Phase1\src\main\java\Systems\NewSystem.java
-C:\Users\stanw\Documenten\Visual Studio Code\Project 1-2\team_17\Phase1\src\main\java\Main\GUI_phase1.java
-C:\Users\stanw\Documenten\Visual Studio Code\Project 1-2\team_17\Phase1\src\main\java\Main\InputModule.java
+/Users/hlm.schulze/Desktop/Project 1-2/team_17/Phase1/src/main/java/Systems/FitzHughNagumo.java
+/Users/hlm.schulze/Desktop/Project 1-2/team_17/Phase1/src/main/java/Systems/NewSystem.java
+/Users/hlm.schulze/Desktop/Project 1-2/team_17/Phase1/src/main/java/Solvers/Solver.java
+/Users/hlm.schulze/Desktop/Project 1-2/team_17/Phase1/src/main/java/Examples/ExampleLotkaVolterra.java
+/Users/hlm.schulze/Desktop/Project 1-2/team_17/Phase1/src/main/java/Examples/ExampleModelPopulation.java
+/Users/hlm.schulze/Desktop/Project 1-2/team_17/Phase1/src/main/java/Main/GUI_phase1.java
+/Users/hlm.schulze/Desktop/Project 1-2/team_17/Phase1/src/main/java/Systems/LotkaVolterra.java
+/Users/hlm.schulze/Desktop/Project 1-2/team_17/Phase1/src/main/java/Experiment/RungeKuttaExperiment.java
+/Users/hlm.schulze/Desktop/Project 1-2/team_17/Phase1/src/main/java/Experiment/EulerExperiment.java
+/Users/hlm.schulze/Desktop/Project 1-2/team_17/Phase1/src/main/java/Main/InputData.java
+/Users/hlm.schulze/Desktop/Project 1-2/team_17/Phase1/src/main/java/Systems/ODE.java
+/Users/hlm.schulze/Desktop/Project 1-2/team_17/Phase1/src/main/java/Systems/SIR.java
+/Users/hlm.schulze/Desktop/Project 1-2/team_17/Phase1/src/main/java/Solvers/EulerSolver.java
+/Users/hlm.schulze/Desktop/Project 1-2/team_17/Phase1/src/main/java/Examples/QuizMain.java
+/Users/hlm.schulze/Desktop/Project 1-2/team_17/Phase1/src/main/java/Main/InputModule.java
+/Users/hlm.schulze/Desktop/Project 1-2/team_17/Phase1/src/main/java/Solvers/RungeKuttaSolver.java
+/Users/hlm.schulze/Desktop/Project 1-2/team_17/Phase1/src/main/java/Experiment/ExponentialODE.java
+/Users/hlm.schulze/Desktop/Project 1-2/team_17/Phase1/src/main/java/Systems/ODEFactory.java
