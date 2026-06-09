@@ -247,7 +247,7 @@ public class Settings {
 
     private ComboBox<String> createStyledBotSelection() {
         ObservableList<String> bot = FXCollections.observableArrayList(
-            "Simple Bot", "ML Bot", "Hill Bot", "ManHattan Bot", "Newton Bot", "Search Bot"
+            "Simple Bot", "ML Bot", "Hill Bot", "ManHattan Bot", "Newton Bot"
         );
         ComboBox<String> comboBox = new ComboBox<>(bot);
 

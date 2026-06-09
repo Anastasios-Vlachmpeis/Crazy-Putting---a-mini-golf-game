@@ -1,22 +1,16 @@
 package GolfCourseData;
 
-import java.nio.file.*;
+/*
+ * Main course class
+ * Stores course settings and uses helper classes for saving, terrain, obstacles, and borders
+ */
+
 import java.util.*;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import GolfCourseData.Obstacles.ObstacleObjects;
 import GolfCourseData.Obstacles.Sand;
 import GolfCourseData.Obstacles.Tree;
 import GolfCourseData.Obstacles.Wall;
-import GolfCourseData.RandomTerrainGeneration.PerlinNoise;
-
-import java.io.Reader;
-import java.io.Writer;
 
 
 public class GolfCourse {
@@ -51,123 +45,81 @@ public class GolfCourse {
     }
 
     private TerrainManipulation TerrainManipulator = new TerrainManipulation();
+
     //Used only in phase 2 in the old GUI
     public void loadFromFile(String filePath)throws Exception{
-        Map<String, String> data = new HashMap<>();
-        Files.lines(Path.of(filePath)).forEach(line -> {
-            String[] parts = line.split("=");
-            if (parts.length == 2) data.put(parts[0].trim(), parts[1].trim());
-        });
-
-        friction = data.get("friction").split(",");
-        target = data.get("target").split(",");
-        start = data.get("start").split(",");
-
-        terrainFormula = data.get("height");
-
+        LegacyCourseInput input = LegacyCourseInput.fromFile(filePath);
+        applyLegacyInput(input);
         System.out.println("New settings loaded");
-        convertToDouble();
     }
+
     //Used only in phase 2 in the old GUI
     public void loadFromGUI(String heightFormula, String[][] inputValuesGUI) throws Exception{
-        friction = inputValuesGUI[0];
-        target = inputValuesGUI[1];
-        start = inputValuesGUI[2];
-        terrainFormula = heightFormula;
-
-        convertToDouble();
+        applyLegacyInput(LegacyCourseInput.fromGui(heightFormula, inputValuesGUI));
     }
+
     //Better way to save data used in phase 3
     public void saveToJson(String filePath) throws Exception {
-        // Create a Gson instance configured to auto-indent your output files beautifully
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    
-        // Open a system stream writer and serialize this entire class layout configuration at once
-        try (Writer writer = Files.newBufferedWriter(Path.of(filePath))) {
-            gson.toJson(this, writer);
-        }
+        GolfCourseJsonPersistence.save(this, filePath);
         System.out.println("Course properties successfully serialized to JSON.");
     }
     
 
     //Better way to save data used in phase 3
     public void loadFromJson(String filePath) throws Exception {
-        Gson gson = new Gson();
-        String json = Files.readString(Path.of(filePath));
-    
-        try (Reader reader = new java.io.StringReader(json)) {
-            // Parse raw JSON text directly back into a temporary data object map
-            GolfCourse loadedData = gson.fromJson(reader, GolfCourse.class);
-        
-            // Safely extract properties back into this active, running UI memory instance
-            this.terrainFormula = loadedData.terrainFormula; 
-            this.size = loadedData.size;                     
-            this.targetValues = loadedData.targetValues;
-            normalizeTargetRadius();
-            this.frictionValues = loadedData.frictionValues; 
-            this.currentBallPosition = loadedData.currentBallPosition;
-            this.sandPits = loadedData.sandPits != null ? loadedData.sandPits : new ArrayList<>();
-            this.trees = loadedData.trees != null ? loadedData.trees : new ArrayList<>();
-            this.walls = loadedData.walls != null ? loadedData.walls : new ArrayList<>();
-            loadLegacyObstacles(json);
-
-            if (loadedData.initialBallPosition != null) {
-                this.initialBallPosition = loadedData.initialBallPosition;
-            } else {
-                this.initialBallPosition = Arrays.copyOf(
-                    loadedData.currentBallPosition,
-                    loadedData.currentBallPosition.length
-                );
-            }       
-        
-            // Wipe and rebuild the active hill list seamlessly
-            this.clearAllHills(); 
-            if (loadedData.TerrainManipulator != null && loadedData.TerrainManipulator.getHills() != null) { 
-                for (Hill h : loadedData.TerrainManipulator.getHills()) { 
-                    this.addHill(h.centerX, h.centerY, h.peakHeight, h.width); 
-                }
-            }
-            removeObstaclesInWater();
-        }
+        GolfCourseJsonPersistence.LoadedCourse loadedCourse = GolfCourseJsonPersistence.load(filePath);
+        applyLoadedCourse(loadedCourse);
         System.out.println("Course properties successfully deserialized from JSON.");
     }
 
-    private void loadLegacyObstacles(String json) {
-        JsonObject root = JsonParser.parseString(json).getAsJsonObject();
-        JsonArray legacyObstacles = root.getAsJsonArray("obstacles");
-        if (legacyObstacles == null) {
-            return;
+    private void applyLoadedCourse(GolfCourseJsonPersistence.LoadedCourse loadedCourse) {
+        GolfCourse loadedData = loadedCourse.course();
+
+        this.terrainFormula = loadedData.terrainFormula;
+        this.size = loadedData.size;
+        this.targetValues = loadedData.targetValues;
+        normalizeTargetRadius();
+        this.frictionValues = loadedData.frictionValues;
+        this.currentBallPosition = loadedData.currentBallPosition;
+        this.sandPits = loadedData.sandPits != null ? loadedData.sandPits : new ArrayList<>();
+        this.trees = loadedData.trees != null ? loadedData.trees : new ArrayList<>();
+        this.walls = loadedData.walls != null ? loadedData.walls : new ArrayList<>();
+
+        if (loadedCourse.legacyObstacles().hasObstacles()) {
+            this.sandPits = loadedCourse.legacyObstacles().sandPits();
+            this.trees = loadedCourse.legacyObstacles().trees();
+            this.walls = loadedCourse.legacyObstacles().walls();
         }
 
-        sandPits.clear();
-        trees.clear();
-        walls.clear();
+        if (loadedData.initialBallPosition != null) {
+            this.initialBallPosition = loadedData.initialBallPosition;
+        } else {
+            this.initialBallPosition = Arrays.copyOf(
+                loadedData.currentBallPosition,
+                loadedData.currentBallPosition.length
+            );
+        }
 
-        for (JsonElement element : legacyObstacles) {
-            JsonObject obstacle = element.getAsJsonObject();
-            String type = obstacle.get("type").getAsString();
-            double x1 = obstacle.get("x1").getAsDouble();
-            double y1 = obstacle.get("y1").getAsDouble();
-
-            switch (type) {
-                case "SAND" -> sandPits.add(new Sand(x1, y1, obstacle.get("radius").getAsDouble()));
-                case "TREE" -> trees.add(new Tree(x1, y1, obstacle.get("radius").getAsDouble()));
-                case "WALL" -> walls.add(new Wall(
-                    x1,
-                    y1,
-                    obstacle.get("x2").getAsDouble(),
-                    obstacle.get("y2").getAsDouble(),
-                    obstacle.get("thickness").getAsDouble(),
-                    1.0
-                ));
-                default -> {
-                }
+        this.clearAllHills();
+        if (loadedData.TerrainManipulator != null && loadedData.TerrainManipulator.getHills() != null) {
+            for (Hill h : loadedData.TerrainManipulator.getHills()) {
+                this.addHill(h.centerX, h.centerY, h.peakHeight, h.width);
             }
         }
+        removeObstaclesInWater();
     }
 
     public void clearAllHills() {
         this.TerrainManipulator.clearHills(); 
+    }
+
+    private void applyLegacyInput(LegacyCourseInput input) {
+        friction = input.friction();
+        target = input.target();
+        start = input.start();
+        terrainFormula = input.terrainFormula();
+
+        convertToDouble();
     }
 
     public void convertToDouble(){
@@ -186,16 +138,24 @@ public class GolfCourse {
         initialBallPosition = Arrays.copyOf(currentBallPosition, currentBallPosition.length);
     }
     
-    public void fetchSize(){//For phase 2 GUI
-        size = SimpleGUI.GameCanvas.sendCanvasSize();
+    public void fetchSize(double[] courseBounds){//For phase 2 GUI
+        setSize(courseBounds);
     }
 
     public void setSize(double minX, double maxX, double minY, double maxY){////For phase 3 GUI
-        size = new double[]{minX, maxX, minY, maxY};
+        size = CourseBounds.of(minX, maxX, minY, maxY).toArray();
+    }
+
+    public void setSize(double[] courseBounds) {
+        size = CourseBounds.fromArray(courseBounds).toArray();
     }
 
     public double[] getSize() {
         return this.size;
+    }
+
+    public CourseBounds getBounds() {
+        return CourseBounds.fromArray(size);
     }
 
     public void setTerrainFormula(String formula){
@@ -210,126 +170,43 @@ public class GolfCourse {
     }
 
     public boolean addSandPit(double centerX, double centerY, double radius) {
-        if (!canPlaceSandPit(centerX, centerY, radius)) {
-            return false;
-        }
-        this.sandPits.add(new Sand(centerX, centerY, radius));
-        return true;
+        return obstacles().addSandPit(centerX, centerY, radius);
     }
 
     public boolean addTree(double centerX, double centerY, double radius) {
-        if (!canPlaceTree(centerX, centerY, radius)) {
-            return false;
-        }
-        this.trees.add(new Tree(centerX, centerY, radius));
-        return true;
+        return obstacles().addTree(centerX, centerY, radius);
     }
 
     public boolean addWall(double startX, double startY, double endX, double endY, double thickness, double height) {
-        if (!canPlaceWall(startX, startY, endX, endY, thickness)) {
-            return false;
-        }
-        this.walls.add(new Wall(startX, startY, endX, endY, thickness, height));
-        return true;
+        return obstacles().addWall(startX, startY, endX, endY, thickness, height);
     }
 
     public boolean canPlaceSandPit(double centerX, double centerY, double radius) {
-        return isAreaDry(centerX, centerY, radius);
+        return obstacles().canPlaceSandPit(centerX, centerY, radius);
     }
 
     public boolean canPlaceTree(double centerX, double centerY, double radius) {
-        Tree tree = new Tree(centerX, centerY, radius);
-        return isCircleWithinBounds(centerX, centerY, tree.getTrunkRadius())
-            && isAreaDry(centerX, centerY, tree.getCollisionRadius())
-            && isTreeTrunkClearOfWalls(tree);
+        return obstacles().canPlaceTree(centerX, centerY, radius);
     }
 
     public boolean canPlaceWall(double startX, double startY, double endX, double endY, double thickness) {
-        Wall wall = new Wall(startX, startY, endX, endY, thickness, 1.0);
-        if (!isWallClearOfTreeTrunks(wall)) {
-            return false;
-        }
-
-        int samples = Math.max(2, (int) Math.ceil(wall.getLength() / Math.max(0.25, thickness)));
-        for (int i = 0; i <= samples; i++) {
-            double t = i / (double) samples;
-            double x = startX + (endX - startX) * t;
-            double y = startY + (endY - startY) * t;
-            if (!isAreaDry(x, y, thickness / 2.0)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean isTreeTrunkClearOfWalls(Tree tree) {
-        for (Wall wall : walls) {
-            double minClearance = tree.getTrunkRadius() + wall.getThickness() / 2.0;
-            if (wall.distanceToSegment(tree.getCenterX(), tree.getCenterY()) <= minClearance) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean isWallClearOfTreeTrunks(Wall wall) {
-        for (Tree tree : trees) {
-            double minClearance = tree.getTrunkRadius() + wall.getThickness() / 2.0;
-            if (wall.distanceToSegment(tree.getCenterX(), tree.getCenterY()) <= minClearance) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean isCircleWithinBounds(double centerX, double centerY, double radius) {
-        return centerX - radius >= size[0]
-            && centerX + radius <= size[1]
-            && centerY - radius >= size[2]
-            && centerY + radius <= size[3];
+        return obstacles().canPlaceWall(startX, startY, endX, endY, thickness);
     }
 
     public void removeObstaclesInWater() {
-        sandPits.removeIf(sand -> !canPlaceSandPit(sand.getCenterX(), sand.getCenterY(), sand.getRadius()));
-        trees.removeIf(tree -> !canPlaceTree(tree.getCenterX(), tree.getCenterY(), tree.getRadius()));
-        walls.removeIf(wall -> !canPlaceWall(
-            wall.getStartX(), wall.getStartY(), wall.getEndX(), wall.getEndY(), wall.getThickness()));
-    }
-
-    private boolean isAreaDry(double centerX, double centerY, double radius) {
-        if (isWater(centerX, centerY)) {
-            return false;
-        }
-
-        int samples = 16;
-        for (int i = 0; i < samples; i++) {
-            double angle = (2.0 * Math.PI * i) / samples;
-            double cos = Math.cos(angle);
-            double sin = Math.sin(angle);
-
-            if (isWater(centerX + cos * radius, centerY + sin * radius)) {
-                return false;
-            }
-
-            double innerRadius = radius * 0.5;
-            if (isWater(centerX + cos * innerRadius, centerY + sin * innerRadius)) {
-                return false;
-            }
-        }
-
-        return true;
+        obstacles().removeObstaclesInWater();
     }
 
     public void clearSandPits() {
-        this.sandPits.clear();
+        obstacles().clearSandPits();
     }
 
     public void clearTrees() {
-        this.trees.clear();
+        obstacles().clearTrees();
     }
 
     public void clearWalls() {
-        this.walls.clear();
+        obstacles().clearWalls();
     }
 
     public void clearObstacles() {
@@ -339,68 +216,39 @@ public class GolfCourse {
     }
 
     public List<Sand> getSandPits() {
-        return Collections.unmodifiableList(sandPits);
+        return obstacles().getSandPits();
     }
 
     public List<Tree> getTrees() {
-        return Collections.unmodifiableList(trees);
+        return obstacles().getTrees();
     }
 
     public List<Wall> getWalls() {
-        return Collections.unmodifiableList(walls);
+        return obstacles().getWalls();
     }
 
     public List<ObstacleObjects> getObstacles() {
-        List<ObstacleObjects> all = new ArrayList<>();
-        all.addAll(sandPits);
-        all.addAll(trees);
-        all.addAll(walls);
-        return Collections.unmodifiableList(all);
+        return obstacles().getObstacles();
     }
 
     public boolean isSand(double x, double y) {
-        for (Sand sand : sandPits) {
-            if (sand.contains(x, y)) {
-                return true;
-            }
-        }
-        return false;
+        return obstacles().isSand(x, y);
     }
 
     public boolean isTree(double x, double y) {
-        for (Tree tree : trees) {
-            if (tree.contains(x, y)) {
-                return true;
-            }
-        }
-        return false;
+        return obstacles().isTree(x, y);
     }
 
     public boolean isWall(double x, double y) {
-        for (Wall wall : walls) {
-            if (wall.contains(x, y)) {
-                return true;
-            }
-        }
-        return false;
+        return obstacles().isWall(x, y);
     }
 
     public Tree getTreeAt(double x, double y) {
-        for (Tree tree : trees) {
-            if (tree.contains(x, y)) {
-                return tree;
-            }
-        }
-        return null;
+        return obstacles().getTreeAt(x, y);
     }
 
     public Wall getWallAt(double x, double y) {
-        for (Wall wall : walls) {
-            if (wall.contains(x, y)) {
-                return wall;
-            }
-        }
-        return null;
+        return obstacles().getWallAt(x, y);
     }
 
     public GolfCourse(double miuK, double miuS) {
@@ -458,41 +306,19 @@ public class GolfCourse {
 
 
     public double height(double x, double y){
-        /* 
-        //return calculateHeight(terrainFormula, x, y);
-        return TerrainManipulator.calculateHeight(terrainFormula, x, y, targetValues);
-        */
-        double calculatedHeight;
-        if (usePerlinNoise) {
-            // The noise function returns a value between -1 and 1. We multiply by 3 to make hills taller.
-            calculatedHeight = PerlinNoise.noise((x + noiseOffset) * widthScale, (y + noiseOffset) * widthScale) * heightScale + globalElevation + 0.25; 
-        } else {
-            // Keep your standard Exp4j formula parser here for the builder!
-            calculatedHeight = TerrainManipulator.calculateHeight(terrainFormula, x, y, targetValues);
-        }
-        return calculatedHeight;
+        return terrain().height(x, y);
     }
     
     public double[] getDerivative(double x, double y){
-       return new double[] {dhdx(x,y), dhdy(x, y)};
+       return terrain().getDerivative(x, y);
     }
 
     public double dhdx(double x, double y){
-        //fetchSize();
-        if(x < size[0]) return -1 * borderSteepness;
-        if(x > size[1]) return borderSteepness;
-        
-        double slopeX = (TerrainManipulator.calculateHeight(terrainFormula, x + epsilon, y, targetValues) - TerrainManipulator.calculateHeight(terrainFormula, x, y, targetValues))/epsilon;
-        return slopeX;
+        return terrain().dhdx(x, y);
     }
 
     public double dhdy(double x, double y){
-        //fetchSize();
-        if(y < size[2]) return -1 * borderSteepness;
-        if(y > size[3]) return borderSteepness;
-
-        double slopeY = (TerrainManipulator.calculateHeight(terrainFormula, x, y + epsilon, targetValues) - TerrainManipulator.calculateHeight(terrainFormula, x, y, targetValues))/epsilon;
-        return slopeY;
+        return terrain().dhdy(x, y);
     }
 
     public boolean isWater(double x, double y) {
@@ -572,5 +398,25 @@ public class GolfCourse {
     
     public double getGlobalElevation() {
         return this.globalElevation;
+    }
+
+    private TerrainHeightProvider terrain() {
+        return new TerrainHeightProvider(
+            TerrainManipulator,
+            terrainFormula,
+            targetValues,
+            getBounds(),
+            borderSteepness,
+            epsilon,
+            usePerlinNoise,
+            widthScale,
+            heightScale,
+            noiseOffset,
+            globalElevation
+        );
+    }
+
+    private ObstacleManager obstacles() {
+        return new ObstacleManager(this, sandPits, trees, walls);
     }
 }
