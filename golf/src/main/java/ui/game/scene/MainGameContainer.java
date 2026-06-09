@@ -1,5 +1,7 @@
 package ui.game.scene;
 
+import java.util.function.Supplier;
+
 import bots.GolfBot;
 import bots.ManhattanBot;
 import engine.GameManager;
@@ -28,6 +30,7 @@ public class MainGameContainer extends StackPane {
     private boolean isMultiplayer = false;
     private boolean isPlayerTurn = true;
     private GolfBot activeBot = null;
+    private Supplier<GolfBot> botSupplier;
 
     public MainGameContainer(GameManager gameManager) {
         this.gameManager = gameManager;
@@ -355,9 +358,17 @@ public class MainGameContainer extends StackPane {
     }
 
     private void playBotStroke() {
-        ManhattanBot bot = new ManhattanBot(gameManager.getCourse(), gameManager.getSolver());
+        gameManager.getCourse().setBallPosition(gameManager.getPlayerX(), gameManager.getPlayerY());
+    
+        GolfBot bot = (botSupplier != null)? botSupplier.get()
+        : new ManhattanBot(gameManager.getCourse(), gameManager.getSolver());
+    
         double[] v = bot.shoot();
         hudOverlay.setVelocity(v[0], v[1]);
         executeShotAnimation(v[0], v[1]);
+    }
+
+    public void setBotSupplier(Supplier<GolfBot> botSupplier) {
+        this.botSupplier = botSupplier;
     }
 }
